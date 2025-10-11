@@ -31,13 +31,13 @@ temp/
 .tmp/
 
 # 本地配置覆盖和生产环境配置（包含敏感信息）
+config.yaml
 config.prod.yaml
 config.local.yaml
 config.dev.yaml
 config.test.yaml
 config.*.yaml
 !config.example.yaml
-!config.yaml
 
 # 部署配置
 deploy.conf
@@ -298,10 +298,7 @@ Thumbs.db
 /logs
 *.log
 
-# Configuration files (keep example files)
-/config.yaml
-/config.yml
-/config.json
+# Configuration files (already handled above, keep example files only)
 
 # Database files
 *.db
