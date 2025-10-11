@@ -10,6 +10,15 @@
           </div>
         </div>
         <div class="flex items-center gap-3">
+          <!-- 工具箱入口 -->
+          <button
+            @click="router.push('/tools')"
+            class="w-9 h-9 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white hover:shadow-lg transition-all"
+            title="工具箱"
+          >
+            <Wrench class="h-5 w-5" />
+          </button>
+
           <!-- 管理员入口 (仅管理员可见) -->
           <button
             v-if="isAdmin"
@@ -101,7 +110,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { User, Home, LogOut } from 'lucide-vue-next'
+import { User, Home, LogOut, Wrench } from 'lucide-vue-next'
 import SecureStorage, { STORAGE_KEYS } from '@/utils/storage'
 import { message } from '@/utils/message'
 

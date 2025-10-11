@@ -111,6 +111,11 @@ export function useTaskForm() {
     }
   }
 
+  const selectTool = (toolCode: string) => {
+    taskForm.value.tool_code = toolCode
+    handleToolChange()
+  }
+
   return {
     taskForm,
     toolConfig,
@@ -122,5 +127,6 @@ export function useTaskForm() {
     handleToolChange,
     loadTaskForEdit,
     loadTaskForClone,
+    selectTool,
   }
 }

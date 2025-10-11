@@ -73,6 +73,7 @@
 
 <script setup lang="ts">
 import { ref, watch, onMounted } from 'vue'
+import { useRoute } from 'vue-router'
 import Dialog from '@/components/Dialog.vue'
 import ToolConfigDrawer from './components/ToolConfigDrawer.vue'
 import TestResultDialog from './components/TestResultDialog.vue'
@@ -86,6 +87,8 @@ import { useTaskList } from '@/composables/useTaskList'
 import { getDefaultScheduleValue } from '@/utils/taskHelpers'
 import type { Task } from '@/api/task'
 
+const route = useRoute()
+
 // Use composables
 const {
   taskForm,
@@ -98,6 +101,7 @@ const {
   handleToolChange,
   loadTaskForEdit,
   loadTaskForClone,
+  selectTool,
 } = useTaskForm()
 
 const {
@@ -381,8 +385,13 @@ watch(
 )
 
 // Initialize
-onMounted(() => {
-  loadTools()
-  loadTasks()
+onMounted(async () => {
+  await loadTools()
+  await loadTasks()
+
+  // Handle tool selection from query parameter
+  if (route.query.tool) {
+    selectTool(route.query.tool as string)
+  }
 })
 </script>

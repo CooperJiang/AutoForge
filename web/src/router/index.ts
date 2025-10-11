@@ -52,6 +52,14 @@ const router = createRouter({
             title: '个人中心',
           },
         },
+        {
+          path: '/tools',
+          name: 'tools',
+          component: () => import('@/pages/Tools/index.vue'),
+          meta: {
+            title: '工具箱',
+          },
+        },
       ],
     },
     // 管理员路由

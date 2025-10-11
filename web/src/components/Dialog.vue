@@ -6,7 +6,7 @@
         <div class="absolute inset-0 bg-black bg-opacity-50 transition-opacity"></div>
 
         <!-- 对话框内容 -->
-        <div class="relative bg-white rounded-lg shadow-xl border-2 border-slate-200 w-full max-w-2xl max-h-[90vh] flex flex-col transform transition-all">
+        <div :class="['relative bg-white rounded-lg shadow-xl border-2 border-slate-200 w-full max-h-[90vh] flex flex-col transform transition-all', maxWidth]">
           <!-- 标题 -->
           <div class="px-5 py-4 border-b-2 border-slate-100 flex items-center justify-between flex-shrink-0">
             <h3 class="text-base font-semibold text-slate-900">{{ title }}</h3>
@@ -23,13 +23,15 @@
           </div>
 
           <!-- 按钮 -->
-          <div class="px-5 py-4 border-t-2 border-slate-100 flex gap-2 justify-end flex-shrink-0">
-            <BaseButton v-if="cancelText" variant="secondary" @click="onCancel">
-              {{ cancelText }}
-            </BaseButton>
-            <BaseButton :variant="confirmVariant" @click="onConfirm">
-              {{ confirmText }}
-            </BaseButton>
+          <div v-if="!hideFooter" class="px-5 py-4 border-t-2 border-slate-100 flex gap-2 justify-end flex-shrink-0">
+            <slot name="footer">
+              <BaseButton v-if="cancelText" variant="secondary" @click="onCancel">
+                {{ cancelText }}
+              </BaseButton>
+              <BaseButton :variant="confirmVariant" @click="onConfirm">
+                {{ confirmText }}
+              </BaseButton>
+            </slot>
           </div>
         </div>
       </div>
@@ -48,6 +50,8 @@ interface Props {
   confirmText?: string
   cancelText?: string
   confirmVariant?: 'primary' | 'secondary' | 'danger' | 'success' | 'ghost'
+  maxWidth?: string
+  hideFooter?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -55,7 +59,9 @@ const props = withDefaults(defineProps<Props>(), {
   message: '确定要执行此操作吗？',
   confirmText: '确定',
   cancelText: '取消',
-  confirmVariant: 'primary'
+  confirmVariant: 'primary',
+  maxWidth: 'max-w-2xl',
+  hideFooter: false
 })
 
 const emit = defineEmits<{
@@ -78,7 +84,7 @@ const onCancel = () => {
 <style scoped>
 .dialog-enter-active,
 .dialog-leave-active {
-  transition: opacity 0.2s ease;
+  transition: opacity 0.3s ease;
 }
 
 .dialog-enter-from,
@@ -86,14 +92,13 @@ const onCancel = () => {
   opacity: 0;
 }
 
-.dialog-enter-active .relative,
-.dialog-leave-active .relative {
-  transition: transform 0.2s ease, opacity 0.2s ease;
+.dialog-enter-active > div:not(.absolute),
+.dialog-leave-active > div:not(.absolute) {
+  transition: transform 0.3s ease;
 }
 
-.dialog-enter-from .relative,
-.dialog-leave-to .relative {
-  transform: scale(0.95);
-  opacity: 0;
+.dialog-enter-from > div:not(.absolute),
+.dialog-leave-to > div:not(.absolute) {
+  transform: scale(0.9);
 }
 </style>
