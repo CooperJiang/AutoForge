@@ -41,7 +41,7 @@
 
 <script setup lang="ts">
 import { X } from 'lucide-vue-next'
-import BaseButton from './BaseButton.vue'
+import BaseButton from '../BaseButton/index.vue'
 
 interface Props {
   modelValue: boolean

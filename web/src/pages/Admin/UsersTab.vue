@@ -142,9 +142,9 @@ import * as adminApi from '@/api/admin'
 import type { User } from '@/api/admin'
 import { message } from '@/utils/message'
 import { formatTime } from '@/utils/format'
-import BaseInput from '@/components/BaseInput.vue'
-import BaseSelect from '@/components/BaseSelect.vue'
-import BaseButton from '@/components/BaseButton.vue'
+import BaseInput from '@/components/BaseInput'
+import BaseSelect from '@/components/BaseSelect'
+import BaseButton from '@/components/BaseButton'
 
 // 用户列表
 const users = ref<User[]>([])

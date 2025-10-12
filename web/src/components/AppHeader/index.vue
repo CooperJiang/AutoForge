@@ -19,6 +19,17 @@
             <Wrench class="h-5 w-5" />
           </button>
 
+          <!-- 工作流入口 -->
+          <button
+            @click="router.push('/workflows')"
+            class="w-9 h-9 rounded-full bg-gradient-to-br from-purple-500 to-pink-600 flex items-center justify-center text-white hover:shadow-lg transition-all"
+            title="工作流"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+            </svg>
+          </button>
+
           <!-- 管理员入口 (仅管理员可见) -->
           <button
             v-if="isAdmin"

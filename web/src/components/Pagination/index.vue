@@ -44,7 +44,7 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
-import BaseButton from './BaseButton.vue'
+import BaseButton from '../BaseButton/index.vue'
 
 interface Props {
   currentPage: number

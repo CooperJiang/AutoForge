@@ -119,11 +119,11 @@ import {
   disableTask,
   triggerTask,
 } from '@/api/task'
-import BaseButton from '@/components/BaseButton.vue'
-import Table from '@/components/Table.vue'
-import Pagination from '@/components/Pagination.vue'
-import TaskDetailDialog from '@/components/TaskDetailDialog.vue'
-import Dialog from '@/components/Dialog.vue'
+import BaseButton from '@/components/BaseButton'
+import Table from '@/components/Table'
+import Pagination from '@/components/Pagination'
+import TaskDetailDialog from '@/components/TaskDetailDialog'
+import Dialog from '@/components/Dialog'
 
 const router = useRouter()
 

@@ -1,18 +1,18 @@
 <template>
   <div class="space-y-2">
-    <label class="block text-sm font-medium text-slate-700">选择星期</label>
+    <label class="block text-sm font-medium text-slate-700">选择日期</label>
     <div class="grid grid-cols-7 gap-1">
       <button
-        v-for="day in weekDays"
-        :key="day.value"
+        v-for="day in 31"
+        :key="day"
         type="button"
-        @click="toggleDay(day.value)"
+        @click="selectDay(day)"
         class="px-2 py-1.5 text-xs font-medium rounded border-2 transition-colors"
-        :class="selectedDays.includes(day.value)
+        :class="selectedDay === day
           ? 'bg-blue-500 text-white border-blue-500'
           : 'bg-white text-slate-700 border-slate-200 hover:border-blue-300'"
       >
-        {{ day.label }}
+        {{ day }}
       </button>
     </div>
     <TimePicker v-model="time" hint="执行时间" />
@@ -22,7 +22,7 @@
 
 <script setup lang="ts">
 import { ref, watch } from 'vue'
-import TimePicker from './TimePicker.vue'
+import TimePicker from '../TimePicker/index.vue'
 
 interface Props {
   modelValue: string
@@ -34,35 +34,25 @@ const emit = defineEmits<{
   'update:modelValue': [value: string]
 }>()
 
-const weekDays = [
-  { label: '周日', value: 0 },
-  { label: '周一', value: 1 },
-  { label: '周二', value: 2 },
-  { label: '周三', value: 3 },
-  { label: '周四', value: 4 },
-  { label: '周五', value: 5 },
-  { label: '周六', value: 6 }
-]
-
-const selectedDays = ref<number[]>([])
+const selectedDay = ref(1)
 const time = ref('09:00:00')
 
-// 解析 modelValue: "1,3,5:09:00:00" -> days=[1,3,5], time="09:00:00"
+// 解析 modelValue: "15:09:00:00" -> day=15, time="09:00:00"
 const parseValue = (value: string) => {
   if (!value) {
-    selectedDays.value = [1]
+    selectedDay.value = 1
     time.value = '09:00:00'
     return
   }
 
   const parts = value.split(':')
   if (parts.length >= 4) {
-    // days:HH:MM:SS
-    const days = parts[0].split(',').map(d => parseInt(d)).filter(d => !isNaN(d))
-    selectedDays.value = days.length > 0 ? days : [1]
+    // day:HH:MM:SS
+    const day = parseInt(parts[0])
+    selectedDay.value = !isNaN(day) && day >= 1 && day <= 31 ? day : 1
     time.value = `${parts[1]}:${parts[2]}:${parts[3]}`
   } else {
-    selectedDays.value = [1]
+    selectedDay.value = 1
     time.value = '09:00:00'
   }
 }
@@ -70,21 +60,13 @@ const parseValue = (value: string) => {
 // 初始化
 parseValue(props.modelValue)
 
-const toggleDay = (day: number) => {
-  const index = selectedDays.value.indexOf(day)
-  if (index > -1) {
-    if (selectedDays.value.length > 1) {
-      selectedDays.value.splice(index, 1)
-    }
-  } else {
-    selectedDays.value.push(day)
-    selectedDays.value.sort((a, b) => a - b)
-  }
+const selectDay = (day: number) => {
+  selectedDay.value = day
   emitValue()
 }
 
 const emitValue = () => {
-  const value = `${selectedDays.value.join(',')}:${time.value}`
+  const value = `${selectedDay.value}:${time.value}`
   emit('update:modelValue', value)
 }
 

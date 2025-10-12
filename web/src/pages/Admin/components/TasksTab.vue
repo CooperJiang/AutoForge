@@ -165,10 +165,10 @@
 import { ref } from 'vue'
 import { Play, Pause, Zap, Trash2, Eye, Copy } from 'lucide-vue-next'
 import type { Task } from '@/api/task'
-import BaseSelect from '@/components/BaseSelect.vue'
-import BaseInput from '@/components/BaseInput.vue'
-import BaseButton from '@/components/BaseButton.vue'
-import NextRunCountdown from '@/components/NextRunCountdown.vue'
+import BaseSelect from '@/components/BaseSelect'
+import BaseInput from '@/components/BaseInput'
+import BaseButton from '@/components/BaseButton'
+import NextRunCountdown from '@/components/NextRunCountdown'
 import { maskUserId, truncateId } from '@/utils/format'
 
 defineProps<{

@@ -142,10 +142,10 @@ import { Eye } from 'lucide-vue-next'
 import * as adminApi from '@/api/admin'
 import { message } from '@/utils/message'
 import { maskUserId, formatTime, truncateId } from '@/utils/format'
-import BaseInput from '@/components/BaseInput.vue'
-import BaseSelect from '@/components/BaseSelect.vue'
-import BaseButton from '@/components/BaseButton.vue'
-import ExecutionDetailDialog from '@/components/ExecutionDetailDialog.vue'
+import BaseInput from '@/components/BaseInput'
+import BaseSelect from '@/components/BaseSelect'
+import BaseButton from '@/components/BaseButton'
+import ExecutionDetailDialog from '@/components/ExecutionDetailDialog'
 
 // 执行记录列表
 const executions = ref<any[]>([])

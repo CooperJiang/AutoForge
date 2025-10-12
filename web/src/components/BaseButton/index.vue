@@ -5,7 +5,7 @@
     :class="buttonClasses"
     :disabled="disabled || loading"
   >
-    <Loader2 v-if="loading" :size="iconSize" class="mr-1.5 inline-block animate-spin" />
+    <Loader2 v-if="loading" :size="iconSize" class="mr-1.5 flex-shrink-0 animate-spin" />
     <slot />
   </button>
 </template>
@@ -60,6 +60,6 @@ const buttonClasses = computed(() => {
     ghost: 'bg-transparent text-slate-600 hover:bg-slate-50 focus:ring-slate-100 border border-slate-200'
   }
 
-  return `${base} ${disabled} ${sizes[props.size]} ${variants[props.variant]} font-medium transition-all duration-200 focus:outline-none focus:ring-2`
+  return `${base} ${disabled} ${sizes[props.size]} ${variants[props.variant]} font-medium transition-all duration-200 focus:outline-none focus:ring-2 whitespace-nowrap inline-flex items-center justify-center shrink-0`
 })
 </script>

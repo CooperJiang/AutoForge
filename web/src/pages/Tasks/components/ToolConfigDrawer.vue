@@ -371,10 +371,10 @@
 
 <script setup lang="ts">
 import { ref, watch, onMounted, onUnmounted } from 'vue'
-import Drawer from '@/components/Drawer.vue'
-import BaseInput from '@/components/BaseInput.vue'
-import BaseSelect from '@/components/BaseSelect.vue'
-import ParamInput from '@/components/ParamInput.vue'
+import Drawer from '@/components/Drawer'
+import BaseInput from '@/components/BaseInput'
+import BaseSelect from '@/components/BaseSelect'
+import ParamInput from '@/components/ParamInput'
 import { message } from '@/utils/message'
 import { parseCurl } from '@/utils/curlParser'
 

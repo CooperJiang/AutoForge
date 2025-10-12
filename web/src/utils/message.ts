@@ -1,5 +1,5 @@
 import { createApp, h } from 'vue'
-import MessageComponent from '@/components/Message.vue'
+import MessageComponent from '@/components/Message'
 
 let messageInstance: any = null
 

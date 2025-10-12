@@ -115,10 +115,10 @@
 
 <script setup lang="ts">
 import { ref, watch, onMounted, onUnmounted } from 'vue'
-import Dialog from '@/components/Dialog.vue'
-import BaseInput from '@/components/BaseInput.vue'
-import BaseSelect from '@/components/BaseSelect.vue'
-import ParamInput from '@/components/ParamInput.vue'
+import Dialog from '@/components/Dialog'
+import BaseInput from '@/components/BaseInput'
+import BaseSelect from '@/components/BaseSelect'
+import ParamInput from '@/components/ParamInput'
 import { message } from '@/utils/message'
 import { parseCurl } from '@/utils/curlParser'
 

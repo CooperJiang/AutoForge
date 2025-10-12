@@ -61,11 +61,11 @@
 </template>
 
 <script setup lang="ts">
-import BaseInput from '@/components/BaseInput.vue'
-import BaseSelect from '@/components/BaseSelect.vue'
-import TimePicker from '@/components/TimePicker.vue'
-import WeekDayPicker from '@/components/WeekDayPicker.vue'
-import MonthDayPicker from '@/components/MonthDayPicker.vue'
+import BaseInput from '@/components/BaseInput'
+import BaseSelect from '@/components/BaseSelect'
+import TimePicker from '@/components/TimePicker'
+import WeekDayPicker from '@/components/WeekDayPicker'
+import MonthDayPicker from '@/components/MonthDayPicker'
 
 defineProps<{
   type: string

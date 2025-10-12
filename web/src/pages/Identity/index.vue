@@ -193,8 +193,8 @@ import { Clock, Zap, Shield, Gauge } from 'lucide-vue-next'
 import { message } from '@/utils/message'
 import * as userApi from '@/api/user'
 import * as configApi from '@/api/config'
-import BaseInput from '@/components/BaseInput.vue'
-import BaseButton from '@/components/BaseButton.vue'
+import BaseInput from '@/components/BaseInput'
+import BaseButton from '@/components/BaseButton'
 import SecureStorage, { STORAGE_KEYS } from '@/utils/storage'
 
 const router = useRouter()

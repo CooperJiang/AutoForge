@@ -60,6 +60,46 @@ const router = createRouter({
             title: '工具箱',
           },
         },
+        {
+          path: '/workflows',
+          name: 'workflows',
+          component: () => import('@/pages/Workflows/index.vue'),
+          meta: {
+            title: '工作流',
+          },
+        },
+        {
+          path: '/workflows/create',
+          name: 'workflows-create',
+          component: () => import('@/pages/Workflows/editor.vue'),
+          meta: {
+            title: '创建工作流',
+          },
+        },
+        {
+          path: '/workflows/:id/edit',
+          name: 'workflows-edit',
+          component: () => import('@/pages/Workflows/editor.vue'),
+          meta: {
+            title: '编辑工作流',
+          },
+        },
+        {
+          path: '/workflows/:id/executions',
+          name: 'workflows-executions',
+          component: () => import('@/pages/Workflows/executions.vue'),
+          meta: {
+            title: '执行历史',
+          },
+        },
+        {
+          path: '/workflows/:id/executions/:executionId',
+          name: 'workflows-execution-detail',
+          component: () => import('@/pages/Workflows/execution-detail.vue'),
+          meta: {
+            title: '执行详情',
+          },
+        },
       ],
     },
     // 管理员路由

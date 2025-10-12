@@ -166,8 +166,8 @@ import {
   Package, User, Tag, BookOpen, Check, Rocket,
   Globe, Mail, HeartPulse
 } from 'lucide-vue-next'
-import Dialog from '@/components/Dialog.vue'
-import BaseButton from '@/components/BaseButton.vue'
+import Dialog from '@/components/Dialog'
+import BaseButton from '@/components/BaseButton'
 
 interface Tool {
   code: string

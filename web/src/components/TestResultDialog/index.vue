@@ -85,8 +85,8 @@
 
 <script setup lang="ts">
 import { CheckCircle, XCircle, X, AlertCircle } from 'lucide-vue-next'
-import BaseButton from './BaseButton.vue'
-import JsonViewer from './JsonViewer.vue'
+import BaseButton from '../BaseButton/index.vue'
+import JsonViewer from '../JsonViewer/index.vue'
 
 interface TestResult {
   success: boolean

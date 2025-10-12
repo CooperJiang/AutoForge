@@ -200,10 +200,10 @@ import { useRouter, useRoute } from 'vue-router'
 import { message } from '@/utils/message'
 import { createTask, updateTask, getTask } from '@/api/task'
 import { getToolList, type Tool } from '@/api/tool'
-import BaseButton from '@/components/BaseButton.vue'
-import BaseInput from '@/components/BaseInput.vue'
-import BaseSelect from '@/components/BaseSelect.vue'
-import Dialog from '@/components/Dialog.vue'
+import BaseButton from '@/components/BaseButton'
+import BaseInput from '@/components/BaseInput'
+import BaseSelect from '@/components/BaseSelect'
+import Dialog from '@/components/Dialog'
 
 const router = useRouter()
 const route = useRoute()

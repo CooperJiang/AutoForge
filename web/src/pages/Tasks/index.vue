@@ -74,7 +74,7 @@
 <script setup lang="ts">
 import { ref, watch, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
-import Dialog from '@/components/Dialog.vue'
+import Dialog from '@/components/Dialog'
 import ToolConfigDrawer from './components/ToolConfigDrawer.vue'
 import TestResultDialog from './components/TestResultDialog.vue'
 import TaskFormPanel from './components/TaskFormPanel.vue'

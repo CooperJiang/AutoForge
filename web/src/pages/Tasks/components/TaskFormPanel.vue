@@ -80,9 +80,9 @@
 </template>
 
 <script setup lang="ts">
-import BaseInput from '@/components/BaseInput.vue'
-import BaseSelect from '@/components/BaseSelect.vue'
-import BaseButton from '@/components/BaseButton.vue'
+import BaseInput from '@/components/BaseInput'
+import BaseSelect from '@/components/BaseSelect'
+import BaseButton from '@/components/BaseButton'
 import ScheduleSelector from './ScheduleSelector.vue'
 import type { TaskFormData } from '@/composables/useTaskForm'
 import type { Task } from '@/api/task'

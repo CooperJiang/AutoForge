@@ -227,9 +227,9 @@ import { ref } from 'vue'
 import { RefreshCw, Trash2 } from 'lucide-vue-next'
 import type { Task, TaskExecution } from '@/api/task'
 import { formatScheduleValue, formatTimestamp, formatNextRunTime, getScheduleTypeName } from '@/utils/taskHelpers'
-import BaseButton from '@/components/BaseButton.vue'
-import JsonViewer from '@/components/JsonViewer.vue'
-import Dialog from '@/components/Dialog.vue'
+import BaseButton from '@/components/BaseButton'
+import JsonViewer from '@/components/JsonViewer'
+import Dialog from '@/components/Dialog'
 
 interface Props {
   task: Task

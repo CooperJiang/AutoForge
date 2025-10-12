@@ -53,8 +53,8 @@
 </template>
 
 <script setup lang="ts">
-import Dialog from '@/components/Dialog.vue'
-import JsonViewer from '@/components/JsonViewer.vue'
+import Dialog from '@/components/Dialog'
+import JsonViewer from '@/components/JsonViewer'
 
 interface TestResult {
   success: boolean
