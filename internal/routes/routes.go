@@ -48,6 +48,9 @@ func RegisterRoutes(r *gin.Engine) {
 		// 工具相关路由
 		RegisterToolRoutes(version)
 
+		// 工作流相关路由
+		RegisterWorkflowRoutes(version)
+
 		// 在这里添加其他模块路由
 		// 例如：
 		// productRoutes := api.Group("/product")

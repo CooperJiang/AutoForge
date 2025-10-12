@@ -135,8 +135,8 @@ func (ts *TaskScheduler) buildCronSpec(scheduleType, scheduleValue string) (stri
 
 	case "interval":
 		// scheduleValue: 秒数
-		// cron 不直接支持间隔，这里使用每N秒执行一次的方式
-		return fmt.Sprintf("*/%s * * * * *", scheduleValue), nil
+		// 使用 @every 语法支持任意间隔
+		return fmt.Sprintf("@every %ss", scheduleValue), nil
 
 	case "cron":
 		// 直接使用 cron 表达式

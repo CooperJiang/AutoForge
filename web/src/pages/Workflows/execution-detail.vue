@@ -1,17 +1,22 @@
 <template>
   <div class="space-y-6">
+    <!-- 加载状态 -->
+    <div v-if="loading" class="flex justify-center items-center py-20">
+      <div class="text-slate-500">加载中...</div>
+    </div>
+
+    <!-- 数据为空 -->
+    <div v-else-if="!execution" class="flex flex-col justify-center items-center py-20">
+      <div class="text-slate-500 mb-4">执行记录不存在</div>
+      <BaseButton size="sm" @click="handleBack">返回列表</BaseButton>
+    </div>
+
+    <!-- 执行详情 -->
+    <template v-else>
     <!-- 顶部信息 -->
     <div class="flex items-center justify-between">
-      <div class="flex items-center gap-3">
-        <BaseButton size="sm" variant="ghost" @click="handleBack">
-          <ArrowLeft class="w-4 h-4 mr-1" />
-          返回列表
-        </BaseButton>
-        <div class="h-6 w-px bg-slate-200"></div>
-        <div>
-          <h2 class="text-lg font-semibold text-slate-900">执行详情</h2>
-          <p class="text-sm text-slate-500 font-mono">{{ executionId }}</p>
-        </div>
+      <div>
+        <p class="text-sm text-slate-500 font-mono">{{ executionId }}</p>
       </div>
 
       <div class="flex items-center gap-2">
@@ -34,32 +39,26 @@
         <div>
           <div class="text-xs text-slate-500 mb-1">触发方式</div>
           <div class="flex items-center gap-2 text-sm font-medium text-slate-900">
-            <component :is="getTriggerIcon(execution?.trigger.type || '')" class="w-4 h-4" />
-            {{ getTriggerText(execution?.trigger.type || '') }}
+            <component :is="getTriggerIcon(execution?.trigger_type || '')" class="w-4 h-4" />
+            {{ getTriggerText(execution?.trigger_type || '') }}
           </div>
         </div>
         <div>
           <div class="text-xs text-slate-500 mb-1">开始时间</div>
-          <div class="text-sm font-medium text-slate-900">{{ formatTime(execution?.startTime || '') }}</div>
+          <div class="text-sm font-medium text-slate-900">{{ formatTime(execution?.start_time) }}</div>
         </div>
         <div>
           <div class="text-xs text-slate-500 mb-1">结束时间</div>
           <div class="text-sm font-medium text-slate-900">
-            {{ execution?.endTime ? formatTime(execution.endTime) : '-' }}
+            {{ execution?.end_time ? formatTime(execution.end_time) : '-' }}
           </div>
         </div>
         <div>
           <div class="text-xs text-slate-500 mb-1">执行耗时</div>
           <div class="text-sm font-medium text-slate-900">
-            {{ execution?.endTime ? formatDuration(execution.startTime, execution.endTime) : '-' }}
+            {{ execution?.duration_ms != null ? formatDurationMs(execution.duration_ms) : '-' }}
           </div>
         </div>
-      </div>
-
-      <!-- 触发器数据 -->
-      <div v-if="execution?.trigger.data" class="mt-4 pt-4 border-t border-slate-200">
-        <div class="text-xs font-semibold text-slate-700 mb-2">触发器数据</div>
-        <pre class="bg-slate-900 text-slate-100 rounded-lg p-3 text-xs overflow-x-auto">{{ JSON.stringify(execution.trigger.data, null, 2) }}</pre>
       </div>
     </div>
 
@@ -71,8 +70,8 @@
 
       <div class="divide-y divide-slate-200">
         <div
-          v-for="(nodeExec, index) in execution?.nodeExecutions"
-          :key="nodeExec.nodeId"
+          v-for="(nodeLog, index) in execution?.node_logs"
+          :key="nodeLog.node_id"
           class="p-6"
         >
           <div class="flex items-start gap-4">
@@ -81,13 +80,13 @@
               <div
                 :class="[
                   'w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold',
-                  getNodeStatusBgClass(nodeExec.status)
+                  getNodeStatusBgClass(nodeLog.status)
                 ]"
               >
                 {{ index + 1 }}
               </div>
               <div
-                v-if="index < (execution?.nodeExecutions.length || 0) - 1"
+                v-if="index < (execution?.node_logs.length || 0) - 1"
                 class="flex-1 w-0.5 bg-slate-200 my-2 min-h-[20px]"
               ></div>
             </div>
@@ -96,66 +95,51 @@
             <div class="flex-1">
               <div class="flex items-center justify-between mb-2">
                 <div class="flex items-center gap-2">
-                  <h4 class="text-sm font-semibold text-slate-900">{{ nodeExec.nodeName }}</h4>
-                  <span class="text-xs text-slate-500 font-mono">{{ nodeExec.nodeId }}</span>
+                  <h4 class="text-sm font-semibold text-slate-900">{{ nodeLog.node_name }}</h4>
+                  <span v-if="nodeLog.tool_code" class="px-2 py-0.5 bg-blue-50 text-blue-600 text-xs font-mono rounded">{{ nodeLog.tool_code }}</span>
+                  <span class="text-xs text-slate-400 font-mono">{{ nodeLog.node_id }}</span>
                 </div>
                 <span
                   :class="[
                     'px-2 py-0.5 rounded-full text-xs font-medium',
-                    getNodeStatusClass(nodeExec.status)
+                    getNodeStatusClass(nodeLog.status)
                   ]"
                 >
-                  {{ getNodeStatusText(nodeExec.status) }}
+                  {{ getNodeStatusText(nodeLog.status) }}
                 </span>
               </div>
 
               <!-- 时间信息 -->
-              <div v-if="nodeExec.startTime" class="flex items-center gap-4 text-xs text-slate-600 mb-3">
-                <span>开始：{{ formatTime(nodeExec.startTime) }}</span>
-                <span v-if="nodeExec.endTime">
-                  耗时：{{ formatDuration(nodeExec.startTime, nodeExec.endTime) }}
+              <div v-if="nodeLog.start_time" class="flex items-center gap-4 text-xs text-slate-600 mb-3">
+                <span>开始：{{ formatTime(nodeLog.start_time) }}</span>
+                <span v-if="nodeLog.duration_ms != null">
+                  耗时：{{ formatDurationMs(nodeLog.duration_ms) }}
                 </span>
               </div>
 
-              <!-- 输入数据 -->
-              <div v-if="nodeExec.input" class="mb-3">
-                <button
-                  type="button"
-                  @click="toggleSection(nodeExec.nodeId, 'input')"
-                  class="flex items-center gap-1 text-xs font-medium text-slate-700 hover:text-slate-900 mb-1"
-                >
-                  <ChevronDown :class="['w-3 h-3 transition-transform', isSectionOpen(nodeExec.nodeId, 'input') && 'rotate-180']" />
-                  输入数据
-                </button>
-                <pre
-                  v-show="isSectionOpen(nodeExec.nodeId, 'input')"
-                  class="bg-slate-50 border border-slate-200 rounded p-3 text-xs overflow-x-auto max-h-60"
-                >{{ JSON.stringify(nodeExec.input, null, 2) }}</pre>
-              </div>
-
               <!-- 输出数据 -->
-              <div v-if="nodeExec.output" class="mb-3">
+              <div v-if="nodeLog.output" class="mb-3">
                 <button
                   type="button"
-                  @click="toggleSection(nodeExec.nodeId, 'output')"
+                  @click="toggleSection(nodeLog.node_id, 'output')"
                   class="flex items-center gap-1 text-xs font-medium text-slate-700 hover:text-slate-900 mb-1"
                 >
-                  <ChevronDown :class="['w-3 h-3 transition-transform', isSectionOpen(nodeExec.nodeId, 'output') && 'rotate-180']" />
+                  <ChevronDown :class="['w-3 h-3 transition-transform', isSectionOpen(nodeLog.node_id, 'output') && 'rotate-180']" />
                   输出数据
                 </button>
                 <pre
-                  v-show="isSectionOpen(nodeExec.nodeId, 'output')"
+                  v-show="isSectionOpen(nodeLog.node_id, 'output')"
                   class="bg-slate-50 border border-slate-200 rounded p-3 text-xs overflow-x-auto max-h-60"
-                >{{ JSON.stringify(nodeExec.output, null, 2) }}</pre>
+                >{{ JSON.stringify(nodeLog.output, null, 2) }}</pre>
               </div>
 
               <!-- 错误信息 -->
-              <div v-if="nodeExec.error" class="bg-red-50 border border-red-200 rounded-lg p-3">
+              <div v-if="nodeLog.error" class="bg-red-50 border border-red-200 rounded-lg p-3">
                 <div class="flex items-start gap-2">
                   <AlertCircle class="w-4 h-4 text-red-600 flex-shrink-0 mt-0.5" />
                   <div>
                     <div class="text-xs font-semibold text-red-900 mb-1">错误信息</div>
-                    <div class="text-xs text-red-700">{{ nodeExec.error }}</div>
+                    <div class="text-xs text-red-700">{{ nodeLog.error }}</div>
                   </div>
                 </div>
               </div>
@@ -164,6 +148,7 @@
         </div>
       </div>
     </div>
+    </template>
   </div>
 </template>
 
@@ -171,7 +156,6 @@
 import { ref, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import {
-  ArrowLeft,
   Clock,
   Webhook,
   MousePointerClick,
@@ -181,6 +165,7 @@ import {
 } from 'lucide-vue-next'
 import BaseButton from '@/components/BaseButton'
 import type { WorkflowExecution } from '@/types/workflow'
+import { message } from '@/utils/message'
 
 const router = useRouter()
 const route = useRoute()
@@ -191,79 +176,24 @@ const executionId = route.params.executionId as string
 // 记录展开/收起状态
 const openSections = ref<Record<string, Set<string>>>({})
 
-// Mock 数据
-const execution = ref<WorkflowExecution>({
-  id: executionId,
-  workflowId: workflowId,
-  status: 'success',
-  startTime: new Date(Date.now() - 3600000).toISOString(),
-  endTime: new Date(Date.now() - 3500000).toISOString(),
-  trigger: {
-    type: 'webhook',
-    data: {
-      user: 'admin',
-      action: 'test',
-      timestamp: Date.now()
-    }
-  },
-  nodeExecutions: [
-    {
-      nodeId: 'node_1',
-      nodeName: 'HTTP请求 - 获取数据',
-      status: 'success',
-      startTime: new Date(Date.now() - 3600000).toISOString(),
-      endTime: new Date(Date.now() - 3550000).toISOString(),
-      input: {
-        url: 'https://api.example.com/data',
-        method: 'GET',
-        headers: {
-          'Authorization': 'Bearer token123'
-        }
-      },
-      output: {
-        status: 200,
-        data: {
-          result: 'success',
-          items: [1, 2, 3]
-        },
-        headers: {
-          'content-type': 'application/json'
-        }
-      }
-    },
-    {
-      nodeId: 'node_2',
-      nodeName: '条件判断',
-      status: 'success',
-      startTime: new Date(Date.now() - 3550000).toISOString(),
-      endTime: new Date(Date.now() - 3540000).toISOString(),
-      input: {
-        field: 'node_1.response.data.result',
-        value: 'success'
-      },
-      output: {
-        result: true,
-        branch: 'true'
-      }
-    },
-    {
-      nodeId: 'node_3',
-      nodeName: '发送邮件通知',
-      status: 'success',
-      startTime: new Date(Date.now() - 3540000).toISOString(),
-      endTime: new Date(Date.now() - 3500000).toISOString(),
-      input: {
-        to: 'admin@example.com',
-        subject: '工作流执行成功',
-        body: '数据已成功获取'
-      },
-      output: {
-        success: true,
-        messageId: 'msg_1234567890'
-      }
-    }
-  ]
-})
+// 执行详情数据
+const execution = ref<WorkflowExecution | null>(null)
+const loading = ref(true)
+
+// 加载执行详情
+const loadExecution = async () => {
+  loading.value = true
+  try {
+    const { workflowApi } = await import('@/api/workflow')
+    const data = await workflowApi.getExecutionDetail(workflowId, executionId)
+    execution.value = data
+  } catch (error: any) {
+    console.error('Load execution failed:', error)
+    message.error('加载执行详情失败')
+  } finally {
+    loading.value = false
+  }
+}
 
 const handleBack = () => {
   router.push(`/workflows/${workflowId}/executions`)
@@ -353,6 +283,7 @@ const getNodeStatusText = (status: string) => {
 // 触发器
 const getTriggerIcon = (type: string) => {
   const icons = {
+    scheduled: Clock,
     schedule: Clock,
     webhook: Webhook,
     manual: MousePointerClick
@@ -362,6 +293,7 @@ const getTriggerIcon = (type: string) => {
 
 const getTriggerText = (type: string) => {
   const texts = {
+    scheduled: '定时触发',
     schedule: '定时触发',
     webhook: 'Webhook',
     manual: '手动触发'
@@ -370,9 +302,9 @@ const getTriggerText = (type: string) => {
 }
 
 // 时间格式化
-const formatTime = (time: string) => {
-  if (!time) return '-'
-  const date = new Date(time)
+const formatTime = (timestamp?: number) => {
+  if (!timestamp) return '-'
+  const date = new Date(timestamp * 1000) // 后端返回秒级时间戳，转为毫秒
   return date.toLocaleString('zh-CN', {
     year: 'numeric',
     month: '2-digit',
@@ -395,7 +327,23 @@ const formatDuration = (start: string, end: string) => {
   }
 }
 
+const formatDurationMs = (ms: number) => {
+  const seconds = Math.floor(ms / 1000)
+  const minutes = Math.floor(seconds / 60)
+  const hours = Math.floor(minutes / 60)
+
+  if (hours > 0) {
+    return `${hours}小时${minutes % 60}分钟${seconds % 60}秒`
+  } else if (minutes > 0) {
+    return `${minutes}分钟${seconds % 60}秒`
+  } else if (seconds > 0) {
+    return `${seconds}秒`
+  } else {
+    return `${ms}毫秒`
+  }
+}
+
 onMounted(() => {
-  // TODO: 加载执行详情
+  loadExecution()
 })
 </script>

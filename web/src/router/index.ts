@@ -47,7 +47,7 @@ const router = createRouter({
         {
           path: '/profile',
           name: 'profile',
-          component: () => import('@/pages/Profile.vue'),
+          component: () => import('@/pages/Profile/index.vue'),
           meta: {
             title: '个人中心',
           },

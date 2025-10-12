@@ -1,48 +1,72 @@
 <template>
   <div class="fixed inset-0 bg-slate-50 flex flex-col">
     <!-- 顶部工具栏 -->
-    <div class="bg-white border-b border-slate-200 px-4 py-3 flex items-center justify-between flex-shrink-0">
-      <div class="flex items-center gap-3">
-        <BaseButton size="sm" variant="ghost" @click="handleBack">
-          <ArrowLeft class="w-4 h-4 mr-1" />
-          返回
+    <div class="bg-white border-b border-slate-200 px-6 py-3 flex items-center justify-between flex-shrink-0">
+      <div class="flex items-center gap-4">
+        <BaseButton size="sm" variant="ghost" @click="handleBack" class="shrink-0">
+          <ArrowLeft class="w-4 h-4" />
         </BaseButton>
-        <div class="h-6 w-px bg-slate-200"></div>
-        <BaseInput
-          v-model="workflow.name"
-          placeholder="工作流名称"
-          class="w-64"
-        />
+        <div class="input-wrapper flex items-center gap-2 px-2.5 py-1 rounded-md bg-slate-50 border border-slate-200 hover:border-slate-300 transition-all duration-200">
+          <Workflow class="w-3.5 h-3.5 text-slate-400 shrink-0" />
+          <input
+            v-model="workflow.name"
+            type="text"
+            placeholder="工作流名称"
+            class="w-32 bg-transparent text-xs font-medium text-slate-900 placeholder:text-slate-400"
+            style="border: none; outline: none; box-shadow: none;"
+            @focus="$event.target.parentElement.classList.add('input-focused')"
+            @blur="$event.target.parentElement.classList.remove('input-focused')"
+          />
+        </div>
       </div>
-      <div class="flex items-center gap-2">
-        <BaseButton
-          size="sm"
-          :variant="workflow.enabled ? 'success' : 'ghost'"
+      <div class="flex items-center gap-3">
+        <!-- 状态指示 -->
+        <div
+          :class="[
+            'px-3 py-1.5 rounded-full text-xs font-medium flex items-center gap-1.5 cursor-pointer transition-colors',
+            workflow.enabled
+              ? 'bg-green-50 text-green-700 hover:bg-green-100'
+              : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+          ]"
           @click="handleToggleEnabled"
         >
-          <Power class="w-4 h-4 mr-1" />
+          <Power :class="['w-3.5 h-3.5', workflow.enabled && 'animate-pulse']" />
           {{ workflow.enabled ? '已启用' : '已禁用' }}
-        </BaseButton>
+        </div>
+
         <div class="h-6 w-px bg-slate-200"></div>
-        <BaseButton size="sm" variant="ghost" @click="showEnvVarManager = true">
-          <Settings class="w-4 h-4 mr-1" />
-          环境变量
-        </BaseButton>
-        <BaseButton size="sm" variant="ghost" @click="handleExport">
-          <FileJson class="w-4 h-4 mr-1" />
-          导出JSON
-        </BaseButton>
+
+        <!-- 次要操作 -->
+        <Tooltip text="环境变量配置" position="bottom">
+          <BaseButton size="sm" variant="ghost" @click="showEnvVarManager = true">
+            <Settings class="w-4 h-4" />
+          </BaseButton>
+        </Tooltip>
+        <Tooltip text="导出为JSON" position="bottom">
+          <BaseButton size="sm" variant="ghost" @click="handleExport">
+            <FileJson class="w-4 h-4" />
+          </BaseButton>
+        </Tooltip>
+        <Tooltip text="清除本地草稿" position="bottom">
+          <BaseButton size="sm" variant="ghost" @click="handleClearDraft">
+            <Trash2 class="w-4 h-4" />
+          </BaseButton>
+        </Tooltip>
+
+        <div class="h-6 w-px bg-slate-200"></div>
+
+        <!-- 主要操作 -->
         <BaseButton
           size="sm"
           variant="secondary"
           @click="handleExecute"
           :disabled="!workflow.enabled || nodes.length === 0"
         >
-          <Play class="w-4 h-4 mr-1" />
+          <Play class="w-4 h-4 mr-1.5" />
           执行
         </BaseButton>
         <BaseButton size="sm" @click="handleSave">
-          <Save class="w-4 h-4 mr-1" />
+          <Save class="w-4 h-4 mr-1.5" />
           保存
         </BaseButton>
       </div>
@@ -124,18 +148,32 @@
       :env-vars="envVars"
       @update:env-vars="handleUpdateEnvVars"
     />
+
+    <!-- 确认对话框 -->
+    <ConfirmDialog
+      v-model="confirmDialog.show"
+      :title="confirmDialog.title"
+      :message="confirmDialog.message"
+      :confirm-text="confirmDialog.confirmText"
+      :cancel-text="confirmDialog.cancelText"
+      :variant="confirmDialog.variant"
+      @confirm="confirmDialog.resolve?.(true)"
+      @cancel="confirmDialog.resolve?.(false)"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch, onMounted } from 'vue'
-import { useRouter, useRoute } from 'vue-router'
+import { ref, computed, watch, onMounted, onUnmounted, nextTick } from 'vue'
+import { useRouter, useRoute, onBeforeRouteLeave } from 'vue-router'
 import { VueFlow, useVueFlow } from '@vue-flow/core'
 import { Background } from '@vue-flow/background'
 import { Controls } from '@vue-flow/controls'
-import { ArrowLeft, Save, Play, FileJson, Workflow, Settings, Power } from 'lucide-vue-next'
+import { ArrowLeft, Save, Play, FileJson, Workflow, Settings, Power, Trash2 } from 'lucide-vue-next'
 import BaseButton from '@/components/BaseButton'
 import BaseInput from '@/components/BaseInput'
+import ConfirmDialog from '@/components/ConfirmDialog.vue'
+import Tooltip from '@/components/Tooltip.vue'
 import ToolPanel from './components/ToolPanel.vue'
 import ToolNode from './components/ToolNode.vue'
 import TriggerNode from './components/TriggerNode.vue'
@@ -148,6 +186,33 @@ import { useWorkflow } from '@/composables/useWorkflow'
 import { message } from '@/utils/message'
 import type { WorkflowNode, WorkflowEnvVar } from '@/types/workflow'
 
+// 确认对话框状态
+interface ConfirmDialogState {
+  show: boolean
+  title?: string
+  message: string
+  confirmText?: string
+  cancelText?: string
+  variant?: 'info' | 'warning' | 'danger' | 'question'
+  resolve?: (value: boolean) => void
+}
+
+const confirmDialog = ref<ConfirmDialogState>({
+  show: false,
+  message: ''
+})
+
+// 通用确认函数
+const confirm = (options: Omit<ConfirmDialogState, 'show' | 'resolve'>): Promise<boolean> => {
+  return new Promise((resolve) => {
+    confirmDialog.value = {
+      ...options,
+      show: true,
+      resolve
+    }
+  })
+}
+
 // Import styles
 import '@vue-flow/core/dist/style.css'
 import '@vue-flow/core/dist/theme-default.css'
@@ -155,7 +220,8 @@ import '@vue-flow/controls/dist/style.css'
 
 const router = useRouter()
 const route = useRoute()
-const { workflow, nodes, edges, envVars, addNode, updateNode, deleteNode, addEdge, deleteEdge, getPreviousNodes, toggleEnabled, validateWorkflow, exportWorkflow } = useWorkflow()
+const workflowId = computed(() => route.params.id as string)
+const { workflow, nodes, edges, envVars, addNode, updateNode, deleteNode, addEdge, deleteEdge, getPreviousNodes, toggleEnabled, validateWorkflow, exportWorkflow, loadWorkflow: loadWorkflowData, clearDraft } = useWorkflow(workflowId.value)
 const { project } = useVueFlow()
 
 // Vue Flow state
@@ -166,13 +232,26 @@ const showEnvVarManager = ref(false)
 const selectedNode = ref<WorkflowNode | null>(null)
 const dropZone = ref<HTMLElement | null>(null)
 
+// 追踪是否有未保存的更改
+const hasUnsavedChanges = ref(false)
+const isCreateMode = computed(() => workflowId.value === 'create')
+
+// 监听数据变化，标记为有未保存的更改
+watch([nodes, edges, workflow, envVars], () => {
+  hasUnsavedChanges.value = true
+}, { deep: true })
+
 // 将工作流节点转换为VueFlow节点
 const syncToVueFlow = () => {
   vueFlowNodes.value = nodes.value.map(node => ({
     id: node.id,
     type: node.type,
     position: node.position,
-    data: node
+    data: {
+      ...node,
+      config: node.config || {},
+      retry: node.retry || { enabled: false, maxRetries: 3, retryInterval: 1000, exponentialBackoff: false }
+    }
   }))
 
   vueFlowEdges.value = edges.value.map(edge => {
@@ -212,15 +291,17 @@ const syncToVueFlow = () => {
 
 // 将VueFlow节点转换回工作流节点
 watch([vueFlowNodes, vueFlowEdges], () => {
-  workflow.value.nodes = vueFlowNodes.value.map(node => ({
+  nodes.value = vueFlowNodes.value.map(node => ({
     ...node.data,
     position: node.position
   }))
 
-  workflow.value.edges = vueFlowEdges.value.map(edge => ({
+  edges.value = vueFlowEdges.value.map(edge => ({
     id: edge.id,
     source: edge.source,
-    target: edge.target
+    target: edge.target,
+    sourceHandle: edge.sourceHandle,
+    targetHandle: edge.targetHandle
   }))
 }, { deep: true })
 
@@ -299,8 +380,14 @@ const handleNodeClick = (event: any) => {
 }
 
 // 点击连线
-const handleEdgeClick = (event: any) => {
-  if (confirm('是否删除此连接？')) {
+const handleEdgeClick = async (event: any) => {
+  const confirmed = await confirm({
+    title: '删除连接',
+    message: '确定要删除这条连接吗？',
+    variant: 'warning'
+  })
+
+  if (confirmed) {
     deleteEdge(event.edge.id)
     syncToVueFlow()
   }
@@ -345,13 +432,21 @@ const handleDeleteNode = (nodeId: string) => {
 
 // 更新环境变量
 const handleUpdateEnvVars = (newEnvVars: WorkflowEnvVar[]) => {
-  workflow.value.envVars = newEnvVars
+  envVars.value = newEnvVars
 }
 
 // 返回
-const handleBack = () => {
-  if (nodes.value.length > 0) {
-    if (confirm('有未保存的更改，确定要离开吗？')) {
+const handleBack = async () => {
+  if (hasUnsavedChanges.value) {
+    const confirmed = await confirm({
+      title: '离开编辑器',
+      message: '有未保存的更改，确定要离开吗？（草稿将保留）',
+      variant: 'warning',
+      confirmText: '离开',
+      cancelText: '继续编辑'
+    })
+
+    if (confirmed) {
       router.push('/workflows')
     }
   } else {
@@ -360,16 +455,81 @@ const handleBack = () => {
 }
 
 // 保存
-const handleSave = () => {
+const handleSave = async () => {
   const validation = validateWorkflow()
   if (!validation.valid) {
     message.error(validation.message)
     return
   }
 
-  // TODO: 调用API保存工作流
-  console.log('Save workflow:', workflow.value)
-  message.success('工作流已保存')
+  try {
+    const currentWorkflowId = workflowId.value
+
+    // 从触发器节点中提取调度配置
+    const triggerNode = nodes.value.find(n => n.type === 'trigger')
+    let scheduleType = ''
+    let scheduleValue = ''
+
+    if (triggerNode && triggerNode.config) {
+      const config = triggerNode.config
+
+      console.log('触发器节点配置:', config)
+
+      // 根据触发器配置构建调度信息
+      if (config.scheduleType === 'interval' && config.scheduleValue) {
+        scheduleType = 'interval'
+        scheduleValue = String(config.scheduleValue) // 秒数
+      } else if (config.scheduleType === 'daily' && config.time) {
+        scheduleType = 'daily'
+        scheduleValue = config.time + ':00' // HH:MM:SS
+      } else if (config.scheduleType === 'weekly' && config.weekDays && config.time) {
+        scheduleType = 'weekly'
+        scheduleValue = config.weekDays.join(',') + ':' + config.time.replace(':', ':') + ':00'
+      } else if (config.scheduleType === 'monthly' && config.monthDay && config.time) {
+        scheduleType = 'monthly'
+        scheduleValue = config.monthDay + ':' + config.time.replace(':', ':') + ':00'
+      } else if (config.scheduleType === 'cron' && config.cronExpr) {
+        scheduleType = 'cron'
+        scheduleValue = config.cronExpr
+      }
+
+      console.log('提取的调度配置:', { scheduleType, scheduleValue })
+    }
+
+    const workflowData = {
+      name: workflow.value.name,
+      description: workflow.value.description,
+      nodes: nodes.value,
+      edges: edges.value,
+      env_vars: envVars.value,
+      schedule_type: scheduleType,
+      schedule_value: scheduleValue,
+      enabled: workflow.value.enabled
+    }
+
+    if (currentWorkflowId && currentWorkflowId !== 'create') {
+      // 更新已有工作流
+      const { workflowApi } = await import('@/api/workflow')
+      await workflowApi.update(currentWorkflowId, workflowData)
+      message.success('工作流已更新')
+      // 保存成功后清除草稿和未保存标记
+      clearDraft()
+      hasUnsavedChanges.value = false
+    } else {
+      // 创建新工作流
+      const { workflowApi } = await import('@/api/workflow')
+      const data = await workflowApi.create(workflowData)
+      message.success('工作流已创建')
+      // 清除创建页面的草稿和未保存标记
+      clearDraft()
+      hasUnsavedChanges.value = false
+      // 跳转到编辑页面
+      router.replace(`/workflows/${data.id}/edit`)
+    }
+  } catch (error: any) {
+    console.error('Save workflow failed:', error)
+    message.error(error.response?.data?.message || '保存失败')
+  }
 }
 
 // 切换启用/禁用
@@ -380,7 +540,7 @@ const handleToggleEnabled = () => {
 }
 
 // 执行工作流
-const handleExecute = () => {
+const handleExecute = async () => {
   if (!workflow.value.enabled) {
     message.warning('工作流已禁用，请先启用工作流')
     return
@@ -392,15 +552,54 @@ const handleExecute = () => {
     return
   }
 
-  // TODO: 调用API执行工作流
-  message.info('正在执行工作流...')
-  console.log('Execute workflow:', workflow.value)
+  const workflowId = route.params.id as string
+  if (!workflowId || workflowId === 'create') {
+    message.warning('请先保存工作流')
+    return
+  }
 
-  // 执行成功后跳转到执行历史
-  setTimeout(() => {
-    message.success('工作流执行成功')
-    router.push(`/workflows/${route.params.id}/executions`)
-  }, 1000)
+  try {
+    message.info('正在执行工作流...')
+    const { workflowApi } = await import('@/api/workflow')
+    const data = await workflowApi.execute(workflowId)
+    message.success('工作流已开始执行')
+    // 跳转到执行详情
+    router.push(`/workflows/${workflowId}/executions/${data.execution_id}`)
+  } catch (error: any) {
+    console.error('Execute workflow failed:', error)
+    message.error(error.message || '执行失败')
+  }
+}
+
+// 清除草稿
+const handleClearDraft = async () => {
+  const confirmed = await confirm({
+    title: '清除草稿',
+    message: '确定要清除本地草稿吗？此操作不可恢复',
+    variant: 'danger',
+    confirmText: '清除',
+    cancelText: '取消'
+  })
+
+  if (confirmed) {
+    clearDraft()
+    // 重新加载服务器数据
+    if (workflowId.value && workflowId.value !== 'create') {
+      loadWorkflow()
+    } else {
+      // 创建页面则重置为空
+      nodes.value = []
+      edges.value = []
+      envVars.value = []
+      workflow.value = {
+        name: '',
+        description: '',
+        enabled: false
+      }
+      syncToVueFlow()
+    }
+    message.success('草稿已清除')
+  }
 }
 
 // 导出JSON
@@ -416,11 +615,99 @@ const handleExport = () => {
   message.success('工作流JSON已导出')
 }
 
+// 加载工作流数据
+const loadWorkflow = async () => {
+  const currentWorkflowId = workflowId.value
+  if (!currentWorkflowId || currentWorkflowId === 'create') {
+    return
+  }
+
+  try {
+    const { workflowApi } = await import('@/api/workflow')
+    const data = await workflowApi.getById(currentWorkflowId)
+
+    // 编辑模式：直接加载服务器数据，不提示
+    // 清除草稿
+    clearDraft()
+
+    // 加载服务器数据
+    loadWorkflowData(data)
+
+    // 使用 nextTick 确保数据更新后再同步到 Vue Flow
+    await nextTick()
+    syncToVueFlow()
+
+    // 加载完成后重置未保存标记
+    hasUnsavedChanges.value = false
+
+    console.log('工作流已加载:', {
+      name: workflow.value.name,
+      nodes: nodes.value.length,
+      edges: edges.value.length
+    })
+  } catch (error: any) {
+    console.error('Load workflow failed:', error)
+    message.error('加载工作流失败')
+  }
+}
+
+// 路由守卫 - 阻止用户在有未保存更改时离开
+onBeforeRouteLeave(async (to, from, next) => {
+  if (hasUnsavedChanges.value) {
+    const confirmed = await confirm({
+      title: '离开编辑器',
+      message: '有未保存的更改，确定要离开吗？（草稿将保留）',
+      variant: 'warning',
+      confirmText: '离开',
+      cancelText: '继续编辑'
+    })
+
+    next(confirmed)
+  } else {
+    next()
+  }
+})
+
+// 浏览器刷新/关闭提示
+const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+  if (hasUnsavedChanges.value) {
+    e.preventDefault()
+    e.returnValue = ''
+  }
+}
+
 // 初始化
+onMounted(() => {
+  loadWorkflow()
+  window.addEventListener('beforeunload', handleBeforeUnload)
+})
+
+// 清理
+onUnmounted(() => {
+  window.removeEventListener('beforeunload', handleBeforeUnload)
+})
+
 syncToVueFlow()
 </script>
 
 <style scoped>
+/* 输入框焦点样式 */
+.input-wrapper input {
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+.input-wrapper input:focus {
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+.input-wrapper.input-focused {
+  @apply border-slate-400 bg-white shadow-sm;
+}
+
 :deep(.vue-flow__node) {
   cursor: pointer;
 }

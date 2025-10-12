@@ -1,7 +1,7 @@
 <template>
-  <div class="max-w-7xl mx-auto px-4 py-6">
+  <div class="px-6 py-6">
     <!-- 统计卡片 -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 mb-6">
       <div class="bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl p-6 text-white shadow-lg">
         <div class="flex items-center justify-between">
           <div>

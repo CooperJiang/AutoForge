@@ -22,6 +22,9 @@ func InitCronManager() {
 
 	// 初始化任务调度器
 	InitTaskScheduler()
+
+	// 初始化工作流调度器
+	InitWorkflowScheduler()
 }
 
 // registerTasks 注册所有定时任务
@@ -39,4 +42,7 @@ func Stop() {
 
 	// 停止任务调度器
 	StopTaskScheduler()
+
+	// 停止工作流调度器
+	StopWorkflowScheduler()
 } 

@@ -1,6 +1,6 @@
 <template>
   <div class="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50">
-    <div class="max-w-7xl mx-auto px-4 py-8">
+    <div class="px-6 py-8">
       <!-- 页面标题 -->
       <div class="text-center mb-12">
         <h1 class="text-4xl font-bold text-slate-900 mb-3">
@@ -12,7 +12,7 @@
       </div>
 
       <!-- 工具卡片网格 -->
-      <div v-if="!loading" class="grid grid-cols-1 md:grid-cols-4 lg:grid-cols-5 gap-3 mb-8">
+      <div v-if="!loading" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6 mb-8">
         <ToolCard
           v-for="tool in tools"
           :key="tool.code"

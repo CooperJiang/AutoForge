@@ -1,6 +1,6 @@
 <template>
   <div class="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50">
-    <div class="max-w-7xl mx-auto px-4 py-8">
+    <div class="px-6 py-8">
       <!-- 页面标题 -->
       <div class="flex items-center justify-between mb-6">
         <div>
@@ -18,7 +18,7 @@
       </div>
 
       <!-- 工作流列表 -->
-      <div v-if="!loading && workflows.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div v-if="!loading && workflows.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4">
         <WorkflowCard
           v-for="workflow in workflows"
           :key="workflow.id"
@@ -54,6 +54,8 @@ import { useRouter } from 'vue-router'
 import { Plus, Workflow } from 'lucide-vue-next'
 import BaseButton from '@/components/BaseButton'
 import WorkflowCard from './components/WorkflowCard.vue'
+import { workflowApi } from '@/api/workflow'
+import { message } from '@/utils/message'
 import type { Workflow as WorkflowType } from '@/types/workflow'
 
 const router = useRouter()
@@ -64,14 +66,11 @@ const workflows = ref<WorkflowType[]>([])
 const loadWorkflows = async () => {
   loading.value = true
   try {
-    // TODO: 调用API加载工作流列表
-    // const response = await workflowApi.getWorkflowList()
-    // workflows.value = response.data
-
-    // 临时Mock数据
-    workflows.value = []
+    const data = await workflowApi.list()
+    workflows.value = data.items || []
   } catch (error) {
     console.error('Failed to load workflows:', error)
+    message.error('加载工作流列表失败')
   } finally {
     loading.value = false
   }
@@ -89,33 +88,44 @@ const handleViewExecutions = (workflow: WorkflowType) => {
 
 // 删除工作流
 const handleDelete = async (workflow: WorkflowType) => {
-  // TODO: 实现删除逻辑
-  console.log('Delete workflow:', workflow.id)
-  await loadWorkflows()
+  try {
+    await workflowApi.delete(workflow.id)
+    message.success('删除成功')
+    await loadWorkflows()
+  } catch (error) {
+    console.error('Delete workflow failed:', error)
+    message.error('删除失败')
+  }
 }
 
 // 执行工作流
 const handleExecute = async (workflow: WorkflowType) => {
   if (!workflow.enabled) {
-    console.warn('工作流已禁用')
+    message.warning('工作流未启用')
     return
   }
 
   try {
-    console.log('执行工作流:', workflow.id)
-    // TODO: 调用API执行工作流
-    // const response = await workflowApi.executeWorkflow(workflow.id)
-    // router.push(`/workflows/${workflow.id}/executions/${response.data.executionId}`)
-    router.push(`/workflows/${workflow.id}/executions`)
+    const data = await workflowApi.execute(workflow.id)
+    message.success('工作流已开始执行')
+    router.push(`/workflows/${workflow.id}/executions/${data.execution_id}`)
   } catch (error) {
-    console.error('工作流执行失败:', error)
+    console.error('Execute workflow failed:', error)
+    message.error('执行失败')
   }
 }
 
 // 切换工作流状态
 const handleToggle = async (workflow: WorkflowType) => {
-  // TODO: 实现切换状态逻辑
-  console.log('Toggle workflow:', workflow.id)
+  try {
+    const newEnabled = !workflow.enabled
+    await workflowApi.toggleEnabled(workflow.id, newEnabled)
+    workflow.enabled = newEnabled
+    message.success(newEnabled ? '已启用' : '已禁用')
+  } catch (error) {
+    console.error('Toggle workflow failed:', error)
+    message.error('操作失败')
+  }
 }
 
 onMounted(() => {

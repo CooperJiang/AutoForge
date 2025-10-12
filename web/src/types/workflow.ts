@@ -42,39 +42,83 @@ export interface WorkflowEnvVar {
 }
 
 export interface Workflow {
-  id?: string
+  id: string
+  user_id?: string
   name: string
   description: string
-  trigger: WorkflowTrigger
   nodes: WorkflowNode[]
   edges: WorkflowEdge[]
-  envVars?: WorkflowEnvVar[] // 环境变量
-  enabled?: boolean
-  created_at?: string
-  updated_at?: string
+  env_vars?: WorkflowEnvVar[]
+  schedule_type?: string
+  schedule_value?: string
+  enabled: boolean
+  next_run_time?: number
+  total_executions?: number
+  success_count?: number
+  failed_count?: number
+  last_executed_at?: number
+  created_at: number
+  updated_at: number
 }
 
 export interface WorkflowExecution {
   id: string
-  workflowId: string
-  status: 'running' | 'success' | 'failed' | 'cancelled'
-  startTime: string
-  endTime?: string
-  trigger: {
-    type: string
-    data?: any
-  }
-  nodeExecutions: NodeExecution[]
+  workflow_id: string
+  user_id: string
+  status: 'pending' | 'running' | 'success' | 'failed' | 'cancelled'
+  trigger_type: string
+  start_time?: number
+  end_time?: number
+  duration_ms: number
+  total_nodes: number
+  success_nodes: number
+  failed_nodes: number
+  skipped_nodes: number
+  node_logs: NodeExecutionLog[]
+  error?: string
+  created_at: number
+  updated_at: number
+}
+
+export interface NodeExecutionLog {
+  node_id: string
+  node_type: string
+  node_name: string
+  status: 'pending' | 'running' | 'success' | 'failed' | 'skipped'
+  start_time?: number
+  end_time?: number
+  duration_ms: number
+  retry_count: number
+  output?: Record<string, any>
   error?: string
 }
 
-export interface NodeExecution {
-  nodeId: string
-  nodeName: string
-  status: 'pending' | 'running' | 'success' | 'failed' | 'skipped'
-  startTime?: string
-  endTime?: string
-  input?: any
-  output?: any
-  error?: string
+// DTO types for API requests
+export interface CreateWorkflowDto {
+  name: string
+  description: string
+  nodes: WorkflowNode[]
+  edges: WorkflowEdge[]
+  env_vars?: WorkflowEnvVar[]
+  schedule_type?: string
+  schedule_value?: string
+  enabled?: boolean
 }
+
+export interface UpdateWorkflowDto {
+  name?: string
+  description?: string
+  nodes?: WorkflowNode[]
+  edges?: WorkflowEdge[]
+  env_vars?: WorkflowEnvVar[]
+  schedule_type?: string
+  schedule_value?: string
+  enabled?: boolean
+}
+
+export interface ExecuteWorkflowDto {
+  env_vars?: Record<string, string>
+}
+
+// Same as WorkflowExecution for now
+export type WorkflowExecutionDetail = WorkflowExecution

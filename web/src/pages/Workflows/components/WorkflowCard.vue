@@ -49,7 +49,7 @@
           variant="primary"
           @click="$emit('execute', workflow)"
           class="flex-1"
-          :disabled="!workflow.enabled"
+          :disabled="workflow.nodes.length === 0"
         >
           <Play class="w-3.5 h-3.5 mr-1" />
           执行

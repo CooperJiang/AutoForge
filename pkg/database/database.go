@@ -109,6 +109,9 @@ func autoMigrate() error {
 		// 定时任务模型
 		&models.Task{},
 		&models.TaskExecution{},
+		// 工作流模型
+		&models.Workflow{},
+		&models.WorkflowExecution{},
 		// 在这里添加其他模型
 	)
 }

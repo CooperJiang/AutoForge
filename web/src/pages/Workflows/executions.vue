@@ -35,8 +35,13 @@
       </div>
     </div>
 
+    <!-- 加载状态 -->
+    <div v-if="loading" class="flex justify-center items-center py-20">
+      <div class="text-slate-500">加载中...</div>
+    </div>
+
     <!-- 执行列表 -->
-    <div class="space-y-3">
+    <div v-else class="space-y-3">
       <div
         v-for="execution in filteredExecutions"
         :key="execution.id"
@@ -62,8 +67,8 @@
 
               <!-- 触发方式 -->
               <span class="text-xs text-slate-500 flex items-center gap-1">
-                <component :is="getTriggerIcon(execution.trigger.type)" class="w-3.5 h-3.5" />
-                {{ getTriggerText(execution.trigger.type) }}
+                <component :is="getTriggerIcon(execution.trigger_type)" class="w-3.5 h-3.5" />
+                {{ getTriggerText(execution.trigger_type) }}
               </span>
             </div>
 
@@ -71,11 +76,11 @@
             <div class="flex items-center gap-4 text-sm text-slate-600">
               <div class="flex items-center gap-1">
                 <Clock class="w-4 h-4" />
-                开始：{{ formatTime(execution.startTime) }}
+                开始：{{ formatTime(execution.start_time) }}
               </div>
-              <div v-if="execution.endTime" class="flex items-center gap-1">
+              <div v-if="execution.end_time" class="flex items-center gap-1">
                 <Timer class="w-4 h-4" />
-                耗时：{{ formatDuration(execution.startTime, execution.endTime) }}
+                耗时：{{ formatDurationMs(execution.duration_ms) }}
               </div>
               <div v-else class="text-blue-600 font-medium">
                 执行中...
@@ -97,7 +102,7 @@
                 ></div>
               </div>
               <span class="text-xs text-slate-500">
-                {{ getCompletedNodeCount(execution) }}/{{ execution.nodeExecutions.length }}
+                {{ execution.success_nodes + execution.failed_nodes + execution.skipped_nodes }}/{{ execution.total_nodes }}
               </span>
             </div>
 
@@ -139,95 +144,20 @@ import BaseButton from '@/components/BaseButton'
 import BaseSelect from '@/components/BaseSelect'
 import BaseInput from '@/components/BaseInput'
 import type { WorkflowExecution } from '@/types/workflow'
+import { workflowApi } from '@/api/workflow'
 import { message } from '@/utils/message'
 
 const router = useRouter()
 const route = useRoute()
 
 const workflowId = route.params.id as string
-const workflowName = ref('我的工作流') // TODO: 从API获取
+const workflowName = ref('')
 const statusFilter = ref('all')
 const searchQuery = ref('')
 const refreshing = ref(false)
+const loading = ref(false)
 
-// Mock 数据
-const executions = ref<WorkflowExecution[]>([
-  {
-    id: 'exec_1234567890',
-    workflowId: workflowId,
-    status: 'success',
-    startTime: new Date(Date.now() - 3600000).toISOString(),
-    endTime: new Date(Date.now() - 3500000).toISOString(),
-    trigger: {
-      type: 'schedule'
-    },
-    nodeExecutions: [
-      {
-        nodeId: 'node_1',
-        nodeName: 'HTTP请求',
-        status: 'success',
-        startTime: new Date(Date.now() - 3600000).toISOString(),
-        endTime: new Date(Date.now() - 3550000).toISOString(),
-        output: { status: 200, data: { result: 'ok' } }
-      },
-      {
-        nodeId: 'node_2',
-        nodeName: '发送邮件',
-        status: 'success',
-        startTime: new Date(Date.now() - 3550000).toISOString(),
-        endTime: new Date(Date.now() - 3500000).toISOString(),
-        output: { success: true, messageId: 'msg_123' }
-      }
-    ]
-  },
-  {
-    id: 'exec_0987654321',
-    workflowId: workflowId,
-    status: 'running',
-    startTime: new Date(Date.now() - 60000).toISOString(),
-    trigger: {
-      type: 'webhook',
-      data: { user: 'test' }
-    },
-    nodeExecutions: [
-      {
-        nodeId: 'node_1',
-        nodeName: 'HTTP请求',
-        status: 'success',
-        startTime: new Date(Date.now() - 60000).toISOString(),
-        endTime: new Date(Date.now() - 50000).toISOString(),
-        output: { status: 200 }
-      },
-      {
-        nodeId: 'node_2',
-        nodeName: '发送邮件',
-        status: 'running',
-        startTime: new Date(Date.now() - 50000).toISOString()
-      }
-    ]
-  },
-  {
-    id: 'exec_1111222233',
-    workflowId: workflowId,
-    status: 'failed',
-    startTime: new Date(Date.now() - 7200000).toISOString(),
-    endTime: new Date(Date.now() - 7150000).toISOString(),
-    trigger: {
-      type: 'manual'
-    },
-    error: '节点执行失败：HTTP请求超时',
-    nodeExecutions: [
-      {
-        nodeId: 'node_1',
-        nodeName: 'HTTP请求',
-        status: 'failed',
-        startTime: new Date(Date.now() - 7200000).toISOString(),
-        endTime: new Date(Date.now() - 7150000).toISOString(),
-        error: '请求超时'
-      }
-    ]
-  }
-])
+const executions = ref<WorkflowExecution[]>([])
 
 const statusOptions = [
   { label: '全部状态', value: 'all' },
@@ -256,16 +186,48 @@ const filteredExecutions = computed(() => {
   return result
 })
 
+// 加载工作流详情
+const loadWorkflow = async () => {
+  try {
+    const data = await workflowApi.getById(workflowId)
+    workflowName.value = data.name
+  } catch (error) {
+    console.error('Load workflow failed:', error)
+  }
+}
+
+// 加载执行历史
+const loadExecutions = async () => {
+  loading.value = true
+  try {
+    const data = await workflowApi.getExecutions(workflowId, {
+      page: 1,
+      page_size: 100,
+      status: statusFilter.value === 'all' ? undefined : statusFilter.value
+    })
+    executions.value = data.items || []
+  } catch (error: any) {
+    console.error('Load executions failed:', error)
+    message.error(error.response?.data?.message || '加载执行历史失败')
+  } finally {
+    loading.value = false
+  }
+}
+
 const handleBack = () => {
   router.push('/workflows')
 }
 
 const handleRefresh = async () => {
   refreshing.value = true
-  // TODO: 调用API刷新数据
-  await new Promise(resolve => setTimeout(resolve, 1000))
-  refreshing.value = false
-  message.success('刷新成功')
+  try {
+    await loadExecutions()
+    message.success('刷新成功')
+  } catch (error) {
+    message.error('刷新失败')
+  } finally {
+    refreshing.value = false
+  }
 }
 
 const handleViewExecution = (execution: WorkflowExecution) => {
@@ -324,20 +286,15 @@ const getTriggerText = (type: string) => {
 
 // 进度计算
 const getProgress = (execution: WorkflowExecution) => {
-  const completed = getCompletedNodeCount(execution)
-  const total = execution.nodeExecutions.length
+  const completed = execution.success_nodes + execution.failed_nodes + execution.skipped_nodes
+  const total = execution.total_nodes
   return total > 0 ? Math.round((completed / total) * 100) : 0
 }
 
-const getCompletedNodeCount = (execution: WorkflowExecution) => {
-  return execution.nodeExecutions.filter(n =>
-    n.status === 'success' || n.status === 'failed' || n.status === 'skipped'
-  ).length
-}
-
 // 时间格式化
-const formatTime = (time: string) => {
-  const date = new Date(time)
+const formatTime = (timestamp?: number) => {
+  if (!timestamp) return '-'
+  const date = new Date(timestamp * 1000)
   return date.toLocaleString('zh-CN', {
     year: 'numeric',
     month: '2-digit',
@@ -348,22 +305,24 @@ const formatTime = (time: string) => {
   })
 }
 
-const formatDuration = (start: string, end: string) => {
-  const duration = new Date(end).getTime() - new Date(start).getTime()
-  const seconds = Math.floor(duration / 1000)
+const formatDurationMs = (ms: number) => {
+  const seconds = Math.floor(ms / 1000)
   const minutes = Math.floor(seconds / 60)
   const hours = Math.floor(minutes / 60)
 
   if (hours > 0) {
-    return `${hours}小时${minutes % 60}分钟`
+    return `${hours}小时${minutes % 60}分钟${seconds % 60}秒`
   } else if (minutes > 0) {
     return `${minutes}分钟${seconds % 60}秒`
-  } else {
+  } else if (seconds > 0) {
     return `${seconds}秒`
+  } else {
+    return `${ms}毫秒`
   }
 }
 
 onMounted(() => {
-  // TODO: 加载执行历史
+  loadWorkflow()
+  loadExecutions()
 })
 </script>
