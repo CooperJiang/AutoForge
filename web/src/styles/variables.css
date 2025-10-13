@@ -1,0 +1,175 @@
+/**
+ * Cooper 主题系统 CSS 变量
+ *
+ * 说明：
+ * - 所有颜色使用 CSS 变量定义
+ * - 支持亮色/暗色主题切换
+ * - 通过 html[data-theme="dark"] 切换暗色模式
+ */
+
+/* ============================================
+   亮色主题（默认）
+   ============================================ */
+:root {
+  /* 1. 背景色 */
+  --color-bg-primary: #ffffff;
+  --color-bg-secondary: #f8fafc;
+  --color-bg-tertiary: #f1f5f9;
+  --color-bg-elevated: #ffffff;
+  --color-bg-overlay: rgba(0, 0, 0, 0.5);
+  --color-bg-hover: #f1f5f9;
+  --color-bg-active: #e2e8f0;
+
+  /* 2. 文本色 */
+  --color-text-primary: #0f172a;
+  --color-text-secondary: #475569;
+  --color-text-tertiary: #64748b;
+  --color-text-disabled: #cbd5e1;
+  --color-text-inverse: #ffffff;
+  --color-text-placeholder: #94a3b8;
+
+  /* 3. 边框色 */
+  --color-border-primary: #e2e8f0;
+  --color-border-secondary: #cbd5e1;
+  --color-border-focus: #52c41a;
+  --color-border-error: #ef4444;
+
+  /* 4. 品牌色 - 护眼绿 */
+  --color-primary: #52c41a;
+  --color-primary-hover: #389e0d;
+  --color-primary-active: #237804;
+  --color-primary-light: #f6ffed;
+  --color-primary-text: #ffffff;
+
+  /* 4. 品牌色 - Cyan */
+  --color-accent: #06b6d4;
+  --color-accent-hover: #0891b2;
+  --color-accent-light: #cffafe;
+
+  /* 5. 功能色 - Success */
+  --color-success: #52c41a;
+  --color-success-hover: #389e0d;
+  --color-success-light: #f6ffed;
+  --color-success-text: #237804;
+
+  /* 5. 功能色 - Warning */
+  --color-warning: #f59e0b;
+  --color-warning-hover: #d97706;
+  --color-warning-light: #fef3c7;
+  --color-warning-text: #92400e;
+
+  /* 5. 功能色 - Error */
+  --color-error: #ef4444;
+  --color-error-hover: #dc2626;
+  --color-error-light: #fee2e2;
+  --color-error-text: #991b1b;
+
+  /* 5. 功能色 - Info */
+  --color-info: #0ea5e9;
+  --color-info-hover: #0284c7;
+  --color-info-light: #e0f2fe;
+  --color-info-text: #075985;
+
+  /* 6. 阴影 */
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+
+  /* 7. 渐变 */
+  --gradient-primary: linear-gradient(135deg, #52c41a 0%, #73d13d 100%);
+  --gradient-bg: linear-gradient(to bottom right, #f1f5f9 0%, #f6ffed 50%, #d9f7be 100%);
+}
+
+/* ============================================
+   暗色主题
+   ============================================ */
+html[data-theme="dark"] {
+  /* 1. 背景色 - 温暖深色系统 */
+  --color-bg-primary: #1a1a1a;        /* 主背景 - 温暖深灰 */
+  --color-bg-secondary: #121212;      /* 次级背景 - 更深 */
+  --color-bg-tertiary: #242424;       /* 三级背景 - 浅一点 */
+  --color-bg-elevated: #1f1f1f;       /* 卡片/弹窗背景 - 略亮 */
+  --color-bg-overlay: rgba(0, 0, 0, 0.85);
+  --color-bg-hover: #2a2a2a;          /* 悬停态 - 明显变化 */
+  --color-bg-active: #333333;         /* 激活态 */
+
+  /* 2. 文本色 - 柔和对比 */
+  --color-text-primary: #e8e8e8;      /* 主文本 - 柔和白 */
+  --color-text-secondary: #b8b8b8;    /* 次要文本 - 中灰 */
+  --color-text-tertiary: #8a8a8a;     /* 三级文本 - 深灰 */
+  --color-text-disabled: #5a5a5a;     /* 禁用态 */
+  --color-text-inverse: #1a1a1a;      /* 反色文本 */
+  --color-text-placeholder: #6a6a6a;  /* 占位符 */
+
+  /* 3. 边框色 - 更明显的分割 */
+  --color-border-primary: #2d2d2d;    /* 主边框 - 可见但不突兀 */
+  --color-border-secondary: #3a3a3a;  /* 次级边框 */
+  --color-border-focus: #73d13d;      /* 焦点边框 - 护眼绿 */
+  --color-border-error: #ef4444;      /* 错误边框 - 红色 */
+
+  /* 4. 品牌色 - 护眼绿 - 暗色模式 */
+  --color-primary: #73d13d;           /* 主色 - 护眼绿 */
+  --color-primary-hover: #52c41a;     /* 悬停 - 深绿 */
+  --color-primary-active: #389e0d;    /* 激活 - 更深绿 */
+  --color-primary-light: #162312;     /* 浅色背景 */
+  --color-primary-text: #000000;      /* 按钮文字 - 黑色 */
+
+  /* 4. 品牌色 - Cyan - 保持鲜艳度 */
+  --color-accent: #06b6d4;            /* 强调色 - 青色 */
+  --color-accent-hover: #0891b2;      /* 悬停 */
+  --color-accent-light: #164e63;      /* 浅色背景 */
+
+  /* 5. 功能色 - Success */
+  --color-success: #73d13d;
+  --color-success-hover: #52c41a;
+  --color-success-light: #162312;
+  --color-success-text: #b7eb8f;
+
+  /* 5. 功能色 - Warning */
+  --color-warning: #f59e0b;
+  --color-warning-hover: #d97706;
+  --color-warning-light: #78350f;
+  --color-warning-text: #fde68a;
+
+  /* 5. 功能色 - Error */
+  --color-error: #ef4444;
+  --color-error-hover: #dc2626;
+  --color-error-light: #7f1d1d;
+  --color-error-text: #fecaca;
+
+  /* 5. 功能色 - Info */
+  --color-info: #0ea5e9;
+  --color-info-hover: #0284c7;
+  --color-info-light: #075985;
+  --color-info-text: #bae6fd;
+
+  /* 6. 阴影 - 更强的阴影增强层次感 */
+  --shadow-sm: 0 1px 3px 0 rgb(0 0 0 / 0.7);
+  --shadow-md: 0 4px 8px -2px rgb(0 0 0 / 0.8), 0 2px 4px -2px rgb(0 0 0 / 0.8);
+  --shadow-lg: 0 10px 20px -5px rgb(0 0 0 / 0.9), 0 4px 8px -4px rgb(0 0 0 / 0.9);
+  --shadow-xl: 0 20px 30px -5px rgb(0 0 0 / 0.95), 0 8px 12px -6px rgb(0 0 0 / 0.95);
+
+  /* 7. 渐变 */
+  --gradient-primary: linear-gradient(135deg, #73d13d 0%, #95de64 100%);
+  --gradient-bg: linear-gradient(to bottom right, #0a0a0b 0%, #162312 50%, #1f3a15 100%);
+}
+
+/* ============================================
+   主题切换过渡动画
+   ============================================ */
+html {
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+* {
+  transition-property: background-color, border-color, color, fill, stroke;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 200ms;
+}
+
+/* 禁用某些元素的过渡 */
+.no-transition,
+.no-transition * {
+  transition: none !important;
+}

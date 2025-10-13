@@ -1,19 +1,19 @@
 <template>
-  <div class="group bg-white rounded-lg shadow-sm hover:shadow-xl transition-all duration-300 p-4 border border-slate-200 hover:border-blue-400">
+  <div class="group bg-bg-elevated rounded-lg shadow-sm hover:shadow-xl transition-all duration-300 p-4 border border-border-primary hover:border-primary">
     <!-- 头部 -->
     <div class="flex items-start justify-between mb-3">
       <div class="flex-1 min-w-0">
-        <h3 class="text-sm font-semibold text-slate-900 truncate mb-1">
+        <h3 class="text-sm font-semibold text-text-primary truncate mb-1">
           {{ workflow.name }}
         </h3>
-        <p class="text-xs text-slate-600 line-clamp-2">
+        <p class="text-xs text-text-secondary line-clamp-2">
           {{ workflow.description || '暂无描述' }}
         </p>
       </div>
       <div
         :class="[
           'flex-shrink-0 px-2 py-0.5 rounded text-xs font-medium ml-2',
-          workflow.enabled ? 'bg-green-50 text-green-700' : 'bg-slate-100 text-slate-600'
+          workflow.enabled ? 'bg-green-50 text-green-700' : 'bg-bg-tertiary text-text-secondary'
         ]"
       >
         {{ workflow.enabled ? '已启用' : '已禁用' }}
@@ -21,7 +21,7 @@
     </div>
 
     <!-- 统计信息 -->
-    <div class="flex items-center gap-3 text-xs text-slate-500 mb-3">
+    <div class="flex items-center gap-3 text-xs text-text-tertiary mb-3">
       <span class="flex items-center gap-1">
         <Box class="w-3.5 h-3.5" />
         {{ workflow.nodes.length }} 个节点
@@ -32,8 +32,16 @@
       </span>
     </div>
 
+    <!-- 下次执行时间 -->
+    <div v-if="workflow.enabled && workflow.next_run_time" class="mb-3">
+      <div class="flex items-center gap-1.5 text-xs bg-primary-light text-primary px-2.5 py-1.5 rounded-md">
+        <Clock class="w-3.5 h-3.5" />
+        <span>下次执行：{{ formatNextRunTime(workflow.next_run_time) }}</span>
+      </div>
+    </div>
+
     <!-- 操作按钮 -->
-    <div class="space-y-2 pt-3 border-t border-slate-100">
+    <div class="space-y-2 pt-3 border-t border-border-primary">
       <!-- 第一行：主要操作 -->
       <div class="flex items-center gap-2">
         <BaseButton size="sm" variant="ghost" @click="$emit('edit', workflow)" class="flex-1">
@@ -76,7 +84,7 @@
 </template>
 
 <script setup lang="ts">
-import { Box, GitBranch, Edit3, Trash2, History, Play, Power } from 'lucide-vue-next'
+import { Box, GitBranch, Edit3, Trash2, History, Play, Power, Clock } from 'lucide-vue-next'
 import BaseButton from '@/components/BaseButton'
 import type { Workflow } from '@/types/workflow'
 
@@ -98,5 +106,42 @@ const handleDelete = () => {
   if (confirm('确定要删除这个工作流吗？')) {
     emit('delete', props.workflow)
   }
+}
+
+const formatNextRunTime = (timestamp: number) => {
+  const date = new Date(timestamp * 1000)
+  const now = new Date()
+  const diffMs = date.getTime() - now.getTime()
+
+  // 如果是过去的时间，显示"立即执行"
+  if (diffMs < 0) {
+    return '立即执行'
+  }
+
+  // 如果在1小时内
+  if (diffMs < 3600000) {
+    const minutes = Math.floor(diffMs / 60000)
+    return `${minutes}分钟后`
+  }
+
+  // 如果在今天
+  if (date.toDateString() === now.toDateString()) {
+    return date.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' })
+  }
+
+  // 如果在明天
+  const tomorrow = new Date(now)
+  tomorrow.setDate(tomorrow.getDate() + 1)
+  if (date.toDateString() === tomorrow.toDateString()) {
+    return '明天 ' + date.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' })
+  }
+
+  // 其他情况显示完整日期时间
+  return date.toLocaleString('zh-CN', {
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit'
+  })
 }
 </script>

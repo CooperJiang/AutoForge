@@ -26,6 +26,7 @@ func RegisterWorkflowRoutes(r *gin.RouterGroup) {
 		workflows.POST("/:id/execute", workflowController.ExecuteWorkflow)                         // 执行工作流
 		workflows.GET("/:id/executions", workflowController.GetExecutionList)                      // 获取执行历史
 		workflows.GET("/:id/executions/:executionId", workflowController.GetExecutionDetail)       // 获取执行详情
+		workflows.DELETE("/:id/executions/:executionId", workflowController.DeleteExecution)       // 删除执行记录
 		workflows.POST("/:id/executions/:executionId/stop", workflowController.StopExecution)      // 停止执行
 
 		// 工作流验证

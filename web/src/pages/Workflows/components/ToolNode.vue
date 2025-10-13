@@ -1,5 +1,5 @@
 <template>
-  <div class="tool-node bg-white rounded-lg shadow-lg border-2 border-slate-200 hover:border-blue-400 transition-all">
+  <div class="tool-node bg-bg-elevated rounded-lg shadow-lg border-2 border-border-primary hover:border-primary transition-all">
     <!-- 节点头部 -->
     <div :class="['px-3 py-2 rounded-t-lg flex items-center gap-2', getToolBgClass(data.toolCode)]">
       <component :is="getToolIcon(data.toolCode)" class="w-4 h-4 text-white flex-shrink-0" />
@@ -7,7 +7,7 @@
     </div>
 
     <!-- 节点内容 -->
-    <div class="px-3 py-2 text-xs text-slate-600">
+    <div class="px-3 py-2 text-xs text-text-secondary">
       <div v-if="hasConfig" class="flex items-center gap-1">
         <CheckCircle2 class="w-3 h-3 text-green-600" />
         <span>已配置</span>
@@ -54,11 +54,11 @@ const getToolIcon = (code?: string) => {
 // 获取工具背景色
 const getToolBgClass = (code?: string) => {
   const colorMap: Record<string, string> = {
-    'http_request': 'bg-gradient-to-r from-blue-500 to-purple-600',
+    'http_request': 'bg-gradient-to-r from-primary to-accent',
     'email_sender': 'bg-gradient-to-r from-purple-500 to-pink-600',
-    'health_checker': 'bg-gradient-to-r from-indigo-500 to-blue-600'
+    'health_checker': 'bg-gradient-to-r from-primary to-accent'
   }
-  return colorMap[code || ''] || 'bg-gradient-to-r from-blue-500 to-purple-600'
+  return colorMap[code || ''] || 'bg-gradient-to-r from-primary to-accent'
 }
 </script>
 

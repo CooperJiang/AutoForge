@@ -55,7 +55,7 @@ const getMessageClass = (type: string) => {
     case 'warning':
       return 'bg-amber-50 border-amber-400 text-amber-700'
     default:
-      return 'bg-blue-50 border-blue-400 text-blue-700'
+      return 'bg-primary-light border-border-focus text-primary'
   }
 }
 

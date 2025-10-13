@@ -1,7 +1,7 @@
 {
-  "name": "gin-template-frontend",
+  "name": "auto-forge",
   "version": "1.0.0",
-  "description": "Vue3 + TypeScript + TailwindCSS 用户端模板",
+  "description": "AutoForge - A powerful automation platform for scheduled tasks, workflows, and intelligent orchestration. Built with Go + Vue3.",
   "private": true,
   "type": "module",
   "scripts": {

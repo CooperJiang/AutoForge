@@ -1,49 +1,49 @@
 <template>
-  <div class="w-64 bg-white border-r border-slate-200 flex flex-col overflow-hidden">
+  <div class="w-64 bg-bg-elevated border-r border-border-primary flex flex-col overflow-hidden">
     <!-- 面板标题 -->
-    <div class="px-4 py-3 border-b border-slate-200">
-      <h3 class="text-sm font-semibold text-slate-900">工具箱</h3>
-      <p class="text-xs text-slate-500 mt-1">点击添加到画布</p>
+    <div class="px-4 py-3 border-b border-border-primary">
+      <h3 class="text-sm font-semibold text-text-primary">工具箱</h3>
+      <p class="text-xs text-text-tertiary mt-1">点击添加到画布</p>
     </div>
 
     <!-- 工具列表 -->
     <div class="flex-1 overflow-y-auto p-3 space-y-2">
       <!-- 触发器分类 -->
       <div class="mb-4">
-        <div class="text-xs font-semibold text-slate-600 mb-2 px-2">触发器</div>
+        <div class="text-xs font-semibold text-text-secondary mb-2 px-2">触发器</div>
         <button
           @click="handleAddTrigger"
           draggable="true"
           @dragstart="handleDragStartTrigger($event)"
-          class="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg border border-slate-200 hover:border-blue-400 hover:bg-blue-50 transition-all group cursor-move"
+          class="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg border border-border-primary hover:border-primary hover:bg-primary-light transition-all group cursor-move"
         >
-          <div class="flex-shrink-0 w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white shadow-sm">
+          <div class="flex-shrink-0 w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-accent flex items-center justify-center text-white shadow-sm">
             <Clock class="w-4 h-4" />
           </div>
           <div class="flex-1 text-left min-w-0">
-            <div class="text-sm font-medium text-slate-900 truncate">定时触发</div>
-            <div class="text-xs text-slate-500 truncate">按计划执行</div>
+            <div class="text-sm font-medium text-text-primary truncate">定时触发</div>
+            <div class="text-xs text-text-tertiary truncate">按计划执行</div>
           </div>
         </button>
       </div>
 
       <!-- 流程控制 -->
       <div class="mb-4">
-        <div class="text-xs font-semibold text-slate-600 mb-2 px-2">流程控制</div>
+        <div class="text-xs font-semibold text-text-secondary mb-2 px-2">流程控制</div>
         <div class="space-y-2">
           <!-- 条件判断 -->
           <button
             @click="handleAddCondition"
             draggable="true"
             @dragstart="handleDragStartCondition($event)"
-            class="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg border border-slate-200 hover:border-amber-400 hover:bg-amber-50 transition-all group cursor-move"
+            class="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg border border-border-primary hover:border-warning hover:bg-warning-light transition-all group cursor-move"
           >
             <div class="flex-shrink-0 w-8 h-8 rounded-lg bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center text-white shadow-sm">
               <GitBranch class="w-4 h-4" />
             </div>
             <div class="flex-1 text-left min-w-0">
-              <div class="text-sm font-medium text-slate-900 truncate">条件判断</div>
-              <div class="text-xs text-slate-500 truncate">IF 分支</div>
+              <div class="text-sm font-medium text-text-primary truncate">条件判断</div>
+              <div class="text-xs text-text-tertiary truncate">IF 分支</div>
             </div>
           </button>
 
@@ -52,14 +52,14 @@
             @click="handleAddSwitch"
             draggable="true"
             @dragstart="handleDragStartSwitch($event)"
-            class="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg border border-slate-200 hover:border-indigo-400 hover:bg-indigo-50 transition-all group cursor-move"
+            class="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg border border-border-primary hover:border-accent hover:bg-accent/10 transition-all group cursor-move"
           >
-            <div class="flex-shrink-0 w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-400 to-indigo-600 flex items-center justify-center text-white shadow-sm">
+            <div class="flex-shrink-0 w-8 h-8 rounded-lg bg-gradient-to-br from-accent to-accent-hover flex items-center justify-center text-white shadow-sm">
               <Split class="w-4 h-4" />
             </div>
             <div class="flex-1 text-left min-w-0">
-              <div class="text-sm font-medium text-slate-900 truncate">开关分支</div>
-              <div class="text-xs text-slate-500 truncate">Switch 多路</div>
+              <div class="text-sm font-medium text-text-primary truncate">开关分支</div>
+              <div class="text-xs text-text-tertiary truncate">Switch 多路</div>
             </div>
           </button>
 
@@ -68,14 +68,14 @@
             @click="handleAddDelay"
             draggable="true"
             @dragstart="handleDragStartDelay($event)"
-            class="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg border border-slate-200 hover:border-purple-400 hover:bg-purple-50 transition-all group cursor-move"
+            class="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg border border-border-primary hover:border-accent hover:bg-accent-light transition-all group cursor-move"
           >
-            <div class="flex-shrink-0 w-8 h-8 rounded-lg bg-gradient-to-br from-purple-400 to-purple-600 flex items-center justify-center text-white shadow-sm">
+            <div class="flex-shrink-0 w-8 h-8 rounded-lg bg-gradient-to-br from-accent to-accent-hover flex items-center justify-center text-white shadow-sm">
               <Timer class="w-4 h-4" />
             </div>
             <div class="flex-1 text-left min-w-0">
-              <div class="text-sm font-medium text-slate-900 truncate">延迟等待</div>
-              <div class="text-xs text-slate-500 truncate">等待指定时间</div>
+              <div class="text-sm font-medium text-text-primary truncate">延迟等待</div>
+              <div class="text-xs text-text-tertiary truncate">等待指定时间</div>
             </div>
           </button>
         </div>
@@ -83,7 +83,7 @@
 
       <!-- 工具分类 -->
       <div>
-        <div class="text-xs font-semibold text-slate-600 mb-2 px-2">工具</div>
+        <div class="text-xs font-semibold text-text-secondary mb-2 px-2">工具</div>
         <div class="space-y-2">
           <button
             v-for="tool in tools"
@@ -91,7 +91,7 @@
             @click="handleAddTool(tool)"
             draggable="true"
             @dragstart="handleDragStart($event, tool)"
-            class="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg border border-slate-200 hover:border-blue-400 hover:bg-blue-50 transition-all group cursor-move"
+            class="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg border border-border-primary hover:border-primary hover:bg-primary-light transition-all group cursor-move"
           >
             <div
               :class="[
@@ -102,8 +102,8 @@
               <component :is="getToolIcon(tool.code)" class="w-4 h-4" />
             </div>
             <div class="flex-1 text-left min-w-0">
-              <div class="text-sm font-medium text-slate-900 truncate">{{ tool.name }}</div>
-              <div class="text-xs text-slate-500 truncate">{{ tool.description }}</div>
+              <div class="text-sm font-medium text-text-primary truncate">{{ tool.name }}</div>
+              <div class="text-xs text-text-tertiary truncate">{{ tool.description }}</div>
             </div>
           </button>
         </div>
@@ -230,11 +230,11 @@ const getToolIcon = (code: string) => {
 // 获取工具背景色
 const getToolBgClass = (code: string) => {
   const colorMap: Record<string, string> = {
-    'http_request': 'bg-gradient-to-br from-blue-500 to-purple-600',
+    'http_request': 'bg-gradient-to-br from-primary to-accent',
     'email_sender': 'bg-gradient-to-br from-purple-500 to-pink-600',
-    'health_checker': 'bg-gradient-to-br from-indigo-500 to-blue-600'
+    'health_checker': 'bg-gradient-to-br from-primary to-accent'
   }
-  return colorMap[code] || 'bg-gradient-to-br from-blue-500 to-purple-600'
+  return colorMap[code] || 'bg-gradient-to-br from-primary to-accent'
 }
 
 onMounted(() => {

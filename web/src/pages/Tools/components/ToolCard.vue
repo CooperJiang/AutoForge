@@ -1,6 +1,6 @@
 <template>
   <div
-    class="group bg-gradient-to-br from-white to-slate-50 rounded-xl shadow-md hover:shadow-2xl transition-all duration-300 p-4 cursor-pointer border-2 border-slate-200 hover:border-blue-400 hover:-translate-y-1 flex flex-col min-h-[180px]"
+    class="group bg-gradient-to-br from-bg-elevated to-bg-secondary rounded-xl shadow-md hover:shadow-2xl transition-all duration-300 p-4 cursor-pointer border-2 border-border-primary hover:border-primary hover:-translate-y-1 flex flex-col min-h-[180px]"
     @click="$emit('click')"
   >
     <!-- 工具图标和标题 -->
@@ -15,17 +15,17 @@
         <component :is="iconComponent" class="w-6 h-6" />
       </div>
       <div class="flex-1 min-w-0">
-        <h3 class="text-base font-bold text-slate-900 mb-1 group-hover:text-blue-600 transition-colors truncate">
+        <h3 class="text-base font-bold text-text-primary mb-1 group-hover:text-primary transition-colors truncate">
           {{ tool.name }}
         </h3>
-        <p class="text-xs text-slate-500 truncate">
+        <p class="text-xs text-text-tertiary truncate">
           {{ tool.version }} · {{ tool.category }}
         </p>
       </div>
     </div>
 
     <!-- 工具描述 -->
-    <p class="text-sm text-slate-600 mb-3 line-clamp-2 flex-shrink-0 leading-relaxed">
+    <p class="text-sm text-text-secondary mb-3 line-clamp-2 flex-shrink-0 leading-relaxed">
       {{ tool.description }}
     </p>
 
@@ -34,25 +34,25 @@
       <span
         v-for="tag in tool.tags.slice(0, 3)"
         :key="tag"
-        class="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-blue-50 text-blue-700"
+        class="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-primary-light text-primary"
       >
         {{ tag }}
       </span>
       <span
         v-if="tool.tags.length > 3"
-        class="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-slate-100 text-slate-600"
+        class="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-bg-tertiary text-text-secondary"
       >
         +{{ tool.tags.length - 3 }}
       </span>
     </div>
 
     <!-- 底部信息 -->
-    <div class="flex items-center justify-between pt-3 border-t-2 border-slate-100 mt-auto">
-      <span class="text-xs text-slate-500 truncate mr-2 font-medium">
+    <div class="flex items-center justify-between pt-3 border-t-2 border-border-primary mt-auto">
+      <span class="text-xs text-text-tertiary truncate mr-2 font-medium">
         {{ tool.author }}
       </span>
       <button
-        class="flex items-center gap-1 text-sm font-semibold text-blue-600 hover:text-blue-700 group-hover:gap-1.5 transition-all flex-shrink-0"
+        class="flex items-center gap-1 text-sm font-semibold text-primary hover:text-primary group-hover:gap-1.5 transition-all flex-shrink-0"
         @click.stop="$emit('click')"
       >
         查看详情
@@ -100,11 +100,11 @@ const iconComponent = computed(() => {
 // 根据工具代码获取图标背景色
 const iconBgClass = computed(() => {
   const colorMap: Record<string, string> = {
-    'http_request': 'bg-gradient-to-br from-blue-500 to-purple-600',
+    'http_request': 'bg-gradient-to-br from-primary to-accent',
     'email_sender': 'bg-gradient-to-br from-purple-500 to-pink-600',
-    'health_checker': 'bg-gradient-to-br from-indigo-500 to-blue-600'
+    'health_checker': 'bg-gradient-to-br from-primary to-accent'
   }
-  return colorMap[props.tool.code] || 'bg-gradient-to-br from-blue-500 to-purple-600'
+  return colorMap[props.tool.code] || 'bg-gradient-to-br from-primary to-accent'
 })
 </script>
 

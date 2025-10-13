@@ -1,13 +1,13 @@
 <template>
-  <main class="flex h-screen bg-slate-50">
+  <main class="flex h-screen bg-bg-hover">
     <!-- 左侧表单区域 -->
-    <div class="w-[480px] bg-white border-r border-slate-200 overflow-y-auto">
+    <div class="w-[480px] bg-bg-elevated border-r border-border-primary overflow-y-auto">
       <div class="p-6">
         <div class="mb-6">
-          <h1 class="text-2xl font-bold text-slate-900">
+          <h1 class="text-2xl font-bold text-text-primary">
             {{ isEditing ? '编辑任务' : '添加定时任务' }}
           </h1>
-          <p class="text-sm text-slate-600 mt-1">
+          <p class="text-sm text-text-secondary mt-1">
             {{ isEditing ? '修改任务配置' : '选择工具创建定时任务' }}
           </p>
         </div>
@@ -15,7 +15,7 @@
         <form @submit.prevent="handleSubmit">
           <!-- 任务名称 -->
           <div class="mb-4">
-            <label class="block text-sm font-medium text-slate-700 mb-2">
+            <label class="block text-sm font-medium text-text-secondary mb-2">
               任务名称 <span class="text-red-500">*</span>
             </label>
             <BaseInput
@@ -27,7 +27,7 @@
 
           <!-- 执行规则 -->
           <div class="mb-4">
-            <label class="block text-sm font-medium text-slate-700 mb-2">
+            <label class="block text-sm font-medium text-text-secondary mb-2">
               执行规则 <span class="text-red-500">*</span>
             </label>
             <BaseSelect
@@ -43,14 +43,14 @@
               :placeholder="getScheduleValuePlaceholder()"
               required
             />
-            <p class="text-xs text-slate-500 mt-1">
+            <p class="text-xs text-text-tertiary mt-1">
               {{ getScheduleValueHint() }}
             </p>
           </div>
 
           <!-- 选择工具 -->
           <div class="mb-4">
-            <label class="block text-sm font-medium text-slate-700 mb-2">
+            <label class="block text-sm font-medium text-text-secondary mb-2">
               选择工具 <span class="text-red-500">*</span>
             </label>
             <BaseSelect
@@ -64,7 +64,7 @@
 
           <!-- 工具配置按钮 -->
           <div v-if="form.tool_code" class="mb-4">
-            <label class="block text-sm font-medium text-slate-700 mb-2">
+            <label class="block text-sm font-medium text-text-secondary mb-2">
               工具配置 <span class="text-red-500">*</span>
             </label>
             <BaseButton
@@ -102,30 +102,30 @@
 
     <!-- 右侧预览区域 -->
     <div class="flex-1 p-6 overflow-y-auto">
-      <div class="bg-white border-2 border-slate-200 rounded-lg p-6">
-        <h2 class="text-lg font-semibold text-slate-900 mb-4">任务预览</h2>
+      <div class="bg-bg-elevated border-2 border-border-primary rounded-lg p-6">
+        <h2 class="text-lg font-semibold text-text-primary mb-4">任务预览</h2>
         
         <div v-if="form.name" class="mb-4">
-          <div class="text-sm text-slate-600">任务名称</div>
-          <div class="text-base font-medium text-slate-900 mt-1">{{ form.name }}</div>
+          <div class="text-sm text-text-secondary">任务名称</div>
+          <div class="text-base font-medium text-text-primary mt-1">{{ form.name }}</div>
         </div>
 
         <div v-if="form.tool_code" class="mb-4">
-          <div class="text-sm text-slate-600">使用工具</div>
-          <div class="text-base font-medium text-slate-900 mt-1">
+          <div class="text-sm text-text-secondary">使用工具</div>
+          <div class="text-base font-medium text-text-primary mt-1">
             {{ selectedTool?.name || form.tool_code }}
           </div>
         </div>
 
         <div v-if="form.schedule_type" class="mb-4">
-          <div class="text-sm text-slate-600">执行规则</div>
-          <div class="text-base font-medium text-slate-900 mt-1">
+          <div class="text-sm text-text-secondary">执行规则</div>
+          <div class="text-base font-medium text-text-primary mt-1">
             {{ getScheduleTypeName(form.schedule_type) }}：{{ form.schedule_value || '-' }}
           </div>
         </div>
 
         <div v-if="isConfigured" class="mb-4">
-          <div class="text-sm text-slate-600">配置状态</div>
+          <div class="text-sm text-text-secondary">配置状态</div>
           <div class="text-base font-medium text-emerald-600 mt-1">✓ 已完成配置</div>
         </div>
       </div>
@@ -141,7 +141,7 @@
     >
       <div v-if="form.tool_code === 'http_tool'" class="space-y-4">
         <div>
-          <label class="block text-sm font-medium text-slate-700 mb-2">
+          <label class="block text-sm font-medium text-text-secondary mb-2">
             请求方式 <span class="text-red-500">*</span>
           </label>
           <BaseSelect
@@ -152,7 +152,7 @@
         </div>
 
         <div>
-          <label class="block text-sm font-medium text-slate-700 mb-2">
+          <label class="block text-sm font-medium text-text-secondary mb-2">
             接口地址 <span class="text-red-500">*</span>
           </label>
           <BaseInput
@@ -163,31 +163,31 @@
         </div>
 
         <div>
-          <label class="block text-sm font-medium text-slate-700 mb-2">
+          <label class="block text-sm font-medium text-text-secondary mb-2">
             请求头（可选）
           </label>
           <textarea
             v-model="toolConfig.headers"
-            class="w-full px-3 py-2 border-2 border-slate-200 rounded-lg focus:outline-none focus:border-green-500 font-mono text-sm"
+            class="w-full px-3 py-2 border-2 border-border-primary rounded-lg focus:outline-none focus:border-green-500 font-mono text-sm"
             rows="4"
             placeholder='{"Content-Type": "application/json"}'
           />
         </div>
 
         <div>
-          <label class="block text-sm font-medium text-slate-700 mb-2">
+          <label class="block text-sm font-medium text-text-secondary mb-2">
             请求参数（可选）
           </label>
           <textarea
             v-model="toolConfig.body"
-            class="w-full px-3 py-2 border-2 border-slate-200 rounded-lg focus:outline-none focus:border-green-500 font-mono text-sm"
+            class="w-full px-3 py-2 border-2 border-border-primary rounded-lg focus:outline-none focus:border-green-500 font-mono text-sm"
             rows="4"
             placeholder='{"key": "value"}'
           />
         </div>
       </div>
 
-      <div v-else class="text-center py-8 text-slate-500">
+      <div v-else class="text-center py-8 text-text-tertiary">
         该工具暂无需配置参数
       </div>
     </Dialog>

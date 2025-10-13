@@ -8,12 +8,12 @@
   >
     <div v-if="toolCode === 'http_request'" class="space-y-4">
       <!-- Curl 粘贴提示 -->
-      <div class="bg-blue-50 border border-blue-200 rounded-lg p-3 text-xs text-blue-800">
-        💡 小提示：按 <kbd class="px-1.5 py-0.5 bg-white border border-blue-300 rounded">{{ isMac ? 'Cmd' : 'Ctrl' }}</kbd> + <kbd class="px-1.5 py-0.5 bg-white border border-blue-300 rounded">V</kbd> 可直接粘贴 cURL 命令自动解析
+      <div class="bg-primary-light border border-primary rounded-lg p-3 text-xs text-primary">
+        💡 小提示：按 <kbd class="px-1.5 py-0.5 bg-bg-elevated border border-primary rounded">{{ isMac ? 'Cmd' : 'Ctrl' }}</kbd> + <kbd class="px-1.5 py-0.5 bg-bg-elevated border border-primary rounded">V</kbd> 可直接粘贴 cURL 命令自动解析
       </div>
 
       <div>
-        <label class="block text-sm font-medium text-slate-700 mb-2">
+        <label class="block text-sm font-medium text-text-secondary mb-2">
           请求方式 <span class="text-red-500">*</span>
         </label>
         <BaseSelect
@@ -24,7 +24,7 @@
       </div>
 
       <div>
-        <label class="block text-sm font-medium text-slate-700 mb-2">
+        <label class="block text-sm font-medium text-text-secondary mb-2">
           接口地址 <span class="text-red-500">*</span>
         </label>
         <BaseInput
@@ -36,7 +36,7 @@
 
       <!-- Headers -->
       <div>
-        <label class="block text-sm font-medium text-slate-700 mb-2">
+        <label class="block text-sm font-medium text-text-secondary mb-2">
           请求头（可选）
         </label>
         <div class="space-y-2">
@@ -52,7 +52,7 @@
           <button
             type="button"
             @click="addHeader"
-            class="w-full py-2 text-sm text-slate-600 border-2 border-dashed border-slate-300 rounded-lg hover:border-slate-400 hover:text-slate-700 transition-colors"
+            class="w-full py-2 text-sm text-text-secondary border-2 border-dashed border-slate-300 rounded-lg hover:border-slate-400 hover:text-text-secondary transition-colors"
           >
             + 添加请求头
           </button>
@@ -61,7 +61,7 @@
 
       <!-- Params -->
       <div>
-        <label class="block text-sm font-medium text-slate-700 mb-2">
+        <label class="block text-sm font-medium text-text-secondary mb-2">
           请求参数（可选）
         </label>
         <div class="space-y-2">
@@ -77,7 +77,7 @@
           <button
             type="button"
             @click="addParam"
-            class="w-full py-2 text-sm text-slate-600 border-2 border-dashed border-slate-300 rounded-lg hover:border-slate-400 hover:text-slate-700 transition-colors"
+            class="w-full py-2 text-sm text-text-secondary border-2 border-dashed border-slate-300 rounded-lg hover:border-slate-400 hover:text-text-secondary transition-colors"
           >
             + 添加参数
           </button>
@@ -91,23 +91,23 @@
           @click="bodyExpanded = !bodyExpanded"
           class="flex items-center justify-between w-full mb-2 text-left"
         >
-          <label class="block text-sm font-medium text-slate-700 cursor-pointer">
-            {{ bodyExpanded ? '▼' : '▶' }} 请求体 (Body) <span class="text-xs text-slate-500">(POST/PUT/PATCH)</span>
+          <label class="block text-sm font-medium text-text-secondary cursor-pointer">
+            {{ bodyExpanded ? '▼' : '▶' }} 请求体 (Body) <span class="text-xs text-text-tertiary">(POST/PUT/PATCH)</span>
           </label>
         </button>
         <div v-show="bodyExpanded" class="space-y-1">
           <textarea
             v-model="localConfig.body"
-            class="w-full px-3 py-2 border-2 border-slate-200 rounded-lg focus:outline-none focus:border-green-500 font-mono text-sm"
+            class="w-full px-3 py-2 border-2 border-border-primary rounded-lg focus:outline-none focus:border-green-500 font-mono text-sm"
             rows="6"
             placeholder='{"key": "value"}'
           />
-          <div class="text-xs text-slate-500">支持 JSON、文本等格式</div>
+          <div class="text-xs text-text-tertiary">支持 JSON、文本等格式</div>
         </div>
       </div>
     </div>
 
-    <div v-else class="text-center py-8 text-slate-500">
+    <div v-else class="text-center py-8 text-text-tertiary">
       该工具暂无需配置参数
     </div>
   </Dialog>

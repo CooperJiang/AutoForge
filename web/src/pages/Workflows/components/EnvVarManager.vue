@@ -2,11 +2,11 @@
   <Drawer v-model="isOpen" title="环境变量管理" size="md" @close="handleClose">
     <div class="space-y-4">
       <!-- 说明 -->
-      <div class="bg-blue-50 border border-blue-200 rounded-lg p-3 text-sm">
-        <div class="font-semibold text-blue-900 mb-1">💡 什么是环境变量？</div>
-        <div class="text-blue-700 text-xs space-y-1">
+      <div class="bg-primary-light border border-primary rounded-lg p-3 text-sm">
+        <div class="font-semibold text-text-primary mb-1">💡 什么是环境变量？</div>
+        <div class="text-primary text-xs space-y-1">
           <p>环境变量可以在工作流的任何节点中引用，用于存储 API 密钥、配置参数等敏感信息。</p>
-          <p>使用方式：<code class="px-1 py-0.5 bg-blue-100 rounded">&#123;&#123;env.VARIABLE_NAME&#125;&#125;</code></p>
+          <p>使用方式：<code class="px-1 py-0.5 bg-primary-light rounded">&#123;&#123;env.VARIABLE_NAME&#125;&#125;</code></p>
         </div>
       </div>
 
@@ -15,11 +15,11 @@
         <div
           v-for="(envVar, index) in localEnvVars"
           :key="index"
-          class="border-2 border-slate-200 rounded-lg p-3 space-y-2"
+          class="border-2 border-border-primary rounded-lg p-3 space-y-2"
         >
           <div class="grid grid-cols-2 gap-2">
             <div>
-              <label class="block text-xs font-medium text-slate-700 mb-1">变量名</label>
+              <label class="block text-xs font-medium text-text-secondary mb-1">变量名</label>
               <BaseInput
                 v-model="envVar.key"
                 placeholder="API_KEY"
@@ -27,7 +27,7 @@
               />
             </div>
             <div>
-              <label class="block text-xs font-medium text-slate-700 mb-1">描述（可选）</label>
+              <label class="block text-xs font-medium text-text-secondary mb-1">描述（可选）</label>
               <BaseInput
                 v-model="envVar.description"
                 placeholder="API密钥"
@@ -35,7 +35,7 @@
             </div>
           </div>
           <div>
-            <label class="block text-xs font-medium text-slate-700 mb-1">值</label>
+            <label class="block text-xs font-medium text-text-secondary mb-1">值</label>
             <div class="relative">
               <BaseInput
                 v-model="envVar.value"
@@ -47,7 +47,7 @@
                 v-if="envVar.encrypted"
                 type="button"
                 @click="togglePasswordVisibility(index)"
-                class="absolute right-2 top-1/2 -translate-y-1/2 text-slate-600 hover:text-slate-900"
+                class="absolute right-2 top-1/2 -translate-y-1/2 text-text-secondary hover:text-text-primary"
                 :title="showPassword[index] ? '隐藏' : '显示'"
               >
                 <Eye v-if="showPassword[index]" class="w-4 h-4" />
@@ -63,7 +63,7 @@
                 :id="`encrypted-${index}`"
                 class="rounded border-slate-300 text-green-600 focus:ring-green-500"
               />
-              <label :for="`encrypted-${index}`" class="text-xs text-slate-600">
+              <label :for="`encrypted-${index}`" class="text-xs text-text-secondary">
                 敏感信息（加密存储）
               </label>
             </div>
@@ -81,14 +81,14 @@
         <button
           type="button"
           @click="addEnvVar"
-          class="w-full py-3 text-sm text-slate-600 border-2 border-dashed border-slate-300 rounded-lg hover:border-green-500 hover:text-green-600 transition-colors"
+          class="w-full py-3 text-sm text-text-secondary border-2 border-dashed border-slate-300 rounded-lg hover:border-green-500 hover:text-green-600 transition-colors"
         >
           + 添加环境变量
         </button>
       </div>
 
       <!-- 操作按钮 -->
-      <div class="flex gap-2 pt-4 border-t border-slate-200">
+      <div class="flex gap-2 pt-4 border-t border-border-primary">
         <BaseButton
           size="sm"
           variant="ghost"

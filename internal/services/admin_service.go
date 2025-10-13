@@ -299,6 +299,24 @@ func (s *AdminService) GetAllExecutions(page, pageSize int, userID, taskID, stat
 	return executions, total, nil
 }
 
+// DeleteExecution 删除执行记录
+func (s *AdminService) DeleteExecution(executionID string) error {
+	db := database.GetDB()
+
+	// 检查执行记录是否存在
+	var execution models.TaskExecution
+	if err := db.Where("id = ?", executionID).First(&execution).Error; err != nil {
+		return errors.New(errors.CodeNotFound, "执行记录不存在")
+	}
+
+	// 删除执行记录
+	if err := db.Delete(&execution).Error; err != nil {
+		return errors.New(errors.CodeInternal, "删除执行记录失败")
+	}
+
+	return nil
+}
+
 // UserWithStats 用户信息及任务统计
 type UserWithStats struct {
 	models.User

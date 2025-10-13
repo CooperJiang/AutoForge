@@ -1,6 +1,6 @@
 <template>
-  <div class="flex items-center justify-between px-4 py-3 border-t-2 border-slate-200">
-    <div class="text-sm text-slate-600">
+  <div class="flex items-center justify-between px-4 py-3 border-t-2 border-border-primary">
+    <div class="text-sm text-text-secondary">
       共 <span class="font-semibold">{{ total }}</span> 条记录
     </div>
     <div class="flex items-center gap-2">
@@ -21,10 +21,10 @@
           :disabled="page === '...'"
           class="px-3 py-1 text-sm border-2 rounded-md transition-colors"
           :class="page === currentPage
-            ? 'bg-green-500 text-white border-green-500'
+            ? 'bg-success-light0 text-white border-green-500'
             : page === '...'
-            ? 'border-transparent text-slate-400 cursor-default'
-            : 'border-slate-200 text-slate-700 hover:border-green-500 hover:text-green-600'"
+            ? 'border-transparent text-text-tertiary cursor-default'
+            : 'border-border-primary text-text-secondary hover:border-green-500 hover:text-green-600'"
         >
           {{ page }}
         </button>

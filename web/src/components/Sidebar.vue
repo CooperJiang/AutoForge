@@ -1,53 +1,55 @@
 <template>
-  <aside class="w-64 bg-white border-r-2 border-slate-200 flex flex-col flex-shrink-0">
+  <aside class="w-56 bg-bg-primary flex flex-col flex-shrink-0 h-screen">
     <!-- Logo -->
-    <div class="px-6 py-4 border-b-2 border-slate-200">
-      <div class="flex items-center gap-3 cursor-pointer" @click="handleLogoClick">
-        <img src="/logo.png" alt="Logo" class="h-10 w-10 object-contain" />
+    <div class="px-4 py-4 border-b border-border-primary">
+      <div class="flex items-center gap-2.5 cursor-pointer group" @click="handleLogoClick">
+        <div class="w-8 h-8 flex items-center justify-center group-hover:scale-105 transition-transform">
+          <img src="/logo.png" alt="Logo" class="h-8 w-8 object-contain" />
+        </div>
         <div>
-          <h1 class="text-lg font-bold text-slate-900">定时任务系统</h1>
-          <p class="text-xs text-slate-500">自动化工作流</p>
+          <h1 class="text-sm font-bold text-text-primary group-hover:text-primary transition-colors">定时任务系统</h1>
+          <p class="text-xs text-text-tertiary">AutoForage Workflow</p>
         </div>
       </div>
     </div>
 
     <!-- Navigation -->
-    <nav class="flex-1 overflow-y-auto py-4">
-      <div class="px-3 space-y-1">
+    <nav class="flex-1 overflow-y-auto py-2.5 px-2.5">
+      <div class="space-y-0.5">
         <router-link
           v-for="item in menuItems"
           :key="item.path"
           :to="item.path"
           :class="[
-            'flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all',
+            'flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200',
             isActive(item.path)
-              ? 'bg-blue-50 text-blue-700 shadow-sm'
-              : 'text-slate-700 hover:bg-slate-50'
+              ? 'bg-[var(--color-primary)] text-white shadow-lg shadow-primary/30'
+              : 'text-text-secondary hover:bg-bg-hover hover:text-text-primary'
           ]"
         >
-          <component :is="item.icon" class="w-5 h-5 flex-shrink-0" />
+          <component :is="item.icon" class="w-4 h-4 flex-shrink-0" />
           <span>{{ item.label }}</span>
         </router-link>
       </div>
 
       <!-- Admin Section -->
-      <div v-if="isAdmin" class="mt-6 px-3">
-        <div class="px-3 py-2 text-xs font-semibold text-slate-500 uppercase tracking-wider">
+      <div v-if="isAdmin" class="mt-5">
+        <div class="px-3 py-1.5 mb-1 text-xs font-bold text-text-tertiary uppercase tracking-wider">
           管理功能
         </div>
-        <div class="space-y-1">
+        <div class="space-y-0.5">
           <router-link
             v-for="item in adminMenuItems"
             :key="item.path"
             :to="item.path"
             :class="[
-              'flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all',
+              'flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200',
               isActive(item.path)
-                ? 'bg-green-50 text-green-700 shadow-sm'
-                : 'text-slate-700 hover:bg-slate-50'
+                ? 'bg-warning text-white shadow-lg shadow-warning/30'
+                : 'text-text-secondary hover:bg-bg-hover hover:text-text-primary'
             ]"
           >
-            <component :is="item.icon" class="w-5 h-5 flex-shrink-0" />
+            <component :is="item.icon" class="w-4 h-4 flex-shrink-0" />
             <span>{{ item.label }}</span>
           </router-link>
         </div>
@@ -55,18 +57,18 @@
     </nav>
 
     <!-- User Info -->
-    <div class="border-t-2 border-slate-200 p-4">
-      <div class="flex items-center gap-3">
-        <div class="w-10 h-10 rounded-full bg-gradient-to-br from-green-400 to-cyan-500 flex items-center justify-center text-white font-bold text-sm shadow-sm flex-shrink-0">
+    <div class="border-t border-border-primary p-3">
+      <div class="flex items-center gap-2.5">
+        <div class="w-9 h-9 rounded-lg bg-gradient-primary flex items-center justify-center text-white font-bold text-sm shadow-md flex-shrink-0">
           {{ userInitial }}
         </div>
         <div class="flex-1 min-w-0">
-          <p class="text-sm font-semibold text-slate-900 truncate">{{ userName }}</p>
-          <p class="text-xs text-slate-500 truncate">{{ user?.email }}</p>
+          <p class="text-sm font-semibold text-text-primary truncate">{{ userName }}</p>
+          <p class="text-xs text-text-tertiary truncate">{{ user?.email }}</p>
         </div>
         <button
           @click="handleLogout"
-          class="flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-lg text-rose-600 hover:bg-rose-50 transition-colors"
+          class="flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-lg text-text-tertiary hover:text-error hover:bg-error-light transition-all"
           title="退出登录"
         >
           <LogOut class="w-4 h-4" />

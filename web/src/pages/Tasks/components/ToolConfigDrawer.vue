@@ -11,12 +11,12 @@
   >
     <div v-if="toolCode === 'http_request'" class="space-y-4">
       <!-- Curl 粘贴提示 -->
-      <div class="bg-blue-50 border border-blue-200 rounded-lg p-3 text-xs text-blue-800">
-        💡 小提示：按 <kbd class="px-1.5 py-0.5 bg-white border border-blue-300 rounded">{{ isMac ? 'Cmd' : 'Ctrl' }}</kbd> + <kbd class="px-1.5 py-0.5 bg-white border border-blue-300 rounded">V</kbd> 可直接粘贴 cURL 命令自动解析
+      <div class="bg-primary-light border border-primary rounded-lg p-3 text-xs text-primary">
+        💡 小提示：按 <kbd class="px-1.5 py-0.5 bg-bg-elevated border border-primary rounded">{{ isMac ? 'Cmd' : 'Ctrl' }}</kbd> + <kbd class="px-1.5 py-0.5 bg-bg-elevated border border-primary rounded">V</kbd> 可直接粘贴 cURL 命令自动解析
       </div>
 
       <div>
-        <label class="block text-sm font-medium text-slate-700 mb-2">
+        <label class="block text-sm font-medium text-text-secondary mb-2">
           请求方式 <span class="text-red-500">*</span>
         </label>
         <BaseSelect
@@ -27,7 +27,7 @@
       </div>
 
       <div>
-        <label class="block text-sm font-medium text-slate-700 mb-2">
+        <label class="block text-sm font-medium text-text-secondary mb-2">
           接口地址 <span class="text-red-500">*</span>
         </label>
         <BaseInput
@@ -39,7 +39,7 @@
 
       <!-- Headers -->
       <div>
-        <label class="block text-sm font-medium text-slate-700 mb-2">
+        <label class="block text-sm font-medium text-text-secondary mb-2">
           请求头（可选）
         </label>
         <div class="space-y-2">
@@ -55,7 +55,7 @@
           <button
             type="button"
             @click="addHeader"
-            class="w-full py-2 text-sm text-slate-600 border-2 border-dashed border-slate-300 rounded-lg hover:border-slate-400 hover:text-slate-700 transition-colors"
+            class="w-full py-2 text-sm text-text-secondary border-2 border-dashed border-slate-300 rounded-lg hover:border-slate-400 hover:text-text-secondary transition-colors"
           >
             + 添加请求头
           </button>
@@ -64,7 +64,7 @@
 
       <!-- Params -->
       <div>
-        <label class="block text-sm font-medium text-slate-700 mb-2">
+        <label class="block text-sm font-medium text-text-secondary mb-2">
           请求参数（可选）
         </label>
         <div class="space-y-2">
@@ -80,7 +80,7 @@
           <button
             type="button"
             @click="addParam"
-            class="w-full py-2 text-sm text-slate-600 border-2 border-dashed border-slate-300 rounded-lg hover:border-slate-400 hover:text-slate-700 transition-colors"
+            class="w-full py-2 text-sm text-text-secondary border-2 border-dashed border-slate-300 rounded-lg hover:border-slate-400 hover:text-text-secondary transition-colors"
           >
             + 添加参数
           </button>
@@ -94,26 +94,26 @@
           @click="bodyExpanded = !bodyExpanded"
           class="flex items-center justify-between w-full mb-2 text-left"
         >
-          <label class="block text-sm font-medium text-slate-700 cursor-pointer">
-            {{ bodyExpanded ? '▼' : '▶' }} 请求体 (Body) <span class="text-xs text-slate-500">(POST/PUT/PATCH)</span>
+          <label class="block text-sm font-medium text-text-secondary cursor-pointer">
+            {{ bodyExpanded ? '▼' : '▶' }} 请求体 (Body) <span class="text-xs text-text-tertiary">(POST/PUT/PATCH)</span>
           </label>
         </button>
         <div v-show="bodyExpanded" class="space-y-1">
           <textarea
             v-model="localConfig.body"
-            class="w-full px-3 py-2 border-2 border-slate-200 rounded-lg focus:outline-none focus:border-green-500 font-mono text-sm"
+            class="w-full px-3 py-2 border-2 border-border-primary rounded-lg focus:outline-none focus:border-primary bg-bg-elevated text-text-primary font-mono text-sm"
             rows="8"
             placeholder='{"key": "value"}'
           />
-          <div class="text-xs text-slate-500">支持 JSON、文本等格式</div>
+          <div class="text-xs text-text-tertiary">支持 JSON、文本等格式</div>
         </div>
       </div>
     </div>
 
     <!-- 邮件发送工具配置 -->
     <div v-else-if="toolCode === 'email_sender'" class="space-y-4">
-      <div class="bg-blue-50 border-l-4 border-blue-400 p-3 mb-4">
-        <p class="text-sm text-blue-700">
+      <div class="bg-primary-light border-l-4 border-primary p-3 mb-4">
+        <p class="text-sm text-primary">
           <svg class="inline-block w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
             <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
           </svg>
@@ -122,7 +122,7 @@
       </div>
 
       <div>
-        <label class="block text-sm font-medium text-slate-700 mb-2">
+        <label class="block text-sm font-medium text-text-secondary mb-2">
           收件人 <span class="text-red-500">*</span>
         </label>
         <BaseInput
@@ -130,11 +130,11 @@
           placeholder="recipient@example.com, another@example.com"
           required
         />
-        <p class="text-xs text-slate-500 mt-1">多个收件人用逗号分隔</p>
+        <p class="text-xs text-text-tertiary mt-1">多个收件人用逗号分隔</p>
       </div>
 
       <div>
-        <label class="block text-sm font-medium text-slate-700 mb-2">
+        <label class="block text-sm font-medium text-text-secondary mb-2">
           抄送人
         </label>
         <BaseInput
@@ -144,7 +144,7 @@
       </div>
 
       <div>
-        <label class="block text-sm font-medium text-slate-700 mb-2">
+        <label class="block text-sm font-medium text-text-secondary mb-2">
           邮件主题 <span class="text-red-500">*</span>
         </label>
         <BaseInput
@@ -155,12 +155,12 @@
       </div>
 
       <div>
-        <label class="block text-sm font-medium text-slate-700 mb-2">
+        <label class="block text-sm font-medium text-text-secondary mb-2">
           邮件正文 <span class="text-red-500">*</span>
         </label>
         <textarea
           v-model="emailConfig.body"
-          class="w-full px-3 py-2 border-2 border-slate-200 rounded-lg focus:outline-none focus:border-emerald-500 font-mono text-sm"
+          class="w-full px-3 py-2 border-2 border-border-primary rounded-lg focus:outline-none focus:border-primary bg-bg-elevated text-text-primary font-mono text-sm"
           rows="8"
           placeholder="尊敬的用户，您好！&#10;&#10;您正在使用【自动任务系统】进行身份验证，您的验证码为：&#10;&#10;      123456&#10;&#10;验证码有效期为 10 分钟，请勿泄露给他人。&#10;如非本人操作，请忽略此邮件。&#10;&#10;感谢您的使用！&#10;&#10;---&#10;【自动任务系统】&#10;support@yourdomain.com"
           required
@@ -169,7 +169,7 @@
           <p class="text-xs text-amber-600">
             💡 <strong>避免被拦截的建议：</strong>
           </p>
-          <ul class="text-xs text-slate-600 ml-4 space-y-0.5">
+          <ul class="text-xs text-text-secondary ml-4 space-y-0.5">
             <li>• 使用完整的邮件格式（称呼、正文、签名）</li>
             <li>• 说明邮件来源和目的</li>
             <li>• 验证码邮件需包含有效期、安全提示</li>
@@ -179,7 +179,7 @@
       </div>
 
       <div>
-        <label class="block text-sm font-medium text-slate-700 mb-2">
+        <label class="block text-sm font-medium text-text-secondary mb-2">
           内容类型
         </label>
         <BaseSelect
@@ -191,8 +191,8 @@
 
     <!-- 健康检查工具配置 -->
     <div v-else-if="toolCode === 'health_checker'" class="space-y-4">
-      <div class="bg-blue-50 border-l-4 border-blue-400 p-3 mb-4">
-        <p class="text-sm text-blue-700">
+      <div class="bg-primary-light border-l-4 border-primary p-3 mb-4">
+        <p class="text-sm text-primary">
           <svg class="inline-block w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
             <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
           </svg>
@@ -201,7 +201,7 @@
       </div>
 
       <div>
-        <label class="block text-sm font-medium text-slate-700 mb-2">
+        <label class="block text-sm font-medium text-text-secondary mb-2">
           检查 URL <span class="text-red-500">*</span>
         </label>
         <BaseInput
@@ -212,7 +212,7 @@
       </div>
 
       <div>
-        <label class="block text-sm font-medium text-slate-700 mb-2">
+        <label class="block text-sm font-medium text-text-secondary mb-2">
           请求方法
         </label>
         <BaseSelect
@@ -224,7 +224,7 @@
       <!-- Headers -->
       <div>
         <div class="flex items-center justify-between mb-2">
-          <label class="block text-sm font-medium text-slate-700">
+          <label class="block text-sm font-medium text-text-secondary">
             请求头 (Headers)
           </label>
           <button
@@ -248,21 +248,21 @@
 
       <!-- Body -->
       <div>
-        <label class="block text-sm font-medium text-slate-700 mb-2">
+        <label class="block text-sm font-medium text-text-secondary mb-2">
           请求体 (Body)
         </label>
         <textarea
           v-model="healthBody"
-          class="w-full px-3 py-2 border-2 border-slate-200 rounded-lg focus:outline-none focus:border-emerald-500 font-mono text-sm"
+          class="w-full px-3 py-2 border-2 border-border-primary rounded-lg focus:outline-none focus:border-primary bg-bg-elevated text-text-primary font-mono text-sm"
           :rows="bodyExpanded ? 12 : 4"
           placeholder='{"key": "value"}'
         />
         <div class="flex items-center justify-between mt-1">
-          <p class="text-xs text-slate-500">支持 JSON 或纯文本</p>
+          <p class="text-xs text-text-tertiary">支持 JSON 或纯文本</p>
           <button
             type="button"
             @click="bodyExpanded = !bodyExpanded"
-            class="text-xs text-blue-600 hover:text-blue-700"
+            class="text-xs text-primary hover:text-primary"
           >
             {{ bodyExpanded ? '收起' : '展开' }}
           </button>
@@ -270,7 +270,7 @@
       </div>
 
       <div>
-        <label class="block text-sm font-medium text-slate-700 mb-2">
+        <label class="block text-sm font-medium text-text-secondary mb-2">
           超时时间（秒）
         </label>
         <BaseInput
@@ -281,7 +281,7 @@
       </div>
 
       <div>
-        <label class="block text-sm font-medium text-slate-700 mb-2">
+        <label class="block text-sm font-medium text-text-secondary mb-2">
           期望状态码
         </label>
         <BaseInput
@@ -289,18 +289,18 @@
           type="number"
           placeholder="200"
         />
-        <p class="text-xs text-slate-500 mt-1">设置为 0 表示任意 2xx 状态码</p>
+        <p class="text-xs text-text-tertiary mt-1">设置为 0 表示任意 2xx 状态码</p>
       </div>
 
       <div>
-        <label class="block text-sm font-medium text-slate-700 mb-2">
+        <label class="block text-sm font-medium text-text-secondary mb-2">
           期望内容
         </label>
         <BaseInput
           v-model="healthConfig.expected_content"
           placeholder="success"
         />
-        <p class="text-xs text-slate-500 mt-1">响应体中应包含的内容</p>
+        <p class="text-xs text-text-tertiary mt-1">响应体中应包含的内容</p>
       </div>
 
       <div class="flex items-center gap-2">
@@ -310,7 +310,7 @@
           id="use_regex"
           class="rounded border-slate-300"
         />
-        <label for="use_regex" class="text-sm text-slate-700 cursor-pointer">
+        <label for="use_regex" class="text-sm text-text-secondary cursor-pointer">
           使用正则表达式匹配
         </label>
       </div>
@@ -322,13 +322,13 @@
           id="check_ssl"
           class="rounded border-slate-300"
         />
-        <label for="check_ssl" class="text-sm text-slate-700 cursor-pointer">
+        <label for="check_ssl" class="text-sm text-text-secondary cursor-pointer">
           检查 SSL 证书有效期
         </label>
       </div>
 
       <div v-if="healthConfig.check_ssl">
-        <label class="block text-sm font-medium text-slate-700 mb-2">
+        <label class="block text-sm font-medium text-text-secondary mb-2">
           SSL 到期告警天数
         </label>
         <BaseInput
@@ -345,7 +345,7 @@
           id="follow_redirects"
           class="rounded border-slate-300"
         />
-        <label for="follow_redirects" class="text-sm text-slate-700 cursor-pointer">
+        <label for="follow_redirects" class="text-sm text-text-secondary cursor-pointer">
           跟随重定向
         </label>
       </div>
@@ -357,13 +357,13 @@
           id="verify_ssl"
           class="rounded border-slate-300"
         />
-        <label for="verify_ssl" class="text-sm text-slate-700 cursor-pointer">
+        <label for="verify_ssl" class="text-sm text-text-secondary cursor-pointer">
           验证 SSL 证书有效性
         </label>
       </div>
     </div>
 
-    <div v-else class="text-center py-8 text-slate-500">
+    <div v-else class="text-center py-8 text-text-tertiary">
       该工具暂无需配置参数
     </div>
   </Drawer>

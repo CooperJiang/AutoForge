@@ -1,15 +1,15 @@
 <template>
-  <div class="trigger-node bg-white rounded-lg shadow-lg border-2 border-blue-300 hover:border-blue-500 transition-all">
+  <div class="trigger-node bg-bg-elevated rounded-lg shadow-lg border-2 border-primary hover:border-primary transition-all">
     <!-- 节点头部 -->
-    <div class="px-3 py-2 bg-gradient-to-r from-blue-500 to-purple-600 rounded-t-lg flex items-center gap-2">
+    <div class="px-3 py-2 bg-gradient-to-r from-primary to-accent rounded-t-lg flex items-center gap-2">
       <Clock class="w-4 h-4 text-white flex-shrink-0" />
       <span class="text-sm font-medium text-white truncate">{{ data.name }}</span>
     </div>
 
     <!-- 节点内容 -->
-    <div class="px-3 py-2 text-xs text-slate-600">
+    <div class="px-3 py-2 text-xs text-text-secondary">
       <div class="flex items-center gap-1">
-        <Zap class="w-3 h-3 text-blue-600" />
+        <Zap class="w-3 h-3 text-primary" />
         <span>工作流入口</span>
       </div>
     </div>

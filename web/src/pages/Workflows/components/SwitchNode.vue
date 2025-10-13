@@ -1,27 +1,27 @@
 <template>
   <div
-    class="switch-node bg-white rounded-lg shadow-lg border-2 border-indigo-400 min-w-[200px] hover:shadow-xl transition-shadow"
-    :class="{ 'ring-2 ring-indigo-500': data.selected }"
+    class="switch-node bg-bg-elevated rounded-lg shadow-lg border-2 border-accent min-w-[200px] hover:shadow-xl transition-shadow"
+    :class="{ 'ring-2 ring-accent': data.selected }"
   >
     <!-- 顶部输入点 -->
     <Handle
       type="target"
       :position="Position.Top"
-      class="w-3 h-3 !bg-indigo-500 !border-2 !border-white"
+      class="w-3 h-3 !bg-accent !border-2 !border-bg-elevated"
     />
 
     <!-- 节点内容 -->
     <div class="px-4 py-3">
       <!-- 图标和标题 -->
       <div class="flex items-center gap-2 mb-2">
-        <div class="flex-shrink-0 w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-400 to-indigo-600 flex items-center justify-center text-white shadow-sm">
+        <div class="flex-shrink-0 w-8 h-8 rounded-lg bg-gradient-to-br from-accent to-accent-hover flex items-center justify-center text-white shadow-sm">
           <Split class="w-4 h-4" />
         </div>
         <div class="flex-1 min-w-0">
-          <div class="text-sm font-semibold text-slate-900 truncate">
+          <div class="text-sm font-semibold text-text-primary truncate">
             {{ data.name || '开关分支' }}
           </div>
-          <div class="text-xs text-slate-500">
+          <div class="text-xs text-text-tertiary">
             多路分支
           </div>
         </div>
@@ -54,7 +54,7 @@
       type="source"
       :position="Position.Bottom"
       :style="{ left: `${(index + 1) * (100 / (branches.length + 1))}%` }"
-      class="w-3 h-3 !bg-indigo-500 !border-2 !border-white"
+      class="w-3 h-3 !bg-accent !border-2 !border-bg-elevated"
     >
       <div
         class="absolute -bottom-5 left-1/2 -translate-x-1/2 text-xs font-medium whitespace-nowrap"

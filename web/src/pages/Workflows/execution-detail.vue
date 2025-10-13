@@ -2,12 +2,12 @@
   <div class="space-y-6">
     <!-- 加载状态 -->
     <div v-if="loading" class="flex justify-center items-center py-20">
-      <div class="text-slate-500">加载中...</div>
+      <div class="text-text-tertiary">加载中...</div>
     </div>
 
     <!-- 数据为空 -->
     <div v-else-if="!execution" class="flex flex-col justify-center items-center py-20">
-      <div class="text-slate-500 mb-4">执行记录不存在</div>
+      <div class="text-text-tertiary mb-4">执行记录不存在</div>
       <BaseButton size="sm" @click="handleBack">返回列表</BaseButton>
     </div>
 
@@ -16,7 +16,7 @@
     <!-- 顶部信息 -->
     <div class="flex items-center justify-between">
       <div>
-        <p class="text-sm text-slate-500 font-mono">{{ executionId }}</p>
+        <p class="text-sm text-text-tertiary font-mono">{{ executionId }}</p>
       </div>
 
       <div class="flex items-center gap-2">
@@ -33,29 +33,29 @@
     </div>
 
     <!-- 执行概览 -->
-    <div class="bg-white rounded-lg border border-slate-200 p-6">
-      <h3 class="text-sm font-semibold text-slate-900 mb-4">执行概览</h3>
+    <div class="bg-bg-elevated rounded-lg border border-border-primary p-6">
+      <h3 class="text-sm font-semibold text-text-primary mb-4">执行概览</h3>
       <div class="grid grid-cols-4 gap-6">
         <div>
-          <div class="text-xs text-slate-500 mb-1">触发方式</div>
-          <div class="flex items-center gap-2 text-sm font-medium text-slate-900">
+          <div class="text-xs text-text-tertiary mb-1">触发方式</div>
+          <div class="flex items-center gap-2 text-sm font-medium text-text-primary">
             <component :is="getTriggerIcon(execution?.trigger_type || '')" class="w-4 h-4" />
             {{ getTriggerText(execution?.trigger_type || '') }}
           </div>
         </div>
         <div>
-          <div class="text-xs text-slate-500 mb-1">开始时间</div>
-          <div class="text-sm font-medium text-slate-900">{{ formatTime(execution?.start_time) }}</div>
+          <div class="text-xs text-text-tertiary mb-1">开始时间</div>
+          <div class="text-sm font-medium text-text-primary">{{ formatTime(execution?.start_time) }}</div>
         </div>
         <div>
-          <div class="text-xs text-slate-500 mb-1">结束时间</div>
-          <div class="text-sm font-medium text-slate-900">
+          <div class="text-xs text-text-tertiary mb-1">结束时间</div>
+          <div class="text-sm font-medium text-text-primary">
             {{ execution?.end_time ? formatTime(execution.end_time) : '-' }}
           </div>
         </div>
         <div>
-          <div class="text-xs text-slate-500 mb-1">执行耗时</div>
-          <div class="text-sm font-medium text-slate-900">
+          <div class="text-xs text-text-tertiary mb-1">执行耗时</div>
+          <div class="text-sm font-medium text-text-primary">
             {{ execution?.duration_ms != null ? formatDurationMs(execution.duration_ms) : '-' }}
           </div>
         </div>
@@ -63,9 +63,9 @@
     </div>
 
     <!-- 节点执行详情 -->
-    <div class="bg-white rounded-lg border border-slate-200">
-      <div class="px-6 py-4 border-b border-slate-200">
-        <h3 class="text-sm font-semibold text-slate-900">节点执行详情</h3>
+    <div class="bg-bg-elevated rounded-lg border border-border-primary">
+      <div class="px-6 py-4 border-b border-border-primary">
+        <h3 class="text-sm font-semibold text-text-primary">节点执行详情</h3>
       </div>
 
       <div class="divide-y divide-slate-200">
@@ -87,7 +87,7 @@
               </div>
               <div
                 v-if="index < (execution?.node_logs.length || 0) - 1"
-                class="flex-1 w-0.5 bg-slate-200 my-2 min-h-[20px]"
+                class="flex-1 w-0.5 bg-bg-tertiary my-2 min-h-[20px]"
               ></div>
             </div>
 
@@ -95,9 +95,9 @@
             <div class="flex-1">
               <div class="flex items-center justify-between mb-2">
                 <div class="flex items-center gap-2">
-                  <h4 class="text-sm font-semibold text-slate-900">{{ nodeLog.node_name }}</h4>
-                  <span v-if="nodeLog.tool_code" class="px-2 py-0.5 bg-blue-50 text-blue-600 text-xs font-mono rounded">{{ nodeLog.tool_code }}</span>
-                  <span class="text-xs text-slate-400 font-mono">{{ nodeLog.node_id }}</span>
+                  <h4 class="text-sm font-semibold text-text-primary">{{ nodeLog.node_name }}</h4>
+                  <span v-if="nodeLog.tool_code" class="px-2 py-0.5 bg-primary-light text-primary text-xs font-mono rounded">{{ nodeLog.tool_code }}</span>
+                  <span class="text-xs text-text-placeholder font-mono">{{ nodeLog.node_id }}</span>
                 </div>
                 <span
                   :class="[
@@ -110,7 +110,7 @@
               </div>
 
               <!-- 时间信息 -->
-              <div v-if="nodeLog.start_time" class="flex items-center gap-4 text-xs text-slate-600 mb-3">
+              <div v-if="nodeLog.start_time" class="flex items-center gap-4 text-xs text-text-secondary mb-3">
                 <span>开始：{{ formatTime(nodeLog.start_time) }}</span>
                 <span v-if="nodeLog.duration_ms != null">
                   耗时：{{ formatDurationMs(nodeLog.duration_ms) }}
@@ -122,14 +122,14 @@
                 <button
                   type="button"
                   @click="toggleSection(nodeLog.node_id, 'output')"
-                  class="flex items-center gap-1 text-xs font-medium text-slate-700 hover:text-slate-900 mb-1"
+                  class="flex items-center gap-1 text-xs font-medium text-text-secondary hover:text-text-primary mb-1"
                 >
                   <ChevronDown :class="['w-3 h-3 transition-transform', isSectionOpen(nodeLog.node_id, 'output') && 'rotate-180']" />
                   输出数据
                 </button>
                 <pre
                   v-show="isSectionOpen(nodeLog.node_id, 'output')"
-                  class="bg-slate-50 border border-slate-200 rounded p-3 text-xs overflow-x-auto max-h-60"
+                  class="bg-bg-hover border border-border-primary rounded p-3 text-xs overflow-x-auto max-h-60"
                 >{{ JSON.stringify(nodeLog.output, null, 2) }}</pre>
               </div>
 
@@ -218,20 +218,20 @@ const isSectionOpen = (nodeId: string, section: 'input' | 'output') => {
 // 状态样式
 const getStatusClass = (status: string) => {
   const classes = {
-    running: 'bg-blue-100 text-blue-700',
+    running: 'bg-primary-light text-primary',
     success: 'bg-green-100 text-green-700',
     failed: 'bg-red-100 text-red-700',
-    cancelled: 'bg-slate-100 text-slate-700'
+    cancelled: 'bg-bg-tertiary text-text-secondary'
   }
   return classes[status as keyof typeof classes] || classes.cancelled
 }
 
 const getStatusDotClass = (status: string) => {
   const classes = {
-    running: 'bg-blue-500 animate-pulse',
+    running: 'bg-[var(--color-primary)] animate-pulse',
     success: 'bg-green-500',
     failed: 'bg-red-500',
-    cancelled: 'bg-slate-500'
+    cancelled: 'bg-bg-hover0'
   }
   return classes[status as keyof typeof classes] || classes.cancelled
 }
@@ -249,8 +249,8 @@ const getStatusText = (status: string) => {
 // 节点状态样式
 const getNodeStatusClass = (status: string) => {
   const classes = {
-    pending: 'bg-slate-100 text-slate-600',
-    running: 'bg-blue-100 text-blue-700',
+    pending: 'bg-bg-tertiary text-text-secondary',
+    running: 'bg-primary-light text-primary',
     success: 'bg-green-100 text-green-700',
     failed: 'bg-red-100 text-red-700',
     skipped: 'bg-amber-100 text-amber-700'
@@ -260,8 +260,8 @@ const getNodeStatusClass = (status: string) => {
 
 const getNodeStatusBgClass = (status: string) => {
   const classes = {
-    pending: 'bg-slate-200 text-slate-600',
-    running: 'bg-blue-500 text-white',
+    pending: 'bg-bg-tertiary text-text-secondary',
+    running: 'bg-[var(--color-primary)] text-white',
     success: 'bg-green-500 text-white',
     failed: 'bg-red-500 text-white',
     skipped: 'bg-amber-500 text-white'

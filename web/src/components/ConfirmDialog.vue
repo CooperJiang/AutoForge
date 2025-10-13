@@ -10,9 +10,9 @@
         <div class="absolute inset-0 bg-black/50 backdrop-blur-sm"></div>
 
         <!-- 对话框 -->
-        <div class="relative bg-white rounded-lg shadow-xl max-w-md w-full mx-4 overflow-hidden">
+        <div class="relative bg-bg-elevated rounded-lg shadow-xl max-w-md w-full mx-4 overflow-hidden">
           <!-- 头部 -->
-          <div class="px-6 py-4 border-b border-slate-200">
+          <div class="px-6 py-4 border-b border-border-primary">
             <div class="flex items-center gap-3">
               <div
                 :class="[
@@ -22,7 +22,7 @@
               >
                 <component :is="variantIcons[variant]" :class="['w-5 h-5', variantClasses[variant].icon]" />
               </div>
-              <h3 class="text-lg font-semibold text-slate-900">
+              <h3 class="text-lg font-semibold text-text-primary">
                 {{ title }}
               </h3>
             </div>
@@ -30,11 +30,11 @@
 
           <!-- 内容 -->
           <div class="px-6 py-4">
-            <p class="text-slate-600 leading-relaxed">{{ message }}</p>
+            <p class="text-text-secondary leading-relaxed">{{ message }}</p>
           </div>
 
           <!-- 底部按钮 -->
-          <div class="px-6 py-4 bg-slate-50 border-t border-slate-200 flex items-center justify-end gap-3">
+          <div class="px-6 py-4 bg-bg-hover border-t border-border-primary flex items-center justify-end gap-3">
             <BaseButton
               size="sm"
               variant="ghost"
@@ -91,8 +91,8 @@ const variantIcons = {
 
 const variantClasses = {
   info: {
-    iconBg: 'bg-blue-100',
-    icon: 'text-blue-600'
+    iconBg: 'bg-primary-light',
+    icon: 'text-primary'
   },
   warning: {
     iconBg: 'bg-amber-100',
@@ -103,8 +103,8 @@ const variantClasses = {
     icon: 'text-red-600'
   },
   question: {
-    iconBg: 'bg-slate-100',
-    icon: 'text-slate-600'
+    iconBg: 'bg-bg-tertiary',
+    icon: 'text-text-secondary'
   }
 }
 

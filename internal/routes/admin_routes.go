@@ -29,6 +29,7 @@ func RegisterAdminRoutes(r *gin.RouterGroup) {
 
 		// 执行记录
 		auth.GET("/executions", adminController.GetExecutions)
+		auth.DELETE("/executions/:id", adminController.DeleteExecution)
 
 		// 统计数据
 		auth.GET("/stats", adminController.GetStats)

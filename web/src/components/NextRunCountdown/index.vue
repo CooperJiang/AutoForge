@@ -1,6 +1,6 @@
 <template>
-  <div class="text-slate-700">
-    <div v-if="!nextRunTime || nextRunTime === 0" class="text-slate-400">--</div>
+  <div class="text-text-secondary">
+    <div v-if="!nextRunTime || nextRunTime === 0" class="text-text-tertiary">--</div>
     <div v-else-if="countdown <= 0" class="text-orange-600 font-medium text-sm">即将执行</div>
     <div v-else>
       <span class="text-sm font-medium" :class="timeColorClass" :title="formattedTime">{{ formattedCountdown }}</span>

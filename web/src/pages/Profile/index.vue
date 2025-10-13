@@ -1,5 +1,5 @@
 <template>
-  <div class="px-6 py-6">
+  <div>
     <div class="grid grid-cols-1 xl:grid-cols-12 gap-6">
       <!-- 左侧菜单 -->
       <div class="xl:col-span-3">

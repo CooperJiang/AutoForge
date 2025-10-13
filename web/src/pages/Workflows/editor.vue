@@ -1,18 +1,18 @@
 <template>
-  <div class="fixed inset-0 bg-slate-50 flex flex-col">
+  <div class="fixed inset-0 bg-bg-hover flex flex-col">
     <!-- 顶部工具栏 -->
-    <div class="bg-white border-b border-slate-200 px-6 py-3 flex items-center justify-between flex-shrink-0">
+    <div class="bg-bg-elevated border-b border-border-primary px-6 py-3 flex items-center justify-between flex-shrink-0">
       <div class="flex items-center gap-4">
         <BaseButton size="sm" variant="ghost" @click="handleBack" class="shrink-0">
           <ArrowLeft class="w-4 h-4" />
         </BaseButton>
-        <div class="input-wrapper flex items-center gap-2 px-2.5 py-1 rounded-md bg-slate-50 border border-slate-200 hover:border-slate-300 transition-all duration-200">
-          <Workflow class="w-3.5 h-3.5 text-slate-400 shrink-0" />
+        <div class="input-wrapper flex items-center gap-2 px-2.5 py-1 rounded-md bg-bg-hover border border-border-primary hover:border-slate-300 transition-all duration-200">
+          <Workflow class="w-3.5 h-3.5 text-text-placeholder shrink-0" />
           <input
             v-model="workflow.name"
             type="text"
             placeholder="工作流名称"
-            class="w-32 bg-transparent text-xs font-medium text-slate-900 placeholder:text-slate-400"
+            class="w-32 bg-transparent text-xs font-medium text-text-primary placeholder:text-text-placeholder"
             style="border: none; outline: none; box-shadow: none;"
             @focus="$event.target.parentElement.classList.add('input-focused')"
             @blur="$event.target.parentElement.classList.remove('input-focused')"
@@ -26,7 +26,7 @@
             'px-3 py-1.5 rounded-full text-xs font-medium flex items-center gap-1.5 cursor-pointer transition-colors',
             workflow.enabled
               ? 'bg-green-50 text-green-700 hover:bg-green-100'
-              : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+              : 'bg-bg-tertiary text-text-secondary hover:bg-bg-tertiary'
           ]"
           @click="handleToggleEnabled"
         >
@@ -34,7 +34,7 @@
           {{ workflow.enabled ? '已启用' : '已禁用' }}
         </div>
 
-        <div class="h-6 w-px bg-slate-200"></div>
+        <div class="h-6 w-px bg-bg-tertiary"></div>
 
         <!-- 次要操作 -->
         <Tooltip text="环境变量配置" position="bottom">
@@ -42,9 +42,14 @@
             <Settings class="w-4 h-4" />
           </BaseButton>
         </Tooltip>
-        <Tooltip text="导出为JSON" position="bottom">
-          <BaseButton size="sm" variant="ghost" @click="handleExport">
-            <FileJson class="w-4 h-4" />
+        <Tooltip text="导入工作流" position="bottom">
+          <BaseButton size="sm" variant="ghost" @click="showImportDialog = true">
+            <Upload class="w-4 h-4" />
+          </BaseButton>
+        </Tooltip>
+        <Tooltip text="导出工作流" position="bottom">
+          <BaseButton size="sm" variant="ghost" @click="showExportDialog = true">
+            <Download class="w-4 h-4" />
           </BaseButton>
         </Tooltip>
         <Tooltip text="清除本地草稿" position="bottom">
@@ -53,7 +58,7 @@
           </BaseButton>
         </Tooltip>
 
-        <div class="h-6 w-px bg-slate-200"></div>
+        <div class="h-6 w-px bg-bg-tertiary"></div>
 
         <!-- 主要操作 -->
         <BaseButton
@@ -94,7 +99,7 @@
           @edge-click="handleEdgeClick"
           @connect="handleConnect"
         >
-          <Background pattern-color="#e2e8f0" :gap="16" />
+          <Background variant="dots" pattern-color="#94a3b8" :gap="16" :size="1" />
           <Controls />
 
           <template #node-tool="{ data }">
@@ -123,7 +128,7 @@
           v-if="nodes.length === 0"
           class="absolute inset-0 flex items-center justify-center pointer-events-none"
         >
-          <div class="text-center text-slate-400">
+          <div class="text-center text-text-placeholder">
             <Workflow class="w-16 h-16 mx-auto mb-4 opacity-50" />
             <p class="text-lg font-medium mb-2">从左侧拖拽工具开始构建工作流</p>
             <p class="text-sm">或点击工具添加到画布</p>
@@ -149,6 +154,20 @@
       @update:env-vars="handleUpdateEnvVars"
     />
 
+    <!-- 导入对话框 -->
+    <ImportExportDialog
+      v-model="showImportDialog"
+      mode="import"
+      @import="handleImportData"
+    />
+
+    <!-- 导出对话框 -->
+    <ImportExportDialog
+      v-model="showExportDialog"
+      mode="export"
+      :workflow-data="exportWorkflowData"
+    />
+
     <!-- 确认对话框 -->
     <ConfirmDialog
       v-model="confirmDialog.show"
@@ -169,7 +188,7 @@ import { useRouter, useRoute, onBeforeRouteLeave } from 'vue-router'
 import { VueFlow, useVueFlow } from '@vue-flow/core'
 import { Background } from '@vue-flow/background'
 import { Controls } from '@vue-flow/controls'
-import { ArrowLeft, Save, Play, FileJson, Workflow, Settings, Power, Trash2 } from 'lucide-vue-next'
+import { ArrowLeft, Save, Play, Upload, Download, Workflow, Settings, Power, Trash2 } from 'lucide-vue-next'
 import BaseButton from '@/components/BaseButton'
 import BaseInput from '@/components/BaseInput'
 import ConfirmDialog from '@/components/ConfirmDialog.vue'
@@ -182,6 +201,7 @@ import DelayNode from './components/DelayNode.vue'
 import SwitchNode from './components/SwitchNode.vue'
 import NodeConfigDrawer from './components/NodeConfigDrawer.vue'
 import EnvVarManager from './components/EnvVarManager.vue'
+import ImportExportDialog from './components/ImportExportDialog.vue'
 import { useWorkflow } from '@/composables/useWorkflow'
 import { message } from '@/utils/message'
 import type { WorkflowNode, WorkflowEnvVar } from '@/types/workflow'
@@ -229,6 +249,8 @@ const vueFlowNodes = ref<any[]>([])
 const vueFlowEdges = ref<any[]>([])
 const showConfigDrawer = ref(false)
 const showEnvVarManager = ref(false)
+const showImportDialog = ref(false)
+const showExportDialog = ref(false)
 const selectedNode = ref<WorkflowNode | null>(null)
 const dropZone = ref<HTMLElement | null>(null)
 
@@ -436,22 +458,8 @@ const handleUpdateEnvVars = (newEnvVars: WorkflowEnvVar[]) => {
 }
 
 // 返回
-const handleBack = async () => {
-  if (hasUnsavedChanges.value) {
-    const confirmed = await confirm({
-      title: '离开编辑器',
-      message: '有未保存的更改，确定要离开吗？（草稿将保留）',
-      variant: 'warning',
-      confirmText: '离开',
-      cancelText: '继续编辑'
-    })
-
-    if (confirmed) {
-      router.push('/workflows')
-    }
-  } else {
-    router.push('/workflows')
-  }
+const handleBack = () => {
+  router.push('/workflows')
 }
 
 // 保存
@@ -602,17 +610,37 @@ const handleClearDraft = async () => {
   }
 }
 
-// 导出JSON
-const handleExport = () => {
-  const json = exportWorkflow()
-  const blob = new Blob([json], { type: 'application/json' })
-  const url = URL.createObjectURL(blob)
-  const a = document.createElement('a')
-  a.href = url
-  a.download = `${workflow.value.name || 'workflow'}.json`
-  a.click()
-  URL.revokeObjectURL(url)
-  message.success('工作流JSON已导出')
+// 导出工作流数据（用于传递给导出对话框）
+const exportWorkflowData = computed(() => {
+  return {
+    name: workflow.value.name,
+    description: workflow.value.description,
+    enabled: workflow.value.enabled,
+    nodes: nodes.value,
+    edges: edges.value,
+    envVars: envVars.value
+  }
+})
+
+// 处理导入数据
+const handleImportData = (data: any) => {
+  // 导入数据
+  workflow.value = {
+    name: data.name || '导入的工作流',
+    description: data.description || '',
+    enabled: data.enabled !== undefined ? data.enabled : false
+  }
+  nodes.value = data.nodes || []
+  edges.value = data.edges || []
+  envVars.value = data.env_vars || data.envVars || []
+
+  // 同步到画布
+  syncToVueFlow()
+
+  // 标记为有未保存的更改
+  hasUnsavedChanges.value = true
+
+  message.success('工作流已导入')
 }
 
 // 加载工作流数据
@@ -705,7 +733,7 @@ syncToVueFlow()
 }
 
 .input-wrapper.input-focused {
-  @apply border-slate-400 bg-white shadow-sm;
+  @apply border-slate-400 bg-bg-elevated shadow-sm;
 }
 
 :deep(.vue-flow__node) {
@@ -714,5 +742,23 @@ syncToVueFlow()
 
 :deep(.vue-flow__edge-path) {
   stroke-width: 2;
+}
+
+/* VueFlow Controls 暗色模式适配 */
+:deep(.vue-flow__controls) {
+  @apply bg-bg-elevated border-2 border-border-primary rounded-lg shadow-lg;
+}
+
+:deep(.vue-flow__controls-button) {
+  @apply bg-bg-primary border-border-primary text-text-primary;
+  @apply hover:bg-bg-hover transition-colors duration-200;
+}
+
+:deep(.vue-flow__controls-button):hover {
+  @apply bg-bg-hover;
+}
+
+:deep(.vue-flow__controls-button) svg {
+  @apply text-text-primary;
 }
 </style>

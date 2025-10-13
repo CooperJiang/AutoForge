@@ -1,8 +1,8 @@
 <template>
-  <div class="bg-white rounded-2xl shadow-lg border border-slate-200 overflow-hidden">
-    <div class="border-b border-slate-200 px-6 py-4">
-      <h3 class="text-lg font-semibold text-slate-900">修改密码</h3>
-      <p class="text-sm text-slate-600">设置一个安全性更高的密码来保护您的账户</p>
+  <div class="bg-bg-elevated rounded-2xl shadow-lg border border-border-primary overflow-hidden">
+    <div class="border-b border-border-primary px-6 py-4">
+      <h3 class="text-lg font-semibold text-text-primary">修改密码</h3>
+      <p class="text-sm text-text-secondary">设置一个安全性更高的密码来保护您的账户</p>
     </div>
 
     <div class="p-6">
@@ -28,14 +28,14 @@
           placeholder="再次输入新密码"
           required
         />
-        <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+        <div class="bg-primary-light border border-primary rounded-lg p-4">
           <div class="flex items-start gap-3">
-            <div class="w-8 h-8 rounded-lg bg-blue-100 flex items-center justify-center flex-shrink-0">
-              <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div class="w-8 h-8 rounded-lg bg-primary-light flex items-center justify-center flex-shrink-0">
+              <svg class="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
             </div>
-            <p class="text-sm text-blue-900 flex-1">
+            <p class="text-sm text-text-primary flex-1">
               <strong>提示：</strong>修改密码成功后，您需要重新登录。
             </p>
           </div>

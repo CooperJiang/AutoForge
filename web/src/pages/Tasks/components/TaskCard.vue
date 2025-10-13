@@ -1,11 +1,11 @@
 <template>
-  <div class="bg-white border-2 border-slate-200 rounded-lg shadow-sm hover:shadow-md transition-shadow">
+  <div class="bg-bg-elevated border-2 border-border-primary rounded-lg shadow-sm hover:shadow-md transition-shadow">
     <!-- 卡片头部 -->
-    <div class="p-4 border-b border-slate-100">
+    <div class="p-4 border-b border-border-primary">
       <div class="flex items-start justify-between">
         <div class="flex-1 min-w-0">
-          <h3 class="text-lg font-semibold text-slate-900 mb-1 truncate">{{ task.name }}</h3>
-          <div class="text-sm text-slate-600 break-all">{{ getTaskUrl() }}</div>
+          <h3 class="text-lg font-semibold text-text-primary mb-1 truncate">{{ task.name }}</h3>
+          <div class="text-sm text-text-secondary break-all">{{ getTaskUrl() }}</div>
         </div>
         <div class="flex gap-1.5 ml-4 flex-shrink-0">
           <BaseButton
@@ -57,36 +57,36 @@
     </div>
 
     <!-- 卡片内容 -->
-    <div class="px-4 py-3 bg-slate-50">
+    <div class="px-4 py-3 bg-bg-hover">
       <div class="space-y-1.5 text-xs">
         <div class="flex items-center">
-          <span class="text-slate-500 w-16">方式:</span>
-          <span class="font-medium text-slate-700">{{ getMethod() }}</span>
+          <span class="text-text-tertiary w-16">方式:</span>
+          <span class="font-medium text-text-secondary">{{ getMethod() }}</span>
         </div>
         <div class="flex items-center">
-          <span class="text-slate-500 w-16">状态:</span>
+          <span class="text-text-tertiary w-16">状态:</span>
           <span
             :class="[
               'inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium',
               task.enabled
                 ? 'bg-emerald-100 text-emerald-700'
-                : 'bg-slate-200 text-slate-600'
+                : 'bg-bg-tertiary text-text-secondary'
             ]"
           >
             {{ task.enabled ? '✓ 已启用' : '✗ 已禁用' }}
           </span>
         </div>
         <div class="flex items-center">
-          <span class="text-slate-500 w-16">工具:</span>
-          <span class="font-medium text-slate-700">{{ task.tool_code }}</span>
+          <span class="text-text-tertiary w-16">工具:</span>
+          <span class="font-medium text-text-secondary">{{ task.tool_code }}</span>
         </div>
         <div class="flex items-center">
-          <span class="text-slate-500 w-16">调度:</span>
-          <span class="font-medium text-slate-700">{{ formatSchedule() }}</span>
+          <span class="text-text-tertiary w-16">调度:</span>
+          <span class="font-medium text-text-secondary">{{ formatSchedule() }}</span>
         </div>
         <div class="flex items-center">
-          <span class="text-slate-500 w-16">下次执行:</span>
-          <span class="font-medium text-blue-600">
+          <span class="text-text-tertiary w-16">下次执行:</span>
+          <span class="font-medium text-primary">
             {{ task.next_run_time ? formatNextRunTime(task.next_run_time) : '-' }}
           </span>
         </div>
@@ -94,10 +94,10 @@
     </div>
 
     <!-- 执行记录区域 -->
-    <div class="border-t border-slate-200">
+    <div class="border-t border-border-primary">
       <button
         @click="toggleExecutions"
-        class="w-full px-4 py-2.5 flex items-center justify-between text-xs text-slate-700 hover:bg-slate-50 transition-colors"
+        class="w-full px-4 py-2.5 flex items-center justify-between text-xs text-text-secondary hover:bg-bg-hover transition-colors"
       >
         <span class="flex items-center gap-2 font-medium">
           <RefreshCw :size="14" class="text-emerald-600" />
@@ -128,15 +128,15 @@
         leave-from-class="opacity-100 max-h-[400px]"
         leave-to-class="opacity-0 max-h-0"
       >
-        <div v-show="executionsExpanded" class="border-t border-slate-200 bg-white overflow-hidden">
-        <div v-if="executions.length === 0" class="px-4 py-8 text-center text-xs text-slate-400">
+        <div v-show="executionsExpanded" class="border-t border-border-primary bg-bg-elevated overflow-hidden">
+        <div v-if="executions.length === 0" class="px-4 py-8 text-center text-xs text-text-placeholder">
           暂无执行记录
         </div>
         <div v-else class="max-h-96 overflow-y-auto">
           <div
             v-for="log in executions"
             :key="log.id"
-            class="group px-4 py-2.5 border-b border-slate-100 hover:bg-slate-50 transition-colors relative"
+            class="group px-4 py-2.5 border-b border-border-primary hover:bg-bg-hover transition-colors relative"
           >
             <div class="flex items-start justify-between gap-3">
               <div class="flex-1 min-w-0">
@@ -153,16 +153,16 @@
                   >
                     {{ log.status === 'success' ? '✓ 成功' : log.status === 'failed' ? '✗ 失败' : '⏱ 超时' }}
                   </span>
-                  <span class="text-slate-400">|</span>
-                  <span class="text-slate-600">
+                  <span class="text-text-placeholder">|</span>
+                  <span class="text-text-secondary">
                     {{ formatTimestamp(log.started_at) }}
                   </span>
-                  <span v-if="log.response_status" class="text-slate-400">|</span>
-                  <span v-if="log.response_status" class="text-slate-600">
+                  <span v-if="log.response_status" class="text-text-placeholder">|</span>
+                  <span v-if="log.response_status" class="text-text-secondary">
                     状态码: {{ log.response_status }}
                   </span>
-                  <span v-if="log.duration_ms" class="text-slate-400">|</span>
-                  <span v-if="log.duration_ms" class="text-slate-600">
+                  <span v-if="log.duration_ms" class="text-text-placeholder">|</span>
+                  <span v-if="log.duration_ms" class="text-text-secondary">
                     耗时: {{ log.duration_ms }}ms
                   </span>
                 </div>
@@ -186,7 +186,7 @@
               <div class="opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0">
                 <button
                   @click="confirmDeleteExecution(log.id)"
-                  class="p-1 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded transition-colors"
+                  class="p-1 text-text-placeholder hover:text-rose-600 hover:bg-rose-50 rounded transition-colors"
                 >
                   <Trash2 :size="12" />
                 </button>

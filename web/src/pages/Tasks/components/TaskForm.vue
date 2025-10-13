@@ -1,8 +1,8 @@
 <template>
-  <div class="bg-white border-2 border-slate-200 rounded-lg shadow-sm p-4 sticky top-4">
+  <div class="bg-bg-elevated border-2 border-border-primary rounded-lg shadow-sm p-4 sticky top-4">
     <div class="mb-3">
       <div class="flex items-center justify-between">
-        <h2 class="text-base font-semibold text-slate-900">
+        <h2 class="text-base font-semibold text-text-primary">
           {{ editingTask ? '编辑任务' : '添加定时任务' }}
         </h2>
       </div>
@@ -69,8 +69,8 @@
         />
       </div>
 
-      <div class="pt-3 border-t-2 border-slate-100 space-y-2">
-        <h3 class="text-xs font-semibold text-slate-700">工具配置</h3>
+      <div class="pt-3 border-t-2 border-border-primary space-y-2">
+        <h3 class="text-xs font-semibold text-text-secondary">工具配置</h3>
 
         <BaseSelect
           v-model="form.tool_code"

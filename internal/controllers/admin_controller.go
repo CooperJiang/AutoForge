@@ -222,6 +222,22 @@ func (c *AdminController) GetExecutions(ctx *gin.Context) {
 	}, "获取成功")
 }
 
+// DeleteExecution 删除执行记录
+func (c *AdminController) DeleteExecution(ctx *gin.Context) {
+	executionID := ctx.Param("id")
+	if executionID == "" {
+		common.BadRequest(ctx, "执行ID不能为空")
+		return
+	}
+
+	if err := c.adminService.DeleteExecution(executionID); err != nil {
+		common.HandleError(ctx, errors.Wrap(err, errors.CodeInternal))
+		return
+	}
+
+	common.SuccessWithMessage(ctx, "删除成功")
+}
+
 // GetUsers 获取用户列表
 func (c *AdminController) GetUsers(ctx *gin.Context) {
 	page := 1

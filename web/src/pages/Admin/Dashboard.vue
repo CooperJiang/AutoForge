@@ -2,7 +2,7 @@
   <div class="px-6 py-6">
     <!-- 统计卡片 -->
     <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 mb-6">
-      <div class="bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl p-6 text-white shadow-lg">
+      <div class="bg-gradient-to-br from-primary to-primary-hover rounded-xl p-6 text-white shadow-lg">
         <div class="flex items-center justify-between">
           <div>
             <p class="text-blue-100 text-sm font-medium">总用户数</p>
@@ -12,7 +12,7 @@
         </div>
       </div>
 
-      <div class="bg-gradient-to-br from-green-500 to-green-600 rounded-xl p-6 text-white shadow-lg">
+      <div class="bg-gradient-to-br from-success to-success-hover rounded-xl p-6 text-white shadow-lg">
         <div class="flex items-center justify-between">
           <div>
             <p class="text-green-100 text-sm font-medium">总任务数</p>
@@ -22,7 +22,7 @@
         </div>
       </div>
 
-      <div class="bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl p-6 text-white shadow-lg">
+      <div class="bg-gradient-to-br from-accent to-accent-hover rounded-xl p-6 text-white shadow-lg">
         <div class="flex items-center justify-between">
           <div>
             <p class="text-purple-100 text-sm font-medium">今日执行</p>
@@ -44,15 +44,15 @@
     </div>
 
     <!-- Tab 导航 -->
-    <div class="bg-white rounded-t-xl shadow-lg border-2 border-b-0 border-slate-200">
-      <div class="flex border-b border-slate-200">
+    <div class="bg-bg-elevated rounded-t-xl shadow-lg border-2 border-b-0 border-border-primary">
+      <div class="flex border-b border-border-primary">
         <button
           @click="activeTab = 'executions'"
           :class="[
             'px-6 py-3 font-semibold transition-colors relative',
             activeTab === 'executions'
-              ? 'text-green-600 bg-slate-50'
-              : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
+              ? 'text-green-600 bg-bg-hover'
+              : 'text-text-secondary hover:text-text-primary hover:bg-bg-hover'
           ]"
         >
           执行记录
@@ -63,8 +63,8 @@
           :class="[
             'px-6 py-3 font-semibold transition-colors relative',
             activeTab === 'tasks'
-              ? 'text-green-600 bg-slate-50'
-              : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
+              ? 'text-green-600 bg-bg-hover'
+              : 'text-text-secondary hover:text-text-primary hover:bg-bg-hover'
           ]"
         >
           任务管理
@@ -75,8 +75,8 @@
           :class="[
             'px-6 py-3 font-semibold transition-colors relative',
             activeTab === 'users'
-              ? 'text-green-600 bg-slate-50'
-              : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
+              ? 'text-green-600 bg-bg-hover'
+              : 'text-text-secondary hover:text-text-primary hover:bg-bg-hover'
           ]"
         >
           用户管理
@@ -87,12 +87,12 @@
 
     <!-- Tab 内容 -->
     <!-- 执行记录 Tab -->
-    <div v-show="activeTab === 'executions'" class="bg-white rounded-b-xl shadow-lg border-2 border-t-0 border-slate-200 p-6">
+    <div v-show="activeTab === 'executions'" class="bg-bg-elevated rounded-b-xl shadow-lg border-2 border-t-0 border-border-primary p-6">
       <ExecutionsTab />
     </div>
 
     <!-- 任务列表 Tab -->
-    <div v-show="activeTab === 'tasks'" class="bg-white rounded-b-xl shadow-lg border-2 border-t-0 border-slate-200 p-6">
+    <div v-show="activeTab === 'tasks'" class="bg-bg-elevated rounded-b-xl shadow-lg border-2 border-t-0 border-border-primary p-6">
       <TasksTab
         :tasks="tasks"
         :total="total"
@@ -110,7 +110,7 @@
     </div>
 
     <!-- 用户管理 Tab -->
-    <div v-show="activeTab === 'users'" class="bg-white rounded-b-xl shadow-lg border-2 border-t-0 border-slate-200 p-6">
+    <div v-show="activeTab === 'users'" class="bg-bg-elevated rounded-b-xl shadow-lg border-2 border-t-0 border-border-primary p-6">
       <UsersTab />
     </div>
 

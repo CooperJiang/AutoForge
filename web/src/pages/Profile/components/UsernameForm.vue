@@ -1,15 +1,15 @@
 <template>
   <div>
-    <h4 class="text-sm font-semibold text-slate-900 mb-4 flex items-center gap-2">
-      <div class="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center">
-        <User class="w-4 h-4 text-blue-600"></User>
+    <h4 class="text-sm font-semibold text-text-primary mb-4 flex items-center gap-2">
+      <div class="w-8 h-8 rounded-lg bg-primary-light flex items-center justify-center">
+        <User class="w-4 h-4 text-primary"></User>
       </div>
       修改用户名
     </h4>
     <form @submit.prevent="handleSubmit" class="space-y-4">
       <div>
-        <label class="block text-sm font-medium text-slate-700 mb-2">当前用户名</label>
-        <div class="px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-slate-900">
+        <label class="block text-sm font-medium text-text-secondary mb-2">当前用户名</label>
+        <div class="px-4 py-2.5 bg-bg-hover border border-border-primary rounded-lg text-text-primary">
           {{ userName }}
         </div>
       </div>

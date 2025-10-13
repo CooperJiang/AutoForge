@@ -1,13 +1,13 @@
 <template>
   <div
-    class="condition-node bg-white rounded-lg shadow-lg border-2 border-amber-400 min-w-[200px] hover:shadow-xl transition-shadow"
+    class="condition-node bg-bg-elevated rounded-lg shadow-lg border-2 border-amber-400 min-w-[200px] hover:shadow-xl transition-shadow"
     :class="{ 'ring-2 ring-amber-500': data.selected }"
   >
     <!-- 顶部输入点 -->
     <Handle
       type="target"
       :position="Position.Top"
-      class="w-3 h-3 !bg-amber-500 !border-2 !border-white"
+      class="w-3 h-3 !bg-amber-500 !border-2 !border-bg-elevated"
     />
 
     <!-- 节点内容 -->
@@ -18,10 +18,10 @@
           <GitBranch class="w-4 h-4" />
         </div>
         <div class="flex-1 min-w-0">
-          <div class="text-sm font-semibold text-slate-900 truncate">
+          <div class="text-sm font-semibold text-text-primary truncate">
             {{ data.name || '条件判断' }}
           </div>
-          <div class="text-xs text-slate-500">
+          <div class="text-xs text-text-tertiary">
             {{ conditionTypeLabel }}
           </div>
         </div>
@@ -52,7 +52,7 @@
       type="source"
       :position="Position.Bottom"
       :style="{ left: '35%' }"
-      class="w-3 h-3 !bg-emerald-500 !border-2 !border-white"
+      class="w-3 h-3 !bg-emerald-500 !border-2 !border-bg-elevated"
     >
       <div class="absolute -bottom-5 left-1/2 -translate-x-1/2 text-xs font-medium text-emerald-600 whitespace-nowrap">
         True
@@ -65,7 +65,7 @@
       type="source"
       :position="Position.Bottom"
       :style="{ left: '65%' }"
-      class="w-3 h-3 !bg-rose-500 !border-2 !border-white"
+      class="w-3 h-3 !bg-rose-500 !border-2 !border-bg-elevated"
     >
       <div class="absolute -bottom-5 left-1/2 -translate-x-1/2 text-xs font-medium text-rose-600 whitespace-nowrap">
         False

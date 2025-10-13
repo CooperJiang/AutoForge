@@ -599,8 +599,22 @@ func (s *EngineService) replaceStringVariables(
 		str = strings.ReplaceAll(str, fmt.Sprintf("{{env.%s}}", key), value)
 	}
 
-	// 替换节点输出 {{nodes.NODE_ID.output.field}}
-	// 简化版：暂不实现复杂的引用解析
+	// 替换节点输出 {{nodes.NODE_ID.field}} 或 {{nodes.NODE_ID.output.field}}
+	for nodeID, output := range nodeOutputs {
+		// 支持 {{nodes.NODE_ID.field}} 格式
+		for field, value := range output {
+			placeholder := fmt.Sprintf("{{nodes.%s.%s}}", nodeID, field)
+			str = strings.ReplaceAll(str, placeholder, fmt.Sprintf("%v", value))
+		}
+
+		// 支持 {{nodes.NODE_ID.output.field}} 格式（嵌套output对象）
+		if outputObj, ok := output["output"].(map[string]interface{}); ok {
+			for field, value := range outputObj {
+				placeholder := fmt.Sprintf("{{nodes.%s.output.%s}}", nodeID, field)
+				str = strings.ReplaceAll(str, placeholder, fmt.Sprintf("%v", value))
+			}
+		}
+	}
 
 	return str
 }

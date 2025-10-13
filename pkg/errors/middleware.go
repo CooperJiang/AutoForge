@@ -15,6 +15,7 @@ import (
 type Response struct {
 	Code      int         `json:"code"`
 	Message   string      `json:"message"`
+	Detail    string      `json:"detail,omitempty"`
 	Data      interface{} `json:"data,omitempty"`
 	RequestID string      `json:"request_id,omitempty"`
 	Timestamp int64       `json:"timestamp"`
@@ -99,6 +100,7 @@ func responseError(c *gin.Context, err error) {
 	response := Response{
 		Code:      int(apiErr.Code),
 		Message:   apiErr.Message,
+		Detail:    apiErr.Detail,
 		RequestID: apiErr.RequestID,
 		Timestamp: time.Now().Unix(),
 	}

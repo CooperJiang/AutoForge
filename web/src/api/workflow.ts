@@ -221,6 +221,16 @@ export const workflowApi = {
     }>(`/api/v1/workflows/${id}/stats`)
     return response.data
   },
+
+  /**
+   * 删除执行记录
+   */
+  deleteExecution: async (workflowId: string, executionId: string) => {
+    const response = await request.delete<void>(
+      `/api/v1/workflows/${workflowId}/executions/${executionId}`
+    )
+    return response.data
+  },
 }
 
 export default workflowApi

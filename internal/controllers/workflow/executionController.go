@@ -142,3 +142,27 @@ func StopExecution(c *gin.Context) {
 
 	errors.ResponseSuccess(c, nil, "已停止执行")
 }
+
+// DeleteExecution 删除执行记录
+func DeleteExecution(c *gin.Context) {
+	userID := c.GetString("user_id")
+	if userID == "" {
+		errors.HandleError(c, errors.New(errors.CodeUnauthorized, "未授权"))
+		return
+	}
+
+	executionID := c.Param("executionId")
+	if executionID == "" {
+		errors.HandleError(c, errors.New(errors.CodeInvalidParameter, "执行ID不能为空"))
+		return
+	}
+
+	// 删除执行记录
+	if err := executionService.DeleteExecution(executionID, userID); err != nil {
+		log.Error("删除执行记录失败: %v", err)
+		errors.HandleError(c, errors.New(errors.CodeInternal, err.Error()))
+		return
+	}
+
+	errors.ResponseSuccess(c, nil, "删除成功")
+}

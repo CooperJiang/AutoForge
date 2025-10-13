@@ -53,11 +53,11 @@ const buttonClasses = computed(() => {
   }
 
   const variants = {
-    primary: 'bg-blue-500 text-white hover:bg-blue-600 focus:ring-blue-100 shadow-sm',
-    secondary: 'bg-slate-100 text-slate-700 hover:bg-slate-200 focus:ring-slate-100',
-    danger: 'bg-rose-500 text-white hover:bg-rose-600 focus:ring-rose-100 shadow-sm',
-    success: 'bg-emerald-500 text-white hover:bg-emerald-600 focus:ring-emerald-100 shadow-sm',
-    ghost: 'bg-transparent text-slate-600 hover:bg-slate-50 focus:ring-slate-100 border border-slate-200'
+    primary: 'bg-[var(--color-primary)] hover:bg-primary-hover text-primary-text focus:ring-primary-light shadow-sm',
+    secondary: 'bg-bg-tertiary text-text-primary hover:bg-bg-active focus:ring-primary-light',
+    danger: 'bg-error text-white hover:bg-error-hover focus:ring-error-light shadow-sm',
+    success: 'bg-success text-white hover:bg-success-hover focus:ring-success-light shadow-sm',
+    ghost: 'bg-transparent text-text-secondary hover:bg-bg-hover focus:ring-primary-light border border-border-primary'
   }
 
   return `${base} ${disabled} ${sizes[props.size]} ${variants[props.variant]} font-medium transition-all duration-200 focus:outline-none focus:ring-2 whitespace-nowrap inline-flex items-center justify-center shrink-0`

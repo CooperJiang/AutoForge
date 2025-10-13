@@ -8,17 +8,17 @@
         <!-- 抽屉内容 -->
         <div
           :class="[
-            'relative bg-white shadow-2xl flex flex-col transition-all duration-300',
+            'relative bg-bg-elevated shadow-2xl flex flex-col transition-all duration-300',
             positionClass,
             sizeClass
           ]"
         >
           <!-- 标题栏 -->
-          <div class="px-6 py-4 border-b-2 border-slate-100 flex items-center justify-between flex-shrink-0">
-            <h3 class="text-lg font-semibold text-slate-900">{{ title }}</h3>
+          <div class="px-6 py-4 border-b-2 border-border-primary flex items-center justify-between flex-shrink-0">
+            <h3 class="text-lg font-semibold text-text-primary">{{ title }}</h3>
             <button
               @click="onClose"
-              class="p-1 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded transition-colors"
+              class="p-1 text-text-tertiary hover:text-text-secondary hover:bg-bg-tertiary rounded transition-colors"
             >
               <X :size="20" />
             </button>
@@ -30,7 +30,7 @@
           </div>
 
           <!-- 底部按钮栏 -->
-          <div v-if="showFooter" class="px-6 py-4 border-t-2 border-slate-100 flex gap-3 justify-end flex-shrink-0">
+          <div v-if="showFooter" class="px-6 py-4 border-t-2 border-border-primary flex gap-3 justify-end flex-shrink-0">
             <BaseButton v-if="cancelText" variant="secondary" @click="onCancel">
               {{ cancelText }}
             </BaseButton>

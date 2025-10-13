@@ -19,9 +19,9 @@
 
     <div
       v-if="filteredTasks.length === 0"
-      class="bg-white border-2 border-slate-200 rounded-lg p-8 text-center"
+      class="bg-bg-elevated border-2 border-border-primary rounded-lg p-8 text-center"
     >
-      <p class="text-slate-500">{{ tasks.length === 0 ? '暂无任务，请添加一个定时任务' : '没有符合条件的任务' }}</p>
+      <p class="text-text-tertiary">{{ tasks.length === 0 ? '暂无任务，请添加一个定时任务' : '没有符合条件的任务' }}</p>
     </div>
 
     <div v-else class="space-y-3">

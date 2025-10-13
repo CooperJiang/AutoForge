@@ -233,6 +233,28 @@ func (s *ExecutionService) UpdateWorkflowStats(workflowID string, success bool) 
 	return nil
 }
 
+// DeleteExecution 删除执行记录
+func (s *ExecutionService) DeleteExecution(executionID, userID string) error {
+	db := database.GetDB()
+
+	// 检查执行记录是否存在且属于该用户
+	var execution models.WorkflowExecution
+	if err := db.Where("id = ? AND user_id = ?", executionID, userID).First(&execution).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return fmt.Errorf("执行记录不存在")
+		}
+		return err
+	}
+
+	// 删除执行记录
+	if err := db.Delete(&execution).Error; err != nil {
+		return fmt.Errorf("删除执行记录失败: %v", err)
+	}
+
+	log.Info("删除执行记录: ExecutionID=%s, UserID=%s", executionID, userID)
+	return nil
+}
+
 // ToExecutionResponse 转换为响应格式（公开方法）
 func (s *ExecutionService) ToExecutionResponse(execution *models.WorkflowExecution) response.WorkflowExecutionResponse {
 	return s.toExecutionResponse(execution)

@@ -1,6 +1,6 @@
 <template>
   <div class="space-y-2">
-    <label class="block text-sm font-medium text-slate-700">选择日期</label>
+    <label class="block text-sm font-medium text-text-secondary">选择日期</label>
     <div class="grid grid-cols-7 gap-1">
       <button
         v-for="day in 31"
@@ -9,14 +9,14 @@
         @click="selectDay(day)"
         class="px-2 py-1.5 text-xs font-medium rounded border-2 transition-colors"
         :class="selectedDay === day
-          ? 'bg-blue-500 text-white border-blue-500'
-          : 'bg-white text-slate-700 border-slate-200 hover:border-blue-300'"
+          ? 'bg-primary text-white border-primary'
+          : 'bg-bg-elevated text-text-secondary border-border-primary hover:border-primary'"
       >
         {{ day }}
       </button>
     </div>
     <TimePicker v-model="time" hint="执行时间" />
-    <div v-if="hint" class="text-xs text-slate-500">{{ hint }}</div>
+    <div v-if="hint" class="text-xs text-text-tertiary">{{ hint }}</div>
   </div>
 </template>
 

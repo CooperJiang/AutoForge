@@ -1,13 +1,12 @@
 <template>
-  <div class="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50">
-    <div class="px-6 py-8">
+  <div>
       <!-- 页面标题 -->
       <div class="flex items-center justify-between mb-6">
         <div>
-          <h1 class="text-2xl font-bold text-slate-900 mb-1">
+          <h1 class="text-2xl font-bold text-text-primary mb-1">
             工作流管理
           </h1>
-          <p class="text-sm text-slate-600">
+          <p class="text-sm text-text-secondary">
             创建和管理自动化工作流程
           </p>
         </div>
@@ -33,7 +32,7 @@
 
       <!-- 空状态 -->
       <div v-else-if="!loading && workflows.length === 0" class="text-center py-20">
-        <div class="text-slate-400 mb-4">
+        <div class="text-text-placeholder mb-4">
           <Workflow class="w-16 h-16 mx-auto mb-4" />
           <p class="text-lg">暂无工作流</p>
           <p class="text-sm">点击上方按钮创建第一个工作流</p>
@@ -42,9 +41,8 @@
 
       <!-- 加载状态 -->
       <div v-else class="flex justify-center items-center py-20">
-        <div class="text-slate-500">加载中...</div>
+        <div class="text-text-tertiary">加载中...</div>
       </div>
-    </div>
   </div>
 </template>
 

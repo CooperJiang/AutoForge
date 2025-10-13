@@ -34,54 +34,54 @@
     <div class="overflow-x-auto">
       <table class="w-full">
         <thead>
-          <tr class="border-b-2 border-slate-200 text-left">
-            <th class="pb-3 text-sm font-semibold text-slate-700 w-24">ID</th>
-            <th class="pb-3 text-sm font-semibold text-slate-700 w-28">用户ID</th>
-            <th class="pb-3 text-sm font-semibold text-slate-700 w-32">任务名称</th>
-            <th class="pb-3 text-sm font-semibold text-slate-700 w-28">工具</th>
-            <th class="pb-3 text-sm font-semibold text-slate-700 w-32">调度规则</th>
-            <th class="pb-3 text-sm font-semibold text-slate-700 w-20">状态</th>
-            <th class="pb-3 text-sm font-semibold text-slate-700 w-28">下次执行</th>
-            <th class="pb-3 text-sm font-semibold text-slate-700 w-40">操作</th>
+          <tr class="border-b-2 border-border-primary text-left">
+            <th class="pb-3 text-sm font-semibold text-text-secondary w-24">ID</th>
+            <th class="pb-3 text-sm font-semibold text-text-secondary w-28">用户ID</th>
+            <th class="pb-3 text-sm font-semibold text-text-secondary w-32">任务名称</th>
+            <th class="pb-3 text-sm font-semibold text-text-secondary w-28">工具</th>
+            <th class="pb-3 text-sm font-semibold text-text-secondary w-32">调度规则</th>
+            <th class="pb-3 text-sm font-semibold text-text-secondary w-20">状态</th>
+            <th class="pb-3 text-sm font-semibold text-text-secondary w-28">下次执行</th>
+            <th class="pb-3 text-sm font-semibold text-text-secondary w-40">操作</th>
           </tr>
         </thead>
         <tbody>
           <tr
             v-for="task in tasks"
             :key="task.id"
-            class="border-b border-slate-100 hover:bg-slate-50 transition-colors"
+            class="border-b border-border-primary hover:bg-bg-hover transition-colors"
           >
-            <td class="py-3 text-sm text-slate-900 font-mono group relative w-24 align-middle">
+            <td class="py-3 text-sm text-text-primary font-mono group relative w-24 align-middle">
               <div class="flex items-center gap-2">
                 <span class="truncate" :title="task.id">{{ truncateId(task.id) }}</span>
                 <button
                   @click="$emit('copy-id', task.id)"
-                  class="opacity-0 group-hover:opacity-100 p-1 hover:bg-slate-200 rounded transition-all"
+                  class="opacity-0 group-hover:opacity-100 p-1 hover:bg-bg-tertiary rounded transition-all"
                   title="复制完整ID"
                 >
                   <Copy :size="14" />
                 </button>
               </div>
             </td>
-            <td class="py-3 text-sm text-slate-900 font-mono w-28 truncate align-middle" :title="task.user_id">
+            <td class="py-3 text-sm text-text-primary font-mono w-28 truncate align-middle" :title="task.user_id">
               {{ maskUserId(task.user_id) }}
             </td>
-            <td class="py-3 text-sm text-slate-900 font-medium w-32 truncate align-middle" :title="task.name">
+            <td class="py-3 text-sm text-text-primary font-medium w-32 truncate align-middle" :title="task.name">
               {{ task.name }}
             </td>
-            <td class="py-3 text-sm text-slate-600 w-28 align-middle">
-              <span class="inline-flex px-2 py-0.5 text-xs font-medium rounded bg-slate-100 text-slate-700">
+            <td class="py-3 text-sm text-text-secondary w-28 align-middle">
+              <span class="inline-flex px-2 py-0.5 text-xs font-medium rounded bg-bg-tertiary text-text-secondary">
                 {{ task.tool_code || 'N/A' }}
               </span>
             </td>
-            <td class="py-3 text-sm text-slate-600 w-32 truncate align-middle" :title="getScheduleText(task)">
+            <td class="py-3 text-sm text-text-secondary w-32 truncate align-middle" :title="getScheduleText(task)">
               {{ getScheduleText(task) }}
             </td>
             <td class="py-3 w-20 align-middle">
               <span
                 :class="[
                   'inline-block px-2 py-1 text-xs font-medium rounded-full whitespace-nowrap',
-                  task.enabled ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700'
+                  task.enabled ? 'bg-green-100 text-green-700' : 'bg-bg-tertiary text-text-secondary'
                 ]"
               >
                 {{ task.enabled ? '已启用' : '已禁用' }}
@@ -104,7 +104,7 @@
                   :class="[
                     'p-1.5 rounded-lg transition-colors',
                     task.enabled
-                      ? 'bg-gray-100 hover:bg-gray-200 text-gray-700'
+                      ? 'bg-bg-tertiary hover:bg-gray-200 text-text-secondary'
                       : 'bg-green-100 hover:bg-green-200 text-green-700'
                   ]"
                   :title="task.enabled ? '禁用' : '启用'"
@@ -114,7 +114,7 @@
                 </button>
                 <button
                   @click="$emit('execute', task)"
-                  class="p-1.5 bg-blue-100 hover:bg-blue-200 text-blue-700 rounded-lg transition-colors"
+                  class="p-1.5 bg-primary-light hover:bg-primary-active text-primary rounded-lg transition-colors"
                   title="立即执行"
                 >
                   <Zap :size="16" />
@@ -135,24 +135,24 @@
 
     <!-- 分页 -->
     <div class="flex justify-between items-center mt-6">
-      <div class="text-sm text-slate-600">
+      <div class="text-sm text-text-secondary">
         共 {{ total }} 条记录
       </div>
       <div class="flex gap-2">
         <button
           @click="$emit('prev-page')"
           :disabled="currentPage === 1"
-          class="px-4 py-2 bg-slate-100 text-slate-700 text-sm font-medium rounded-lg hover:bg-slate-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          class="px-4 py-2 bg-bg-tertiary text-text-secondary text-sm font-medium rounded-lg hover:bg-bg-tertiary disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
         >
           上一页
         </button>
-        <span class="px-4 py-2 text-sm text-slate-700">
+        <span class="px-4 py-2 text-sm text-text-secondary">
           {{ currentPage }} / {{ totalPages }}
         </span>
         <button
           @click="$emit('next-page')"
           :disabled="currentPage >= totalPages"
-          class="px-4 py-2 bg-slate-100 text-slate-700 text-sm font-medium rounded-lg hover:bg-slate-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          class="px-4 py-2 bg-bg-tertiary text-text-secondary text-sm font-medium rounded-lg hover:bg-bg-tertiary disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
         >
           下一页
         </button>

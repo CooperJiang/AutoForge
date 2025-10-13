@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+  <div class="min-h-screen flex items-center justify-center bg-bg-secondary py-12 px-4 sm:px-6 lg:px-8">
     <div class="max-w-md w-full space-y-8">
       <div>
         <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">
@@ -7,7 +7,7 @@
         </h2>
         <p class="mt-2 text-center text-sm text-gray-600">
           或者
-          <router-link to="/register" class="font-medium text-blue-600 hover:text-blue-500">
+          <router-link to="/register" class="font-medium text-primary hover:text-primary-text0">
             创建新账户
           </router-link>
         </p>
@@ -36,7 +36,7 @@
               type="text"
               required
               :disabled="loading"
-              class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+              class="appearance-none rounded-none relative block w-full px-3 py-2 border border-border-secondary placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-primary focus:border-primary focus:z-10 sm:text-sm disabled:opacity-50 disabled:cursor-not-allowed"
               placeholder="用户名或邮箱"
             />
           </div>
@@ -49,7 +49,7 @@
               type="password"
               required
               :disabled="loading"
-              class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+              class="appearance-none rounded-none relative block w-full px-3 py-2 border border-border-secondary placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-primary focus:border-primary focus:z-10 sm:text-sm disabled:opacity-50 disabled:cursor-not-allowed"
               placeholder="密码"
             />
           </div>
@@ -62,7 +62,7 @@
               v-model="form.remember"
               name="remember-me"
               type="checkbox"
-              class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+              class="h-4 w-4 text-primary focus:ring-primary border-border-secondary rounded"
             />
             <label for="remember-me" class="ml-2 block text-sm text-gray-900">
               记住我
@@ -70,7 +70,7 @@
           </div>
 
           <div class="text-sm">
-            <router-link to="/forgot-password" class="font-medium text-blue-600 hover:text-blue-500">
+            <router-link to="/forgot-password" class="font-medium text-primary hover:text-primary-text0">
               忘记密码？
             </router-link>
           </div>
@@ -80,7 +80,7 @@
           <button
             type="submit"
             :disabled="loading || !isFormValid"
-            class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-primary hover:bg-primary-hover focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
             <span v-if="loading" class="absolute left-0 inset-y-0 flex items-center pl-3">
               <!-- Loading spinner -->

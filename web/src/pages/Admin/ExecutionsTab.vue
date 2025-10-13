@@ -38,28 +38,28 @@
     <div class="overflow-x-auto">
       <table class="w-full">
         <thead>
-          <tr class="border-b-2 border-slate-200 text-left">
-            <th class="pb-3 text-sm font-semibold text-slate-700">执行ID</th>
-            <th class="pb-3 text-sm font-semibold text-slate-700">任务名称</th>
-            <th class="pb-3 text-sm font-semibold text-slate-700">用户ID</th>
-            <th class="pb-3 text-sm font-semibold text-slate-700">状态</th>
-            <th class="pb-3 text-sm font-semibold text-slate-700">HTTP码</th>
-            <th class="pb-3 text-sm font-semibold text-slate-700">耗时</th>
-            <th class="pb-3 text-sm font-semibold text-slate-700">开始时间</th>
-            <th class="pb-3 text-sm font-semibold text-slate-700">操作</th>
+          <tr class="border-b-2 border-border-primary text-left">
+            <th class="pb-3 text-sm font-semibold text-text-secondary">执行ID</th>
+            <th class="pb-3 text-sm font-semibold text-text-secondary">任务名称</th>
+            <th class="pb-3 text-sm font-semibold text-text-secondary">用户ID</th>
+            <th class="pb-3 text-sm font-semibold text-text-secondary">状态</th>
+            <th class="pb-3 text-sm font-semibold text-text-secondary">HTTP码</th>
+            <th class="pb-3 text-sm font-semibold text-text-secondary">耗时</th>
+            <th class="pb-3 text-sm font-semibold text-text-secondary">开始时间</th>
+            <th class="pb-3 text-sm font-semibold text-text-secondary">操作</th>
           </tr>
         </thead>
         <tbody>
           <tr
             v-for="exec in executions"
             :key="exec.id"
-            class="border-b border-slate-100 hover:bg-slate-50 transition-colors"
+            class="border-b border-border-primary hover:bg-bg-hover transition-colors"
           >
-            <td class="py-3 text-sm text-slate-900 font-mono text-xs">{{ truncateId(exec.id, 8) }}</td>
-            <td class="py-3 text-sm text-slate-900 font-medium max-w-[200px] truncate" :title="exec.task?.name || exec.task_id">
+            <td class="py-3 text-sm text-text-primary font-mono text-xs">{{ truncateId(exec.id, 8) }}</td>
+            <td class="py-3 text-sm text-text-primary font-medium max-w-[200px] truncate" :title="exec.task?.name || exec.task_id">
               {{ exec.task?.name || '未知任务' }}
             </td>
-            <td class="py-3 text-sm text-slate-900 font-mono">{{ maskUserId(exec.user_id) }}</td>
+            <td class="py-3 text-sm text-text-primary font-mono">{{ maskUserId(exec.user_id) }}</td>
             <td class="py-3">
               <span
                 :class="[
@@ -86,16 +86,25 @@
                 {{ exec.response_status || 'N/A' }}
               </span>
             </td>
-            <td class="py-3 text-sm text-slate-600">{{ exec.duration_ms }}ms</td>
-            <td class="py-3 text-sm text-slate-600">{{ formatTime(exec.started_at) }}</td>
+            <td class="py-3 text-sm text-text-secondary">{{ exec.duration_ms }}ms</td>
+            <td class="py-3 text-sm text-text-secondary">{{ formatTime(exec.started_at) }}</td>
             <td class="py-3">
-              <button
-                @click="viewExecution(exec)"
-                class="p-1.5 bg-blue-100 hover:bg-blue-200 text-blue-700 rounded-lg transition-colors"
-                title="查看详情"
-              >
-                <Eye :size="16" />
-              </button>
+              <div class="flex items-center gap-2">
+                <button
+                  @click="viewExecution(exec)"
+                  class="p-1.5 bg-primary-light hover:bg-primary-active text-primary rounded-lg transition-colors"
+                  title="查看详情"
+                >
+                  <Eye :size="16" />
+                </button>
+                <button
+                  @click="deleteExecution(exec)"
+                  class="p-1.5 bg-error-light hover:bg-error-active text-error rounded-lg transition-colors"
+                  title="删除记录"
+                >
+                  <Trash2 :size="16" />
+                </button>
+              </div>
             </td>
           </tr>
         </tbody>
@@ -104,24 +113,24 @@
 
     <!-- 分页 -->
     <div class="flex justify-between items-center mt-6">
-      <div class="text-sm text-slate-600">
+      <div class="text-sm text-text-secondary">
         共 {{ total }} 条记录
       </div>
       <div class="flex gap-2">
         <button
           @click="prevPage"
           :disabled="currentPage === 1"
-          class="px-4 py-2 bg-slate-100 text-slate-700 text-sm font-medium rounded-lg hover:bg-slate-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          class="px-4 py-2 bg-bg-tertiary text-text-secondary text-sm font-medium rounded-lg hover:bg-bg-tertiary disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
         >
           上一页
         </button>
-        <span class="px-4 py-2 text-sm text-slate-700">
+        <span class="px-4 py-2 text-sm text-text-secondary">
           {{ currentPage }} / {{ totalPages }}
         </span>
         <button
           @click="nextPage"
           :disabled="currentPage >= totalPages"
-          class="px-4 py-2 bg-slate-100 text-slate-700 text-sm font-medium rounded-lg hover:bg-slate-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          class="px-4 py-2 bg-bg-tertiary text-text-secondary text-sm font-medium rounded-lg hover:bg-bg-tertiary disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
         >
           下一页
         </button>
@@ -133,18 +142,30 @@
       v-model="showExecutionDetail"
       :execution="selectedExecution"
     />
+
+    <!-- 删除确认对话框 -->
+    <Dialog
+      v-model="showDeleteDialog"
+      title="确认删除"
+      :message="`确定要删除执行记录吗？此操作不可恢复！`"
+      confirm-text="删除"
+      cancel-text="取消"
+      confirm-variant="danger"
+      @confirm="confirmDelete"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue'
-import { Eye } from 'lucide-vue-next'
+import { Eye, Trash2 } from 'lucide-vue-next'
 import * as adminApi from '@/api/admin'
 import { message } from '@/utils/message'
 import { maskUserId, formatTime, truncateId } from '@/utils/format'
 import BaseInput from '@/components/BaseInput'
 import BaseSelect from '@/components/BaseSelect'
 import BaseButton from '@/components/BaseButton'
+import Dialog from '@/components/Dialog'
 import ExecutionDetailDialog from '@/components/ExecutionDetailDialog'
 
 // 执行记录列表
@@ -163,6 +184,10 @@ const filters = ref({
 // 详情对话框
 const showExecutionDetail = ref(false)
 const selectedExecution = ref<any>(null)
+
+// 删除确认对话框
+const showDeleteDialog = ref(false)
+const executionToDelete = ref<any>(null)
 
 // 计算总页数
 const totalPages = computed(() => Math.ceil(total.value / pageSize.value))
@@ -188,6 +213,28 @@ const loadExecutions = async () => {
 const viewExecution = (execution: any) => {
   selectedExecution.value = execution
   showExecutionDetail.value = true
+}
+
+/**
+ * 删除执行记录
+ */
+const deleteExecution = (execution: any) => {
+  executionToDelete.value = execution
+  showDeleteDialog.value = true
+}
+
+const confirmDelete = async () => {
+  if (!executionToDelete.value) return
+
+  try {
+    await adminApi.deleteExecution(executionToDelete.value.id)
+    message.success('删除成功')
+    executionToDelete.value = null
+    // 重新加载当前页数据
+    loadExecutions()
+  } catch (error: any) {
+    message.error(error.message || '删除失败')
+  }
 }
 
 // 上一页

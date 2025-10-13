@@ -5,7 +5,10 @@
 </template>
 
 <script setup lang="ts">
-// 全局样式已在 main.ts 中引入
+import { useTheme } from '@/composables/useTheme'
+
+// 初始化主题（确保应用启动时立即应用主题）
+useTheme()
 </script>
 
 <style>

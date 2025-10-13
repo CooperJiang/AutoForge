@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen bg-gradient-to-br from-green-50 via-cyan-50 to-teal-50 flex items-center justify-center p-4 overflow-hidden relative">
+  <div class="min-h-screen bg-gradient-to-br from-bg-secondary via-bg-secondary to-bg-secondary flex items-center justify-center p-4 overflow-hidden relative">
     <!-- 背景装饰 -->
     <div class="absolute inset-0 overflow-hidden pointer-events-none">
       <div class="absolute top-20 left-10 w-72 h-72 bg-green-200 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-blob"></div>
@@ -11,15 +11,15 @@
       <!-- 左侧介绍区域 -->
       <div class="hidden lg:block space-y-8 animate-fade-in-left">
         <div class="space-y-4">
-          <div class="inline-flex items-center gap-2 px-3 py-1.5 bg-white/50 backdrop-blur-sm border border-green-200 rounded-full">
+          <div class="inline-flex items-center gap-2 px-3 py-1.5 bg-bg-elevated/50 backdrop-blur-sm border border-green-200 rounded-full">
             <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-            <span class="text-sm font-medium text-slate-700">智能定时任务管理</span>
+            <span class="text-sm font-medium text-text-secondary">智能定时任务管理</span>
           </div>
-          <h1 class="text-5xl font-bold text-slate-900 leading-tight">
+          <h1 class="text-5xl font-bold text-text-primary leading-tight">
             让任务<br/>
-            <span class="bg-gradient-to-r from-green-600 to-cyan-600 bg-clip-text text-transparent">自动执行</span>
+            <span class="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">自动执行</span>
           </h1>
-          <p class="text-lg text-slate-600 leading-relaxed max-w-md">
+          <p class="text-lg text-text-secondary leading-relaxed max-w-md">
             简单易用的定时任务系统，支持多种调度规则，轻松管理您的 HTTP 定时任务
           </p>
         </div>
@@ -27,14 +27,14 @@
         <!-- 功能亮点 -->
         <div class="space-y-4">
           <div v-for="(feature, index) in features" :key="index"
-               class="flex items-start gap-3 p-4 bg-white/60 backdrop-blur-sm border border-slate-200 rounded-xl hover:shadow-md transition-all duration-300 animate-fade-in-up"
+               class="flex items-start gap-3 p-4 bg-bg-elevated/60 backdrop-blur-sm border border-border-primary rounded-xl hover:shadow-md transition-all duration-300 animate-fade-in-up"
                :style="{ animationDelay: `${index * 100}ms` }">
-            <div class="flex-shrink-0 w-10 h-10 bg-gradient-to-br from-green-500 to-cyan-500 rounded-lg flex items-center justify-center">
+            <div class="flex-shrink-0 w-10 h-10 bg-gradient-to-br from-primary to-accent rounded-lg flex items-center justify-center">
               <component :is="feature.icon" class="w-5 h-5 text-white" />
             </div>
             <div>
-              <h3 class="font-semibold text-slate-900 text-sm">{{ feature.title }}</h3>
-              <p class="text-xs text-slate-600 mt-0.5">{{ feature.description }}</p>
+              <h3 class="font-semibold text-text-primary text-sm">{{ feature.title }}</h3>
+              <p class="text-xs text-text-secondary mt-0.5">{{ feature.description }}</p>
             </div>
           </div>
         </div>
@@ -42,25 +42,25 @@
 
       <!-- 右侧登录/注册表单 -->
       <div class="flex justify-center lg:justify-end">
-        <div class="bg-white/80 backdrop-blur-xl border-2 border-white shadow-2xl rounded-2xl p-8 max-w-md w-full animate-fade-in-up">
+        <div class="bg-bg-elevated/80 backdrop-blur-xl border-2 border-bg-elevated shadow-2xl rounded-2xl p-8 max-w-md w-full animate-fade-in-up">
           <!-- 图标和标题 -->
           <div class="text-center mb-6">
             <div class="inline-flex items-center justify-center w-20 h-20 mb-4 animate-bounce-subtle">
               <img src="/logo.png" alt="Logo" class="w-full h-full object-contain" />
             </div>
-            <h2 class="text-2xl font-bold text-slate-900 mb-2">欢迎使用</h2>
-            <p class="text-sm text-slate-600">定时任务管理系统</p>
+            <h2 class="text-2xl font-bold text-text-primary mb-2">欢迎使用</h2>
+            <p class="text-sm text-text-secondary">定时任务管理系统</p>
           </div>
 
           <!-- Tab 切换 -->
-          <div class="flex bg-slate-100 rounded-lg p-1 mb-6">
+          <div class="flex bg-bg-tertiary rounded-lg p-1 mb-6">
             <button
               @click="activeTab = 'login'"
               :class="[
                 'flex-1 py-2 px-4 text-sm font-medium rounded-md transition-all duration-200',
                 activeTab === 'login'
-                  ? 'bg-white text-slate-900 shadow-sm'
-                  : 'text-slate-600 hover:text-slate-900'
+                  ? 'bg-bg-elevated text-text-primary shadow-sm'
+                  : 'text-text-secondary hover:text-text-primary'
               ]"
             >
               登录
@@ -70,8 +70,8 @@
               :class="[
                 'flex-1 py-2 px-4 text-sm font-medium rounded-md transition-all duration-200',
                 activeTab === 'register'
-                  ? 'bg-white text-slate-900 shadow-sm'
-                  : 'text-slate-600 hover:text-slate-900'
+                  ? 'bg-bg-elevated text-text-primary shadow-sm'
+                  : 'text-text-secondary hover:text-text-primary'
               ]"
             >
               注册
@@ -108,14 +108,14 @@
             <template v-if="oauth2Config.linuxdo.enabled">
               <!-- 分隔线 -->
               <div class="relative flex items-center justify-center my-4">
-                <div class="border-t border-slate-200 w-full absolute"></div>
-                <span class="bg-white px-3 text-sm text-slate-500 relative z-10">或</span>
+                <div class="border-t border-border-primary w-full absolute"></div>
+                <span class="bg-bg-elevated px-3 text-sm text-text-tertiary relative z-10">或</span>
               </div>
 
               <!-- Linux.do OAuth2 登录 -->
               <a
                 href="/api/v1/auth/linuxdo"
-                class="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-white border-2 border-slate-200 text-slate-700 font-medium rounded-lg hover:bg-slate-50 hover:border-slate-300 transition-all duration-200 shadow-sm"
+                class="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-bg-elevated border-2 border-border-primary text-text-secondary font-medium rounded-lg hover:bg-bg-hover hover:border-slate-300 transition-all duration-200 shadow-sm"
               >
                 <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none">
                   <path d="M12 2L2 7L12 12L22 7L12 2Z" fill="currentColor" opacity="0.6"/>

@@ -99,6 +99,11 @@ export const getExecutions = (params: ExecutionQueryParams) => {
   return request.get<ExecutionListResponse>('/api/v1/admin/executions', { params })
 }
 
+// 删除执行记录
+export const deleteExecution = (id: string) => {
+  return request.delete(`/api/v1/admin/executions/${id}`)
+}
+
 // 用户接口
 export interface User {
   id: string

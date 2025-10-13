@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+  <div class="min-h-screen flex items-center justify-center bg-bg-secondary py-12 px-4 sm:px-6 lg:px-8">
     <div class="max-w-md w-full space-y-8">
       <div>
         <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">
@@ -7,7 +7,7 @@
         </h2>
         <p class="mt-2 text-center text-sm text-gray-600">
           已有账户？
-          <router-link to="/login" class="font-medium text-blue-600 hover:text-blue-500">
+          <router-link to="/login" class="font-medium text-primary hover:text-primary-text0">
             立即登录
           </router-link>
         </p>
@@ -40,55 +40,55 @@
       <form class="mt-8 space-y-6" @submit.prevent="handleSubmit">
         <div class="space-y-4">
           <div>
-            <label for="username" class="block text-sm font-medium text-gray-700">用户名</label>
+            <label for="username" class="block text-sm font-medium text-text-secondary">用户名</label>
             <input
               id="username"
               v-model="form.username"
               type="text"
               required
               :disabled="loading"
-              class="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+              class="mt-1 appearance-none relative block w-full px-3 py-2 border border-border-secondary placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-primary focus:border-primary sm:text-sm disabled:opacity-50 disabled:cursor-not-allowed"
               placeholder="请输入用户名"
             />
           </div>
           <div>
-            <label for="email" class="block text-sm font-medium text-gray-700">邮箱</label>
+            <label for="email" class="block text-sm font-medium text-text-secondary">邮箱</label>
             <input
               id="email"
               v-model="form.email"
               type="email"
               required
               :disabled="loading"
-              class="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+              class="mt-1 appearance-none relative block w-full px-3 py-2 border border-border-secondary placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-primary focus:border-primary sm:text-sm disabled:opacity-50 disabled:cursor-not-allowed"
               placeholder="请输入邮箱"
             />
           </div>
           <div>
-            <label for="password" class="block text-sm font-medium text-gray-700">密码</label>
+            <label for="password" class="block text-sm font-medium text-text-secondary">密码</label>
             <input
               id="password"
               v-model="form.password"
               type="password"
               required
               :disabled="loading"
-              class="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+              class="mt-1 appearance-none relative block w-full px-3 py-2 border border-border-secondary placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-primary focus:border-primary sm:text-sm disabled:opacity-50 disabled:cursor-not-allowed"
               placeholder="请输入密码"
             />
           </div>
           <div>
-            <label for="confirmPassword" class="block text-sm font-medium text-gray-700">确认密码</label>
+            <label for="confirmPassword" class="block text-sm font-medium text-text-secondary">确认密码</label>
             <input
               id="confirmPassword"
               v-model="form.confirmPassword"
               type="password"
               required
               :disabled="loading"
-              class="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+              class="mt-1 appearance-none relative block w-full px-3 py-2 border border-border-secondary placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-primary focus:border-primary sm:text-sm disabled:opacity-50 disabled:cursor-not-allowed"
               placeholder="请再次输入密码"
             />
           </div>
           <div>
-            <label for="code" class="block text-sm font-medium text-gray-700">验证码</label>
+            <label for="code" class="block text-sm font-medium text-text-secondary">验证码</label>
             <div class="mt-1 flex space-x-2">
               <input
                 id="code"
@@ -96,14 +96,14 @@
                 type="text"
                 required
                 :disabled="loading"
-                class="flex-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                class="flex-1 appearance-none relative block w-full px-3 py-2 border border-border-secondary placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-primary focus:border-primary sm:text-sm disabled:opacity-50 disabled:cursor-not-allowed"
                 placeholder="请输入验证码"
               />
               <button
                 type="button"
                 :disabled="sendCodeLoading || countdown > 0 || !isEmailValid"
                 @click="handleSendCode"
-                class="px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                class="px-4 py-2 border border-border-secondary text-sm font-medium rounded-md text-text-secondary bg-bg-elevated hover:bg-bg-secondary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <span v-if="sendCodeLoading">发送中...</span>
                 <span v-else-if="countdown > 0">{{ countdown }}s</span>
@@ -117,7 +117,7 @@
           <button
             type="submit"
             :disabled="loading || !isFormValid"
-            class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-primary hover:bg-primary-hover focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
             <span v-if="loading" class="absolute left-0 inset-y-0 flex items-center pl-3">
               <!-- Loading spinner -->

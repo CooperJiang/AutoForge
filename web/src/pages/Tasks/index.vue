@@ -1,11 +1,11 @@
 <template>
   <!-- Loading -->
   <div v-if="loading" class="flex justify-center items-center py-20">
-    <div class="text-slate-500">加载中...</div>
+    <div class="text-text-tertiary">加载中...</div>
   </div>
 
   <!-- Main Content -->
-  <main v-else class="px-6 py-4">
+  <main v-else>
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
       <!-- Task Form Panel -->
       <div class="lg:col-span-1">

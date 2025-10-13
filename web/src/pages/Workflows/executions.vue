@@ -3,14 +3,9 @@
     <!-- 顶部面包屑 -->
     <div class="flex items-center justify-between">
       <div class="flex items-center gap-3">
-        <BaseButton size="sm" variant="ghost" @click="handleBack">
-          <ArrowLeft class="w-4 h-4 mr-1" />
-          返回工作流
-        </BaseButton>
-        <div class="h-6 w-px bg-slate-200"></div>
         <div>
-          <h2 class="text-lg font-semibold text-slate-900">执行历史</h2>
-          <p class="text-sm text-slate-500">{{ workflowName }}</p>
+          <h2 class="text-lg font-semibold text-text-primary">执行历史</h2>
+          <p class="text-sm text-text-tertiary">{{ workflowName }}</p>
         </div>
       </div>
       <BaseButton size="sm" @click="handleRefresh">
@@ -20,7 +15,7 @@
     </div>
 
     <!-- 筛选器 -->
-    <div class="bg-white rounded-lg border border-slate-200 p-4">
+    <div class="bg-bg-elevated rounded-lg border border-border-primary p-4">
       <div class="flex items-center gap-3">
         <BaseSelect
           v-model="statusFilter"
@@ -37,7 +32,7 @@
 
     <!-- 加载状态 -->
     <div v-if="loading" class="flex justify-center items-center py-20">
-      <div class="text-slate-500">加载中...</div>
+      <div class="text-text-tertiary">加载中...</div>
     </div>
 
     <!-- 执行列表 -->
@@ -45,11 +40,10 @@
       <div
         v-for="execution in filteredExecutions"
         :key="execution.id"
-        @click="handleViewExecution(execution)"
-        class="bg-white rounded-lg border-2 border-slate-200 p-4 hover:border-green-400 transition-all cursor-pointer"
+        class="bg-bg-elevated rounded-lg border-2 border-border-primary p-4 hover:border-green-400 transition-all"
       >
         <div class="flex items-start justify-between">
-          <div class="flex-1">
+          <div class="flex-1 cursor-pointer" @click="handleViewExecution(execution)">
             <div class="flex items-center gap-3 mb-2">
               <!-- 状态标签 -->
               <span
@@ -63,17 +57,17 @@
               </span>
 
               <!-- 执行ID -->
-              <span class="text-xs font-mono text-slate-500">{{ execution.id }}</span>
+              <span class="text-xs font-mono text-text-tertiary">{{ execution.id }}</span>
 
               <!-- 触发方式 -->
-              <span class="text-xs text-slate-500 flex items-center gap-1">
+              <span class="text-xs text-text-tertiary flex items-center gap-1">
                 <component :is="getTriggerIcon(execution.trigger_type)" class="w-3.5 h-3.5" />
                 {{ getTriggerText(execution.trigger_type) }}
               </span>
             </div>
 
             <!-- 时间信息 -->
-            <div class="flex items-center gap-4 text-sm text-slate-600">
+            <div class="flex items-center gap-4 text-sm text-text-secondary">
               <div class="flex items-center gap-1">
                 <Clock class="w-4 h-4" />
                 开始：{{ formatTime(execution.start_time) }}
@@ -82,26 +76,26 @@
                 <Timer class="w-4 h-4" />
                 耗时：{{ formatDurationMs(execution.duration_ms) }}
               </div>
-              <div v-else class="text-blue-600 font-medium">
+              <div v-else class="text-primary font-medium">
                 执行中...
               </div>
             </div>
 
             <!-- 节点执行进度 -->
             <div class="mt-3 flex items-center gap-2">
-              <div class="flex-1 bg-slate-100 rounded-full h-2 overflow-hidden">
+              <div class="flex-1 bg-bg-tertiary rounded-full h-2 overflow-hidden">
                 <div
                   :style="{ width: getProgress(execution) + '%' }"
                   :class="[
                     'h-full transition-all',
                     execution.status === 'success' ? 'bg-green-500' :
                     execution.status === 'failed' ? 'bg-red-500' :
-                    execution.status === 'running' ? 'bg-blue-500' :
+                    execution.status === 'running' ? 'bg-[var(--color-primary)]' :
                     'bg-slate-400'
                   ]"
                 ></div>
               </div>
-              <span class="text-xs text-slate-500">
+              <span class="text-xs text-text-tertiary">
                 {{ execution.success_nodes + execution.failed_nodes + execution.skipped_nodes }}/{{ execution.total_nodes }}
               </span>
             </div>
@@ -112,17 +106,37 @@
             </div>
           </div>
 
-          <!-- 查看详情按钮 -->
-          <ChevronRight class="w-5 h-5 text-slate-400 flex-shrink-0 ml-4" />
+          <!-- 操作按钮 -->
+          <div class="flex items-center gap-2 flex-shrink-0 ml-4">
+            <button
+              @click.stop="handleDeleteExecution(execution)"
+              class="w-8 h-8 flex items-center justify-center rounded-lg text-text-tertiary hover:text-error hover:bg-error-light transition-all"
+              title="删除记录"
+            >
+              <Trash2 class="w-4 h-4" />
+            </button>
+            <ChevronRight class="w-5 h-5 text-text-placeholder cursor-pointer" @click="handleViewExecution(execution)" />
+          </div>
         </div>
       </div>
 
       <!-- 空状态 -->
       <div v-if="filteredExecutions.length === 0" class="text-center py-16">
         <Activity class="w-16 h-16 mx-auto mb-4 text-slate-300" />
-        <p class="text-slate-500">暂无执行记录</p>
+        <p class="text-text-tertiary">暂无执行记录</p>
       </div>
     </div>
+
+    <!-- 删除确认对话框 -->
+    <Dialog
+      v-model="showDeleteDialog"
+      title="确认删除"
+      :message="`确定要删除执行记录吗？此操作不可恢复！`"
+      confirm-text="删除"
+      cancel-text="取消"
+      confirm-variant="danger"
+      @confirm="confirmDelete"
+    />
   </div>
 </template>
 
@@ -138,11 +152,13 @@ import {
   Activity,
   Play,
   Webhook,
-  MousePointerClick
+  MousePointerClick,
+  Trash2
 } from 'lucide-vue-next'
 import BaseButton from '@/components/BaseButton'
 import BaseSelect from '@/components/BaseSelect'
 import BaseInput from '@/components/BaseInput'
+import Dialog from '@/components/Dialog'
 import type { WorkflowExecution } from '@/types/workflow'
 import { workflowApi } from '@/api/workflow'
 import { message } from '@/utils/message'
@@ -158,6 +174,10 @@ const refreshing = ref(false)
 const loading = ref(false)
 
 const executions = ref<WorkflowExecution[]>([])
+
+// 删除确认对话框
+const showDeleteDialog = ref(false)
+const executionToDelete = ref<WorkflowExecution | null>(null)
 
 const statusOptions = [
   { label: '全部状态', value: 'all' },
@@ -234,23 +254,42 @@ const handleViewExecution = (execution: WorkflowExecution) => {
   router.push(`/workflows/${workflowId}/executions/${execution.id}`)
 }
 
+const handleDeleteExecution = (execution: WorkflowExecution) => {
+  executionToDelete.value = execution
+  showDeleteDialog.value = true
+}
+
+const confirmDelete = async () => {
+  if (!executionToDelete.value) return
+
+  try {
+    await workflowApi.deleteExecution(workflowId, executionToDelete.value.id)
+    message.success('删除成功')
+    // 从列表中移除
+    executions.value = executions.value.filter(e => e.id !== executionToDelete.value!.id)
+    executionToDelete.value = null
+  } catch (error: any) {
+    message.error(error.message || '删除失败')
+  }
+}
+
 // 状态相关
 const getStatusClass = (status: string) => {
   const classes = {
-    running: 'bg-blue-100 text-blue-700',
+    running: 'bg-primary-light text-primary',
     success: 'bg-green-100 text-green-700',
     failed: 'bg-red-100 text-red-700',
-    cancelled: 'bg-slate-100 text-slate-700'
+    cancelled: 'bg-bg-tertiary text-text-secondary'
   }
   return classes[status as keyof typeof classes] || classes.cancelled
 }
 
 const getStatusDotClass = (status: string) => {
   const classes = {
-    running: 'bg-blue-500 animate-pulse',
+    running: 'bg-[var(--color-primary)] animate-pulse',
     success: 'bg-green-500',
     failed: 'bg-red-500',
-    cancelled: 'bg-slate-500'
+    cancelled: 'bg-bg-hover0'
   }
   return classes[status as keyof typeof classes] || classes.cancelled
 }
@@ -269,6 +308,7 @@ const getStatusText = (status: string) => {
 const getTriggerIcon = (type: string) => {
   const icons = {
     schedule: Clock,
+    scheduled: Clock,
     webhook: Webhook,
     manual: MousePointerClick
   }
@@ -278,6 +318,7 @@ const getTriggerIcon = (type: string) => {
 const getTriggerText = (type: string) => {
   const texts = {
     schedule: '定时触发',
+    scheduled: '定时触发',
     webhook: 'Webhook',
     manual: '手动触发'
   }

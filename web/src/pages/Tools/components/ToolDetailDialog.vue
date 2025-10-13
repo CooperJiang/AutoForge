@@ -18,19 +18,19 @@
           <component :is="iconComponent" class="w-8 h-8" />
         </div>
         <div class="flex-1">
-          <p class="text-slate-600 mb-2">
+          <p class="text-text-secondary mb-2">
             {{ tool.description }}
           </p>
           <div class="flex flex-wrap items-center gap-3 text-sm">
-            <span class="flex items-center gap-1 text-slate-600">
+            <span class="flex items-center gap-1 text-text-secondary">
               <Package class="w-4 h-4" />
               版本 {{ tool.version }}
             </span>
-            <span class="flex items-center gap-1 text-slate-600">
+            <span class="flex items-center gap-1 text-text-secondary">
               <User class="w-4 h-4" />
               {{ tool.author }}
             </span>
-            <span class="flex items-center gap-1 text-slate-600">
+            <span class="flex items-center gap-1 text-text-secondary">
               <Tag class="w-4 h-4" />
               {{ tool.category }}
             </span>
@@ -40,12 +40,12 @@
 
       <!-- 工具标签 -->
       <div>
-        <h3 class="text-sm font-semibold text-slate-700 mb-2">标签</h3>
+        <h3 class="text-sm font-semibold text-text-secondary mb-2">标签</h3>
         <div class="flex flex-wrap gap-2">
           <span
             v-for="tag in tool.tags"
             :key="tag"
-            class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-blue-50 text-blue-700 border border-blue-200"
+            class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-primary-light text-primary border border-primary"
           >
             {{ tag }}
           </span>
@@ -54,17 +54,17 @@
 
       <!-- 使用说明 -->
       <div>
-        <h3 class="text-sm font-semibold text-slate-900 mb-2 flex items-center gap-2">
+        <h3 class="text-sm font-semibold text-text-primary mb-2 flex items-center gap-2">
           <BookOpen class="w-4 h-4" />
           使用说明
         </h3>
-        <div class="bg-slate-50 rounded-lg p-4 space-y-3">
+        <div class="bg-bg-hover rounded-lg p-4 space-y-3">
           <div v-if="tool.code === 'http_request'">
-            <h4 class="font-semibold text-slate-900 mb-2 text-sm">📡 HTTP 请求工具</h4>
-            <p class="text-xs text-slate-700 mb-2">
+            <h4 class="font-semibold text-text-primary mb-2 text-sm">📡 HTTP 请求工具</h4>
+            <p class="text-xs text-text-secondary mb-2">
               发送 HTTP 请求到指定的 URL，支持所有常见的 HTTP 方法。
             </p>
-            <ul class="space-y-1.5 text-xs text-slate-600">
+            <ul class="space-y-1.5 text-xs text-text-secondary">
               <li class="flex items-start gap-2">
                 <Check class="w-3.5 h-3.5 text-green-600 mt-0.5 flex-shrink-0" />
                 <span>支持 GET、POST、PUT、DELETE、PATCH 等方法</span>
@@ -85,11 +85,11 @@
           </div>
 
           <div v-else-if="tool.code === 'email_sender'">
-            <h4 class="font-semibold text-slate-900 mb-2 text-sm">📧 邮件发送工具</h4>
-            <p class="text-xs text-slate-700 mb-2">
+            <h4 class="font-semibold text-text-primary mb-2 text-sm">📧 邮件发送工具</h4>
+            <p class="text-xs text-text-secondary mb-2">
               通过 SMTP 协议发送邮件通知，支持多收件人和 HTML 格式。
             </p>
-            <ul class="space-y-1.5 text-xs text-slate-600">
+            <ul class="space-y-1.5 text-xs text-text-secondary">
               <li class="flex items-start gap-2">
                 <Check class="w-3.5 h-3.5 text-green-600 mt-0.5 flex-shrink-0" />
                 <span>系统自动使用配置的 SMTP 服务器，无需用户提供</span>
@@ -110,11 +110,11 @@
           </div>
 
           <div v-else-if="tool.code === 'health_checker'">
-            <h4 class="font-semibold text-slate-900 mb-2 text-sm">🏥 健康检查工具</h4>
-            <p class="text-xs text-slate-700 mb-2">
+            <h4 class="font-semibold text-text-primary mb-2 text-sm">🏥 健康检查工具</h4>
+            <p class="text-xs text-text-secondary mb-2">
               监控网站或 API 的可用性，检查 SSL 证书有效期。
             </p>
-            <ul class="space-y-1.5 text-xs text-slate-600">
+            <ul class="space-y-1.5 text-xs text-text-secondary">
               <li class="flex items-start gap-2">
                 <Check class="w-3.5 h-3.5 text-green-600 mt-0.5 flex-shrink-0" />
                 <span>检查网站状态码和响应时间</span>
@@ -139,7 +139,7 @@
           </div>
 
           <div v-else>
-            <p class="text-xs text-slate-600">
+            <p class="text-xs text-text-secondary">
               暂无详细说明，请直接使用该工具。
             </p>
           </div>
@@ -215,13 +215,13 @@ const iconComponent = computed(() => {
 
 // 根据工具代码获取图标背景色
 const iconBgClass = computed(() => {
-  if (!props.tool) return 'bg-gradient-to-br from-blue-500 to-purple-600'
+  if (!props.tool) return 'bg-gradient-to-br from-primary to-accent'
   const colorMap: Record<string, string> = {
-    'http_request': 'bg-gradient-to-br from-blue-500 to-purple-600',
+    'http_request': 'bg-gradient-to-br from-primary to-accent',
     'email_sender': 'bg-gradient-to-br from-purple-500 to-pink-600',
-    'health_checker': 'bg-gradient-to-br from-indigo-500 to-blue-600'
+    'health_checker': 'bg-gradient-to-br from-primary to-accent'
   }
-  return colorMap[props.tool.code] || 'bg-gradient-to-br from-blue-500 to-purple-600'
+  return colorMap[props.tool.code] || 'bg-gradient-to-br from-primary to-accent'
 })
 
 const close = () => {

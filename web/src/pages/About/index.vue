@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen bg-gray-50">
+  <div class="min-h-screen bg-bg-secondary">
     <div class="max-w-4xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
       <div class="text-center mb-12">
         <h1 class="text-4xl font-bold text-gray-900 mb-4">关于我们</h1>
@@ -8,7 +8,7 @@
         </p>
       </div>
 
-      <div class="bg-white rounded-lg shadow-md p-8 mb-8">
+      <div class="bg-bg-elevated rounded-lg shadow-md p-8 mb-8">
         <h2 class="text-2xl font-bold text-gray-900 mb-6">项目介绍</h2>
         <div class="prose max-w-none">
           <p class="text-gray-600 mb-4">
@@ -21,7 +21,7 @@
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
-        <div class="bg-white rounded-lg shadow-md p-6">
+        <div class="bg-bg-elevated rounded-lg shadow-md p-6">
           <h3 class="text-xl font-bold text-gray-900 mb-4">技术栈</h3>
           <ul class="space-y-2 text-gray-600">
             <li>• Vue 3 - 渐进式 JavaScript 框架</li>
@@ -33,7 +33,7 @@
           </ul>
         </div>
 
-        <div class="bg-white rounded-lg shadow-md p-6">
+        <div class="bg-bg-elevated rounded-lg shadow-md p-6">
           <h3 class="text-xl font-bold text-gray-900 mb-4">特性</h3>
           <ul class="space-y-2 text-gray-600">
             <li>• 响应式设计</li>
@@ -49,7 +49,7 @@
       <div class="text-center">
         <router-link
           to="/"
-          class="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700"
+          class="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-primary hover:bg-primary-hover"
         >
           返回首页
         </router-link>

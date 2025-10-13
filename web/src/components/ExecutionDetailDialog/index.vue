@@ -1,12 +1,12 @@
 <template>
   <div v-if="modelValue" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-    <div class="bg-white rounded-xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden flex flex-col">
+    <div class="bg-bg-elevated rounded-xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden flex flex-col">
       <!-- Header -->
-      <div class="px-6 py-4 border-b-2 border-slate-200 flex justify-between items-center flex-shrink-0">
-        <h3 class="text-xl font-bold text-slate-900">执行详情</h3>
+      <div class="px-6 py-4 border-b-2 border-border-primary flex justify-between items-center flex-shrink-0">
+        <h3 class="text-xl font-bold text-text-primary">执行详情</h3>
         <button
           @click="$emit('update:modelValue', false)"
-          class="text-slate-400 hover:text-slate-600 transition-colors"
+          class="text-text-tertiary hover:text-text-secondary transition-colors"
         >
           <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
@@ -19,76 +19,76 @@
         <div v-if="execution" class="space-y-6">
           <!-- 基本信息 -->
           <div>
-            <h4 class="text-sm font-semibold text-slate-700 mb-3 flex items-center gap-2">
-              <span class="w-1 h-4 bg-blue-500 rounded"></span>
+            <h4 class="text-sm font-semibold text-text-secondary mb-3 flex items-center gap-2">
+              <span class="w-1 h-4 bg-[var(--color-primary)] rounded"></span>
               基本信息
             </h4>
-            <div class="grid grid-cols-3 gap-4 bg-slate-50 rounded-lg p-4">
+            <div class="grid grid-cols-3 gap-4 bg-bg-hover rounded-lg p-4">
               <div>
-                <p class="text-xs text-slate-500 mb-1">执行ID</p>
-                <p class="text-sm text-slate-900 font-mono">{{ execution.id }}</p>
+                <p class="text-xs text-text-tertiary mb-1">执行ID</p>
+                <p class="text-sm text-text-primary font-mono">{{ execution.id }}</p>
               </div>
               <div>
-                <p class="text-xs text-slate-500 mb-1">任务ID</p>
-                <p class="text-sm text-slate-900 font-mono">{{ execution.task_id }}</p>
+                <p class="text-xs text-text-tertiary mb-1">任务ID</p>
+                <p class="text-sm text-text-primary font-mono">{{ execution.task_id }}</p>
               </div>
               <div>
-                <p class="text-xs text-slate-500 mb-1">用户ID</p>
-                <p class="text-sm text-slate-900 font-mono">{{ execution.user_id }}</p>
+                <p class="text-xs text-text-tertiary mb-1">用户ID</p>
+                <p class="text-sm text-text-primary font-mono">{{ execution.user_id }}</p>
               </div>
             </div>
           </div>
 
           <!-- 执行状态 -->
           <div>
-            <h4 class="text-sm font-semibold text-slate-700 mb-3 flex items-center gap-2">
-              <span class="w-1 h-4 bg-green-500 rounded"></span>
+            <h4 class="text-sm font-semibold text-text-secondary mb-3 flex items-center gap-2">
+              <span class="w-1 h-4 bg-success-light0 rounded"></span>
               执行状态
             </h4>
-            <div class="grid grid-cols-3 gap-4 bg-slate-50 rounded-lg p-4">
+            <div class="grid grid-cols-3 gap-4 bg-bg-hover rounded-lg p-4">
               <div>
-                <p class="text-xs text-slate-500 mb-1">状态</p>
+                <p class="text-xs text-text-tertiary mb-1">状态</p>
                 <span :class="[
                   'inline-flex px-2 py-1 text-xs font-medium rounded-full',
-                  execution.status === 'success' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
+                  execution.status === 'success' ? 'bg-green-100 text-success' : 'bg-red-100 text-red-700'
                 ]">
                   {{ execution.status === 'success' ? '成功' : '失败' }}
                 </span>
               </div>
               <div>
-                <p class="text-xs text-slate-500 mb-1">HTTP状态码</p>
+                <p class="text-xs text-text-tertiary mb-1">HTTP状态码</p>
                 <span :class="[
                   'inline-flex px-2 py-1 text-xs font-semibold rounded',
-                  execution.response_status >= 200 && execution.response_status < 300 ? 'bg-green-100 text-green-700' :
+                  execution.response_status >= 200 && execution.response_status < 300 ? 'bg-green-100 text-success' :
                   execution.response_status >= 400 ? 'bg-red-100 text-red-700' : 'bg-yellow-100 text-yellow-700'
                 ]">
                   {{ execution.response_status || 'N/A' }}
                 </span>
               </div>
               <div>
-                <p class="text-xs text-slate-500 mb-1">执行时长</p>
-                <p class="text-sm text-slate-900">{{ execution.duration_ms }}ms</p>
+                <p class="text-xs text-text-tertiary mb-1">执行时长</p>
+                <p class="text-sm text-text-primary">{{ execution.duration_ms }}ms</p>
               </div>
             </div>
           </div>
 
           <!-- 响应数据 -->
           <div>
-            <h4 class="text-sm font-semibold text-slate-700 mb-3 flex items-center gap-2">
+            <h4 class="text-sm font-semibold text-text-secondary mb-3 flex items-center gap-2">
               <span class="w-1 h-4 bg-purple-500 rounded"></span>
               响应数据
             </h4>
             <div v-if="execution.response_body">
               <JsonViewer :content="execution.response_body" />
             </div>
-            <div v-else class="bg-slate-50 rounded-lg p-4">
-              <p class="text-sm text-slate-400">无响应数据</p>
+            <div v-else class="bg-bg-hover rounded-lg p-4">
+              <p class="text-sm text-text-tertiary">无响应数据</p>
             </div>
           </div>
 
           <!-- 错误信息 -->
           <div v-if="execution.error_message">
-            <h4 class="text-sm font-semibold text-slate-700 mb-3 flex items-center gap-2">
+            <h4 class="text-sm font-semibold text-text-secondary mb-3 flex items-center gap-2">
               <span class="w-1 h-4 bg-red-500 rounded"></span>
               错误信息
             </h4>
@@ -99,18 +99,18 @@
 
           <!-- 时间信息 -->
           <div>
-            <h4 class="text-sm font-semibold text-slate-700 mb-3 flex items-center gap-2">
+            <h4 class="text-sm font-semibold text-text-secondary mb-3 flex items-center gap-2">
               <span class="w-1 h-4 bg-orange-500 rounded"></span>
               时间信息
             </h4>
-            <div class="grid grid-cols-2 gap-4 bg-slate-50 rounded-lg p-4">
+            <div class="grid grid-cols-2 gap-4 bg-bg-hover rounded-lg p-4">
               <div>
-                <p class="text-xs text-slate-500 mb-1">开始时间</p>
-                <p class="text-sm text-slate-900">{{ formatTime(execution.started_at) }}</p>
+                <p class="text-xs text-text-tertiary mb-1">开始时间</p>
+                <p class="text-sm text-text-primary">{{ formatTime(execution.started_at) }}</p>
               </div>
               <div>
-                <p class="text-xs text-slate-500 mb-1">结束时间</p>
-                <p class="text-sm text-slate-900">{{ formatTime(execution.finished_at) }}</p>
+                <p class="text-xs text-text-tertiary mb-1">结束时间</p>
+                <p class="text-sm text-text-primary">{{ formatTime(execution.finished_at) }}</p>
               </div>
             </div>
           </div>
@@ -118,10 +118,10 @@
       </div>
 
       <!-- Footer -->
-      <div class="px-6 py-4 border-t-2 border-slate-200 flex justify-end gap-3 flex-shrink-0">
+      <div class="px-6 py-4 border-t-2 border-border-primary flex justify-end gap-3 flex-shrink-0">
         <button
           @click="$emit('update:modelValue', false)"
-          class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium rounded-lg transition-colors"
+          class="px-4 py-2 bg-bg-tertiary hover:bg-bg-tertiary text-text-secondary font-medium rounded-lg transition-colors"
         >
           关闭
         </button>

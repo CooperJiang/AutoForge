@@ -51,7 +51,7 @@ const messageClasses = {
   success: 'bg-emerald-50 text-emerald-800 border-emerald-200 shadow-emerald-100',
   error: 'bg-red-50 text-red-800 border-red-200 shadow-red-100',
   warning: 'bg-amber-50 text-amber-800 border-amber-200 shadow-amber-100',
-  info: 'bg-sky-50 text-sky-800 border-sky-200 shadow-sky-100',
+  info: 'bg-info-light text-info-text border-info shadow-info-light',
 }
 
 // 消息类型对应的图标

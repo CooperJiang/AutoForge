@@ -6,7 +6,7 @@
         @input="updateKey(($event.target as HTMLInputElement).value)"
         type="text"
         :placeholder="keyPlaceholder"
-        class="w-full px-2 py-1 text-xs text-slate-900 bg-white border-2 border-slate-200 rounded transition-all duration-200 focus:border-blue-400 focus:ring-2 focus:ring-blue-50 focus:outline-none hover:border-slate-300"
+        class="w-full px-2 py-1 text-xs text-text-primary bg-bg-elevated border-2 border-border-primary rounded transition-all duration-200 focus:border-border-focus focus:ring-2 focus:ring-primary-light focus:outline-none hover:border-border-secondary"
       />
     </div>
     <div class="flex-1">
@@ -15,13 +15,13 @@
         @input="updateValue(($event.target as HTMLInputElement).value)"
         type="text"
         :placeholder="valuePlaceholder"
-        class="w-full px-2 py-1 text-xs text-slate-900 bg-white border-2 border-slate-200 rounded transition-all duration-200 focus:border-blue-400 focus:ring-2 focus:ring-blue-50 focus:outline-none hover:border-slate-300"
+        class="w-full px-2 py-1 text-xs text-text-primary bg-bg-elevated border-2 border-border-primary rounded transition-all duration-200 focus:border-border-focus focus:ring-2 focus:ring-primary-light focus:outline-none hover:border-border-secondary"
       />
     </div>
     <button
       type="button"
       @click="$emit('remove')"
-      class="p-1 text-rose-500 hover:bg-rose-50 rounded transition-colors duration-200"
+      class="p-1 text-error hover:bg-error-light rounded transition-colors duration-200"
     >
       <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />

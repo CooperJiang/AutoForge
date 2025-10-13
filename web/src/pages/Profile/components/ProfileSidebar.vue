@@ -1,14 +1,14 @@
 <template>
-  <div class="bg-white rounded-2xl shadow-lg border border-slate-200 overflow-hidden sticky top-6">
+  <div class="bg-bg-elevated rounded-2xl shadow-lg border border-border-primary overflow-hidden sticky top-6">
     <!-- 用户信息 -->
-    <div class="bg-gradient-to-br from-blue-500 to-purple-600 p-6 text-white">
+    <div class="bg-gradient-to-br from-primary to-accent p-6 text-white">
       <div class="flex flex-col items-center">
-        <div class="w-20 h-20 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center text-white text-3xl font-bold shadow-lg mb-4 ring-4 ring-white/30">
+        <div class="w-20 h-20 rounded-full bg-bg-elevated/20 backdrop-blur-sm flex items-center justify-center text-white text-3xl font-bold shadow-lg mb-4 ring-4 ring-white/30">
           {{ userInitial }}
         </div>
         <h2 class="text-lg font-bold mb-1">{{ userName }}</h2>
-        <p class="text-sm text-blue-50 mb-3 truncate max-w-full px-4">{{ userEmail }}</p>
-        <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-white/20 backdrop-blur-sm">
+        <p class="text-sm text-primary-text mb-3 truncate max-w-full px-4">{{ userEmail }}</p>
+        <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-bg-elevated/20 backdrop-blur-sm">
           {{ roleText }}
         </span>
       </div>
@@ -23,8 +23,8 @@
         :class="[
           'w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium transition-all',
           activeTab === item.id
-            ? 'bg-blue-50 text-blue-700 shadow-sm'
-            : 'text-slate-700 hover:bg-slate-50'
+            ? 'bg-primary-light text-primary shadow-sm'
+            : 'text-text-secondary hover:bg-bg-hover'
         ]"
       >
         <component :is="item.icon" class="w-5 h-5"></component>

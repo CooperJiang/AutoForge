@@ -2,7 +2,7 @@
   <div class="space-y-4">
     <!-- 触发器类型选择 -->
     <div>
-      <label class="block text-sm font-medium text-slate-700 mb-2">
+      <label class="block text-sm font-medium text-text-secondary mb-2">
         触发器类型 <span class="text-red-500">*</span>
       </label>
       <BaseSelect
@@ -14,8 +14,8 @@
 
     <!-- 定时触发配置 -->
     <div v-if="localConfig.triggerType === 'schedule'">
-      <div class="bg-blue-50 border-l-4 border-blue-400 p-3 mb-3">
-        <p class="text-sm text-blue-700">
+      <div class="bg-primary-light border-l-4 border-border-focus p-3 mb-3">
+        <p class="text-sm text-primary">
           <svg class="inline-block w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
             <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
           </svg>
@@ -33,8 +33,8 @@
 
     <!-- Webhook 触发配置 -->
     <div v-if="localConfig.triggerType === 'webhook'" class="space-y-3">
-      <div class="bg-purple-50 border-l-4 border-purple-400 p-3">
-        <p class="text-sm text-purple-700">
+      <div class="bg-info-light border-l-4 border-info rounded-lg p-3">
+        <p class="text-sm text-info-text">
           <svg class="inline-block w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
             <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
           </svg>
@@ -43,7 +43,7 @@
       </div>
 
       <div>
-        <label class="block text-sm font-medium text-slate-700 mb-2">
+        <label class="block text-sm font-medium text-text-secondary mb-2">
           请求方法 <span class="text-red-500">*</span>
         </label>
         <BaseSelect
@@ -53,41 +53,41 @@
       </div>
 
       <div>
-        <label class="block text-sm font-medium text-slate-700 mb-2">
+        <label class="block text-sm font-medium text-text-secondary mb-2">
           Webhook 路径 <span class="text-red-500">*</span>
         </label>
         <div class="flex items-center gap-2">
-          <span class="text-sm text-slate-500 whitespace-nowrap">/api/webhook/</span>
+          <span class="text-sm text-text-tertiary whitespace-nowrap">/api/webhook/</span>
           <BaseInput
             v-model="localConfig.webhookPath"
             placeholder="my-workflow"
             @update:model-value="emitUpdate"
           />
         </div>
-        <p class="text-xs text-slate-500 mt-1">
-          完整URL: <code class="px-1 py-0.5 bg-slate-100 rounded">https://your-domain.com/api/webhook/{{ localConfig.webhookPath || 'my-workflow' }}</code>
+        <p class="text-xs text-text-tertiary mt-1">
+          完整URL: <code class="px-1 py-0.5 bg-bg-tertiary rounded">https://your-domain.com/api/webhook/{{ localConfig.webhookPath || 'my-workflow' }}</code>
         </p>
       </div>
 
       <!-- 示例说明 -->
-      <div class="bg-slate-50 rounded-lg p-3">
-        <div class="text-xs font-semibold text-slate-700 mb-2">使用示例：</div>
+      <div class="bg-bg-hover rounded-lg p-3">
+        <div class="text-xs font-semibold text-text-secondary mb-2">使用示例：</div>
         <div class="bg-slate-900 text-slate-100 rounded p-2 font-mono text-xs overflow-x-auto">
           <div>curl -X {{ localConfig.webhookMethod || 'POST' }} \</div>
           <div class="ml-2">https://your-domain.com/api/webhook/{{ localConfig.webhookPath || 'my-workflow' }} \</div>
           <div class="ml-2">-H "Content-Type: application/json" \</div>
           <div class="ml-2">-d '{"key": "value"}'</div>
         </div>
-        <p class="text-xs text-slate-600 mt-2">
-          请求体数据可通过 <code class="px-1 py-0.5 bg-slate-200 rounded">&#123;&#123;trigger.data&#125;&#125;</code> 在后续节点中访问
+        <p class="text-xs text-text-secondary mt-2">
+          请求体数据可通过 <code class="px-1 py-0.5 bg-bg-tertiary rounded">&#123;&#123;trigger.data&#125;&#125;</code> 在后续节点中访问
         </p>
       </div>
     </div>
 
     <!-- 手动触发配置 -->
     <div v-if="localConfig.triggerType === 'manual'">
-      <div class="bg-green-50 border-l-4 border-green-400 p-3">
-        <p class="text-sm text-green-700">
+      <div class="bg-success-light border-l-4 border-green-400 p-3">
+        <p class="text-sm text-success">
           <svg class="inline-block w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
             <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
           </svg>

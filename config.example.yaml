@@ -52,7 +52,7 @@ log:
 # JWT认证配置
 jwt:
   secret_key: "change-to-your-secure-secret-key" # JWT签名密钥，生产环境必须修改为强密钥
-  expires_in: 24                   # JWT令牌有效期，单位小时
+  expires_in: 240                  # JWT令牌有效期，单位小时
   refresh_expires_in: 168          # 刷新令牌有效期，单位小时
   issuer: "auto-task"              # JWT发行者
   audience: "auto-task-users"      # JWT接收者

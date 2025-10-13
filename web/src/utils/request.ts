@@ -48,13 +48,15 @@ request.interceptors.response.use(
 
     // 检查业务状态码
     if (data.code !== 200) {
-      const errorMessage = data.message || '请求失败'
+      // 优先使用 detail（详细错误），如果没有则使用 message
+      const errorMessage = (data as any).detail || data.message || '请求失败'
       const error: any = new Error(errorMessage)
 
       // 将完整的响应数据附加到error对象上，方便业务代码获取
       error.response = response
       error.code = data.code
       error.message = errorMessage
+      error.detail = (data as any).detail
 
       return Promise.reject(error)
     }
@@ -72,27 +74,34 @@ request.interceptors.response.use(
     if (error.response) {
       const { status, data } = error.response
 
-      switch (status) {
-        case 401:
-          message = '未授权，请重新登录'
-          // 清除token并跳转到登录页
-          SecureStorage.removeItem(STORAGE_KEYS.AUTH_TOKEN)
-          SecureStorage.removeItem(STORAGE_KEYS.AUTH_USER)
-          if (window.location.pathname !== '/auth') {
-            window.location.replace('/auth')
-          }
-          break
-        case 403:
-          message = '拒绝访问'
-          break
-        case 404:
-          message = '请求的资源不存在'
-          break
-        case 500:
-          message = '服务器内部错误'
-          break
-        default:
-          message = data?.message || `请求失败 (${status})`
+      // 优先使用 detail（详细错误），其次 message
+      if (data?.detail) {
+        message = data.detail
+      } else if (data?.message) {
+        message = data.message
+      } else {
+        switch (status) {
+          case 401:
+            message = '未授权，请重新登录'
+            // 清除token并跳转到登录页
+            SecureStorage.removeItem(STORAGE_KEYS.AUTH_TOKEN)
+            SecureStorage.removeItem(STORAGE_KEYS.AUTH_USER)
+            if (window.location.pathname !== '/auth') {
+              window.location.replace('/auth')
+            }
+            break
+          case 403:
+            message = '拒绝访问'
+            break
+          case 404:
+            message = '请求的资源不存在'
+            break
+          case 500:
+            message = '服务器内部错误'
+            break
+          default:
+            message = `请求失败 (${status})`
+        }
       }
     } else if (error.request) {
       message = '网络连接失败，请检查网络连接'

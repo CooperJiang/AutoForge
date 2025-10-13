@@ -1,19 +1,19 @@
 <template>
   <div class="w-full relative" ref="selectRef">
-    <label v-if="label" class="block text-sm font-medium text-slate-700 mb-2">
+    <label v-if="label" class="block text-sm font-medium text-text-primary mb-2">
       {{ label }}
-      <span v-if="required" class="text-rose-500 ml-1">*</span>
+      <span v-if="required" class="text-error ml-1">*</span>
     </label>
     <button
       type="button"
       @click="toggleDropdown"
-      class="w-full px-3 py-1.5 text-sm text-left bg-white border-2 border-slate-200 rounded-md transition-all duration-200 hover:border-slate-300 focus:border-blue-400 focus:ring-2 focus:ring-blue-50 focus:outline-none"
-      :class="{ 'border-blue-400 ring-2 ring-blue-50': isOpen }"
+      class="w-full px-3 py-1.5 text-sm text-left bg-bg-primary border-2 border-border-primary rounded-md transition-all duration-200 hover:border-border-secondary focus:border-border-focus focus:ring-2 focus:ring-primary-light focus:outline-none"
+      :class="{ 'border-border-focus ring-2 ring-primary-light': isOpen }"
     >
       <div class="flex items-center justify-between">
-        <span class="text-slate-900">{{ selectedLabel || placeholder }}</span>
+        <span class="text-text-primary">{{ selectedLabel || placeholder }}</span>
         <svg
-          class="w-5 h-5 text-slate-400 transition-transform duration-200"
+          class="w-5 h-5 text-text-tertiary transition-transform duration-200"
           :class="{ 'rotate-180': isOpen }"
           fill="none"
           stroke="currentColor"
@@ -36,15 +36,15 @@
       >
         <div
           v-show="isOpen"
-          class="fixed bg-white border-2 border-slate-200 rounded-md shadow-lg max-h-48 overflow-y-auto"
+          class="fixed bg-bg-elevated border-2 border-border-primary rounded-md shadow-lg max-h-48 overflow-y-auto"
           :style="dropdownStyle"
         >
           <div
             v-for="option in options"
             :key="option.value"
             @click="selectOption(option)"
-            class="px-3 py-1.5 text-sm cursor-pointer transition-colors duration-150 hover:bg-blue-50 text-slate-900"
-            :class="{ 'bg-blue-50 font-medium': option.value === modelValue }"
+            class="px-3 py-1.5 text-sm cursor-pointer transition-colors duration-150 hover:bg-bg-hover text-text-primary"
+            :class="{ 'bg-primary-light font-medium': option.value === modelValue }"
           >
             {{ option.label }}
           </div>

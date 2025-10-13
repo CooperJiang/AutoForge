@@ -1,8 +1,8 @@
 <template>
   <div class="w-full">
-    <label v-if="label" class="block text-sm font-medium text-slate-700 mb-2">
+    <label v-if="label" class="block text-sm font-medium text-text-primary mb-2">
       {{ label }}
-      <span v-if="required" class="text-rose-500 ml-1">*</span>
+      <span v-if="required" class="text-error ml-1">*</span>
     </label>
     <input
       :value="modelValue"
@@ -12,10 +12,10 @@
       :required="required"
       :min="min"
       :max="max"
-      class="w-full px-3 py-1.5 text-sm text-slate-900 bg-white border-2 border-slate-200 rounded-md transition-all duration-200 focus:border-blue-400 focus:ring-2 focus:ring-blue-50 focus:outline-none hover:border-slate-300"
+      class="w-full px-3 py-1.5 text-sm text-text-primary bg-bg-primary border-2 border-border-primary rounded-md transition-all duration-200 focus:border-border-focus focus:ring-2 focus:ring-primary-light focus:outline-none hover:border-border-secondary placeholder:text-text-placeholder"
       :class="inputClass"
     />
-    <p v-if="hint" class="mt-1.5 text-xs text-slate-500">{{ hint }}</p>
+    <p v-if="hint" class="mt-1.5 text-xs text-text-tertiary">{{ hint }}</p>
   </div>
 </template>
 
@@ -44,3 +44,16 @@ defineEmits<{
   'update:modelValue': [value: string]
 }>()
 </script>
+
+<style scoped>
+/* 隐藏 number 类型的上下箭头 */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type="number"] {
+  -moz-appearance: textfield;
+}
+</style>

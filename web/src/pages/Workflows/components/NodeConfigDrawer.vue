@@ -2,11 +2,11 @@
   <Drawer v-model="isOpen" title="节点配置" size="xl" @close="handleClose">
     <div v-if="node" class="space-y-4">
       <!-- 节点基本信息 -->
-      <div class="bg-slate-50 rounded-lg p-4">
-        <h3 class="text-sm font-semibold text-slate-900 mb-3">基本信息</h3>
+      <div class="bg-bg-hover rounded-lg p-4">
+        <h3 class="text-sm font-semibold text-text-primary mb-3">基本信息</h3>
         <div class="space-y-3">
           <div>
-            <label class="block text-xs font-medium text-slate-700 mb-1">节点名称</label>
+            <label class="block text-xs font-medium text-text-secondary mb-1">节点名称</label>
             <BaseInput
               v-model="localNode.name"
               placeholder="输入节点名称"
@@ -16,18 +16,18 @@
       </div>
 
       <!-- 工具配置 - 使用Tasks的配置组件 -->
-      <div v-if="node.type === 'tool' && node.toolCode" class="border-t border-slate-200 pt-4">
-        <h3 class="text-sm font-semibold text-slate-900 mb-3">工具配置</h3>
+      <div v-if="node.type === 'tool' && node.toolCode" class="border-t border-border-primary pt-4">
+        <h3 class="text-sm font-semibold text-text-primary mb-3">工具配置</h3>
 
         <!-- HTTP请求 -->
         <div v-if="node.toolCode === 'http_request'" class="space-y-4">
           <!-- Curl 粘贴提示 -->
-          <div class="bg-blue-50 border border-blue-200 rounded-lg p-3 text-xs text-blue-800">
-            💡 小提示：按 <kbd class="px-1.5 py-0.5 bg-white border border-blue-300 rounded">{{ isMac ? 'Cmd' : 'Ctrl' }}</kbd> + <kbd class="px-1.5 py-0.5 bg-white border border-blue-300 rounded">V</kbd> 可直接粘贴 cURL 命令自动解析
+          <div class="bg-primary-light border border-primary rounded-lg p-3 text-xs text-primary">
+            💡 小提示：按 <kbd class="px-1.5 py-0.5 bg-bg-elevated border border-primary rounded">{{ isMac ? 'Cmd' : 'Ctrl' }}</kbd> + <kbd class="px-1.5 py-0.5 bg-bg-elevated border border-primary rounded">V</kbd> 可直接粘贴 cURL 命令自动解析
           </div>
 
           <div>
-            <label class="block text-sm font-medium text-slate-700 mb-2">
+            <label class="block text-sm font-medium text-text-secondary mb-2">
               请求方式 <span class="text-red-500">*</span>
             </label>
             <BaseSelect
@@ -37,7 +37,7 @@
           </div>
 
           <div>
-            <label class="block text-sm font-medium text-slate-700 mb-2">
+            <label class="block text-sm font-medium text-text-secondary mb-2">
               接口地址 <span class="text-red-500">*</span>
             </label>
             <VariableSelector
@@ -51,7 +51,7 @@
 
           <!-- Headers -->
           <div>
-            <label class="block text-sm font-medium text-slate-700 mb-2">
+            <label class="block text-sm font-medium text-text-secondary mb-2">
               请求头（可选）
             </label>
             <div class="space-y-2">
@@ -67,7 +67,7 @@
               <button
                 type="button"
                 @click="addHeader"
-                class="w-full py-2 text-sm text-slate-600 border-2 border-dashed border-slate-300 rounded-lg hover:border-slate-400 hover:text-slate-700 transition-colors"
+                class="w-full py-2 text-sm text-text-secondary border-2 border-dashed border-slate-300 rounded-lg hover:border-slate-400 hover:text-text-secondary transition-colors"
               >
                 + 添加请求头
               </button>
@@ -76,7 +76,7 @@
 
           <!-- Params -->
           <div>
-            <label class="block text-sm font-medium text-slate-700 mb-2">
+            <label class="block text-sm font-medium text-text-secondary mb-2">
               请求参数（可选）
             </label>
             <div class="space-y-2">
@@ -92,7 +92,7 @@
               <button
                 type="button"
                 @click="addParam"
-                class="w-full py-2 text-sm text-slate-600 border-2 border-dashed border-slate-300 rounded-lg hover:border-slate-400 hover:text-slate-700 transition-colors"
+                class="w-full py-2 text-sm text-text-secondary border-2 border-dashed border-slate-300 rounded-lg hover:border-slate-400 hover:text-text-secondary transition-colors"
               >
                 + 添加参数
               </button>
@@ -106,18 +106,18 @@
               @click="bodyExpanded = !bodyExpanded"
               class="flex items-center justify-between w-full mb-2 text-left"
             >
-              <label class="block text-sm font-medium text-slate-700 cursor-pointer">
-                {{ bodyExpanded ? '▼' : '▶' }} 请求体 (Body) <span class="text-xs text-slate-500">(POST/PUT/PATCH)</span>
+              <label class="block text-sm font-medium text-text-secondary cursor-pointer">
+                {{ bodyExpanded ? '▼' : '▶' }} 请求体 (Body) <span class="text-xs text-text-tertiary">(POST/PUT/PATCH)</span>
               </label>
             </button>
             <div v-show="bodyExpanded" class="space-y-1">
               <textarea
                 v-model="localNode.config.body"
-                class="w-full px-3 py-2 border-2 border-slate-200 rounded-lg focus:outline-none focus:border-green-500 font-mono text-sm"
+                class="w-full px-3 py-1.5 text-sm text-text-primary bg-bg-primary border-2 border-border-primary rounded-md transition-all duration-200 focus:border-border-focus focus:ring-2 focus:ring-primary-light focus:outline-none hover:border-border-secondary placeholder:text-text-placeholder font-mono"
                 rows="8"
                 placeholder='{"key": "value"}'
               />
-              <div class="text-xs text-slate-500">支持 JSON、文本等格式</div>
+              <div class="text-xs text-text-tertiary">支持 JSON、文本等格式</div>
             </div>
           </div>
         </div>
@@ -126,6 +126,8 @@
         <EmailToolConfig
           v-else-if="node.toolCode === 'email_sender'"
           v-model:config="localNode.config"
+          :previous-nodes="props.previousNodes"
+          :env-vars="props.envVars"
         />
 
         <!-- 健康检查 -->
@@ -136,32 +138,35 @@
       </div>
 
       <!-- 触发器配置 -->
-      <div v-if="node.type === 'trigger'" class="border-t border-slate-200 pt-4">
-        <h3 class="text-sm font-semibold text-slate-900 mb-3">触发配置</h3>
+      <div v-if="node.type === 'trigger'" class="border-t border-border-primary pt-4">
+        <h3 class="text-sm font-semibold text-text-primary mb-3">触发配置</h3>
         <TriggerConfig v-model:config="localNode.config" />
       </div>
 
       <!-- 条件配置 -->
-      <div v-if="node.type === 'condition'" class="border-t border-slate-200 pt-4">
-        <h3 class="text-sm font-semibold text-slate-900 mb-3">条件配置</h3>
-        <ConditionConfig v-model:config="localNode.config" />
+      <div v-if="node.type === 'condition'" class="border-t border-border-primary pt-4">
+        <h3 class="text-sm font-semibold text-text-primary mb-3">条件配置</h3>
+        <ConditionConfig
+          v-model:config="localNode.config"
+          :previous-nodes="props.previousNodes"
+        />
       </div>
 
       <!-- 延迟配置 -->
-      <div v-if="node.type === 'delay'" class="border-t border-slate-200 pt-4">
-        <h3 class="text-sm font-semibold text-slate-900 mb-3">延迟配置</h3>
+      <div v-if="node.type === 'delay'" class="border-t border-border-primary pt-4">
+        <h3 class="text-sm font-semibold text-text-primary mb-3">延迟配置</h3>
         <DelayConfig v-model:config="localNode.config" />
       </div>
 
       <!-- 开关配置 -->
-      <div v-if="node.type === 'switch'" class="border-t border-slate-200 pt-4">
-        <h3 class="text-sm font-semibold text-slate-900 mb-3">开关配置</h3>
+      <div v-if="node.type === 'switch'" class="border-t border-border-primary pt-4">
+        <h3 class="text-sm font-semibold text-text-primary mb-3">开关配置</h3>
         <SwitchConfig v-model:config="localNode.config" />
       </div>
 
       <!-- 错误重试配置 -->
-      <div v-if="node.type === 'tool'" class="border-t border-slate-200 pt-4">
-        <h3 class="text-sm font-semibold text-slate-900 mb-3">错误重试</h3>
+      <div v-if="node.type === 'tool'" class="border-t border-border-primary pt-4">
+        <h3 class="text-sm font-semibold text-text-primary mb-3">错误重试</h3>
         <RetryConfig
           :config="localNode.retry || defaultRetryConfig"
           @update:config="updateRetryConfig"
@@ -169,10 +174,10 @@
       </div>
 
       <!-- 测试运行结果 -->
-      <div v-if="testResult" class="border-t border-slate-200 pt-4">
-        <div class="bg-slate-50 rounded-lg p-4">
+      <div v-if="testResult" class="border-t border-border-primary pt-4">
+        <div class="bg-bg-hover rounded-lg p-4">
           <div class="flex items-center justify-between mb-3">
-            <h3 class="text-sm font-semibold text-slate-900">测试结果</h3>
+            <h3 class="text-sm font-semibold text-text-primary">测试结果</h3>
             <span
               :class="[
                 'px-2 py-1 rounded text-xs font-medium',
@@ -189,19 +194,19 @@
           </div>
 
           <div v-if="testResult.output" class="space-y-2">
-            <div class="text-xs font-semibold text-slate-700">输出数据结构：</div>
+            <div class="text-xs font-semibold text-text-secondary">输出数据结构：</div>
             <div class="bg-slate-900 text-slate-100 rounded p-3 font-mono text-xs overflow-x-auto">
               <pre>{{ JSON.stringify(testResult.output, null, 2) }}</pre>
             </div>
-            <div class="text-xs text-slate-600">
-              💡 可以在后续节点中通过 <code class="px-1 py-0.5 bg-slate-200 rounded">&#123;&#123;{{ node.id }}.fieldName&#125;&#125;</code> 引用这些字段
+            <div class="text-xs text-text-secondary">
+              💡 可以在后续节点中通过 <code class="px-1 py-0.5 bg-bg-tertiary rounded">&#123;&#123;{{ node.id }}.fieldName&#125;&#125;</code> 引用这些字段
             </div>
           </div>
         </div>
       </div>
 
       <!-- 操作按钮 -->
-      <div class="flex items-center justify-between pt-4 border-t border-slate-200">
+      <div class="flex items-center justify-between pt-4 border-t border-border-primary">
         <BaseButton
           size="sm"
           variant="danger"

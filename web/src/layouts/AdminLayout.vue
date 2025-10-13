@@ -1,10 +1,10 @@
 <template>
-  <div class="h-screen flex flex-col bg-slate-50">
+  <div class="h-screen flex flex-col bg-bg-secondary">
     <!-- Fixed Header -->
     <AppHeader />
 
     <!-- Scrollable Content Area -->
-    <div class="flex-1 overflow-y-auto bg-slate-50">
+    <div class="flex-1 overflow-y-auto bg-bg-secondary">
       <router-view />
     </div>
   </div>

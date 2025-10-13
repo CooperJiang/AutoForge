@@ -6,11 +6,11 @@
         <div class="absolute inset-0 bg-black bg-opacity-50 transition-opacity"></div>
 
         <!-- 对话框内容 -->
-        <div :class="['relative bg-white rounded-lg shadow-xl border-2 border-slate-200 w-full max-h-[90vh] flex flex-col transform transition-all', maxWidth]">
+        <div :class="['relative bg-bg-elevated rounded-lg shadow-xl border-2 border-border-primary w-full max-h-[90vh] flex flex-col transform transition-all', maxWidth]">
           <!-- 标题 -->
-          <div class="px-5 py-4 border-b-2 border-slate-100 flex items-center justify-between flex-shrink-0">
-            <h3 class="text-base font-semibold text-slate-900">{{ title }}</h3>
-            <button @click="onCancel" class="text-slate-400 hover:text-slate-600 transition-colors">
+          <div class="px-5 py-4 border-b-2 border-border-primary flex items-center justify-between flex-shrink-0">
+            <h3 class="text-base font-semibold text-text-primary">{{ title }}</h3>
+            <button @click="onCancel" class="text-text-tertiary hover:text-text-secondary transition-colors">
               <X :size="20" />
             </button>
           </div>
@@ -18,12 +18,12 @@
           <!-- 内容 - 可滚动 -->
           <div class="px-5 py-4 overflow-y-auto flex-1">
             <slot>
-              <p class="text-sm text-slate-600">{{ message }}</p>
+              <p class="text-sm text-text-secondary">{{ message }}</p>
             </slot>
           </div>
 
           <!-- 按钮 -->
-          <div v-if="!hideFooter" class="px-5 py-4 border-t-2 border-slate-100 flex gap-2 justify-end flex-shrink-0">
+          <div v-if="!hideFooter" class="px-5 py-4 border-t-2 border-border-primary flex gap-2 justify-end flex-shrink-0">
             <slot name="footer">
               <BaseButton v-if="cancelText" variant="secondary" @click="onCancel">
                 {{ cancelText }}
@@ -60,7 +60,7 @@ const props = withDefaults(defineProps<Props>(), {
   confirmText: '确定',
   cancelText: '取消',
   confirmVariant: 'primary',
-  maxWidth: 'max-w-2xl',
+  maxWidth: 'max-w-md',
   hideFooter: false
 })
 
