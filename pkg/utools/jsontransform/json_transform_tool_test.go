@@ -9,7 +9,7 @@ import (
 func TestJSONTransform_JSExpression(t *testing.T) {
 	tool := NewJSONTransformTool()
 	config := map[string]interface{}{
-		"data_source": `[{"url":"https://a.com"},{"url":"https://b.com"}]`,
+		"data_source": `[{"url":"https:
 		"expression":  "data.map(item => item.url)",
 		"output_name": "urls",
 		"timeout_ms":  1500.0,
@@ -29,7 +29,7 @@ func TestJSONTransform_JSExpression(t *testing.T) {
 	if len(outputs) != 2 {
 		t.Fatalf("expected 2 urls, got %d", len(outputs))
 	}
-	if outputs[0].(string) != "https://a.com" {
+	if outputs[0].(string) != "https:
 		t.Fatalf("unexpected first url: %v", outputs[0])
 	}
 }

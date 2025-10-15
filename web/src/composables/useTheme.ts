@@ -50,13 +50,13 @@ function resolveTheme(theme: Theme): 'light' | 'dark' {
 function applyTheme(theme: 'light' | 'dark') {
   const html = document.documentElement
 
-  // 移除旧主题
+
   html.removeAttribute('data-theme')
 
-  // 应用新主题
+
   html.setAttribute('data-theme', theme)
 
-  // 更新应用的主题
+
   appliedTheme.value = theme
 }
 
@@ -116,16 +116,16 @@ function watchSystemTheme() {
 
   systemThemeQuery = window.matchMedia('(prefers-color-scheme: dark)')
 
-  // 添加监听器
+
   const handler = (e: MediaQueryListEvent) => {
-    // 只在 auto 模式下响应系统主题变化
+
     if (currentTheme.value === 'auto') {
       const newTheme = e.matches ? 'dark' : 'light'
       applyTheme(newTheme)
     }
   }
 
-  // 兼容不同浏览器
+
   if (systemThemeQuery.addEventListener) {
     systemThemeQuery.addEventListener('change', handler)
   } else if (systemThemeQuery.addListener) {
@@ -137,15 +137,15 @@ function watchSystemTheme() {
  * 初始化主题
  */
 function initTheme() {
-  // 1. 读取保存的主题
+
   const saved = loadTheme()
   currentTheme.value = saved
 
-  // 2. 解析并应用主题
+
   const resolved = resolveTheme(saved)
   applyTheme(resolved)
 
-  // 3. 监听系统主题变化
+
   watchSystemTheme()
 }
 
@@ -153,7 +153,7 @@ function initTheme() {
  * 主题管理 Composable
  */
 export function useTheme() {
-  // 首次调用时初始化
+
   onMounted(() => {
     if (!document.documentElement.hasAttribute('data-theme')) {
       initTheme()
@@ -193,7 +193,7 @@ export function useTheme() {
   }
 }
 
-// 在应用启动时立即初始化主题（避免闪烁）
+
 if (typeof window !== 'undefined') {
   initTheme()
 }

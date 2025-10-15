@@ -1,13 +1,13 @@
 <template>
   <Drawer v-model="isOpen" title="工作流 API 设置" size="lg" @close="handleClose">
-    <!-- Tab 导航 -->
+    
     <Tabs v-model="activeTab" :tabs="tabList" class="mb-6" />
 
-    <!-- Tab 内容 -->
+    
     <div class="space-y-6">
-      <!-- Tab 1: 概览 -->
+      
       <div v-show="activeTab === 'overview'">
-        <!-- 提示：外部触发节点说明 -->
+        
         <div
           v-if="hasExternalTrigger"
           class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4"
@@ -28,7 +28,7 @@
           </div>
         </div>
 
-        <!-- 未保存提示 -->
+        
         <div
           v-if="!props.workflow?.id"
           class="bg-yellow-50 border border-yellow-300 rounded-lg p-3 mb-4"
@@ -42,7 +42,7 @@
           </div>
         </div>
 
-        <!-- API 状态 -->
+        
         <div class="bg-bg-hover rounded-lg p-4">
           <div class="flex items-center justify-between mb-4">
             <div>
@@ -69,7 +69,7 @@
             </button>
           </div>
 
-          <!-- API Key -->
+          
           <div v-if="apiEnabled" class="space-y-3">
             <div>
               <label class="block text-xs font-medium text-text-secondary mb-1">API Key</label>
@@ -98,7 +98,7 @@
               </div>
             </div>
 
-            <!-- 调用端点 -->
+            
             <div>
               <label class="block text-xs font-medium text-text-secondary mb-1">调用端点</label>
               <div class="flex gap-2">
@@ -115,7 +115,7 @@
           </div>
         </div>
 
-        <!-- 统计信息 -->
+        
         <div v-if="apiEnabled" class="grid grid-cols-3 gap-3">
           <div class="bg-bg-hover rounded-lg p-4">
             <div class="text-xs text-text-secondary mb-1">总调用次数</div>
@@ -132,9 +132,9 @@
         </div>
       </div>
 
-      <!-- Tab 2: 调用设置 -->
+      
       <div v-show="activeTab === 'settings'" class="space-y-4">
-        <!-- 超时设置 -->
+        
         <div>
           <label class="block text-sm font-medium text-text-primary mb-2">
             超时时间（同步模式）
@@ -149,7 +149,7 @@
           <p class="text-xs text-text-tertiary mt-1">同步模式下，API 请求的最大等待时间</p>
         </div>
 
-        <!-- Webhook URL -->
+        
         <div>
           <label class="block text-sm font-medium text-text-primary mb-2">
             Webhook 回调地址（异步模式）
@@ -163,7 +163,7 @@
           <p class="text-xs text-text-tertiary mt-1">异步执行完成后，系统会将结果 POST 到此地址</p>
         </div>
 
-        <!-- 执行模式说明 -->
+        
         <div class="bg-blue-50 border border-blue-200 rounded-lg p-3">
           <div class="text-xs text-blue-800 space-y-2">
             <p class="font-medium">执行模式说明：</p>
@@ -179,13 +179,13 @@
         </div>
       </div>
 
-      <!-- Tab 3: 测试调用 -->
+      
       <div v-show="activeTab === 'test'" class="space-y-4">
         <div class="bg-yellow-50 border border-yellow-300 rounded-lg p-3 text-xs text-yellow-800">
           💡 提示：测试前请确保工作流已保存并启用
         </div>
 
-        <!-- 执行模式选择 -->
+        
         <div>
           <label class="block text-sm font-medium text-text-primary mb-2">执行模式</label>
           <div class="flex gap-3">
@@ -200,7 +200,7 @@
           </div>
         </div>
 
-        <!-- 测试参数 -->
+        
         <div>
           <label class="block text-sm font-medium text-text-primary mb-2">请求参数（JSON）</label>
           <textarea
@@ -211,14 +211,14 @@
           ></textarea>
         </div>
 
-        <!-- 测试按钮 -->
+        
         <BaseButton @click="handleTest" :disabled="!apiEnabled || testing" class="w-full">
           <Play v-if="!testing" class="w-4 h-4 mr-2" />
           <Loader v-else class="w-4 h-4 mr-2 animate-spin" />
           {{ testing ? '测试中...' : '发送测试请求' }}
         </BaseButton>
 
-        <!-- 测试结果 -->
+        
         <div v-if="testResult" class="space-y-2">
           <label class="block text-sm font-medium text-text-primary">响应结果</label>
           <div class="bg-gray-900 rounded-lg p-4 overflow-x-auto">
@@ -227,9 +227,9 @@
         </div>
       </div>
 
-      <!-- Tab 4: 代码示例 -->
+      
       <div v-show="activeTab === 'code'" class="space-y-4">
-        <!-- 语言选择 -->
+        
         <div class="flex gap-2">
           <button
             v-for="lang in ['cURL', 'JavaScript', 'Python']"
@@ -246,7 +246,7 @@
           </button>
         </div>
 
-        <!-- 代码示例 -->
+        
         <div>
           <div class="bg-gray-900 rounded-lg p-4 overflow-x-auto">
             <pre class="text-xs text-green-400 font-mono">{{ currentCodeExample }}</pre>
@@ -258,7 +258,7 @@
         </div>
       </div>
 
-      <!-- Tab 5: 调用日志 -->
+      
       <div v-show="activeTab === 'logs'" class="space-y-4">
         <div class="text-center py-12 text-text-tertiary">
           <History class="w-12 h-12 mx-auto mb-3 opacity-50" />

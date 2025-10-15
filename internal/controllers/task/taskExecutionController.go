@@ -7,7 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// DeleteExecution 删除执行记录
+
 func DeleteExecution(c *gin.Context) {
 	id := c.Param("id")
 	userID := c.Query("user_id")
@@ -26,7 +26,7 @@ func DeleteExecution(c *gin.Context) {
 	errors.ResponseSuccess(c, nil, "删除执行记录成功")
 }
 
-// DeleteAllExecutions 删除任务的所有执行记录
+
 func DeleteAllExecutions(c *gin.Context) {
 	taskID := c.Param("id")
 	userID := c.Query("user_id")

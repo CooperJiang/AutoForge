@@ -1,18 +1,18 @@
 <template>
-  <!-- Loading -->
+  
   <div v-if="loading" class="flex justify-center items-center py-20">
     <div class="text-text-tertiary">加载中...</div>
   </div>
 
-  <!-- Main Content -->
+  
   <main v-else class="max-w-7xl mx-auto px-4 py-4">
-    <!-- 顶部操作栏 -->
+    
     <div class="mb-4 flex items-center justify-between">
       <h1 class="text-2xl font-bold text-text-primary">定时任务管理</h1>
       <BaseButton variant="primary" @click="goToCreateTask"> ➕ 创建任务 </BaseButton>
     </div>
 
-    <!-- 任务列表 -->
+    
     <div class="bg-bg-elevated border-2 border-border-primary rounded-lg shadow-sm">
       <Table :data="tasks" :loading="loading">
         <template #header>
@@ -80,7 +80,7 @@
         </template>
       </Table>
 
-      <!-- 分页 -->
+      
       <Pagination
         v-model:current-page="currentPage"
         :page-size="pageSize"
@@ -89,7 +89,7 @@
       />
     </div>
 
-    <!-- 执行记录对话框 -->
+    
     <TaskDetailDialog
       v-if="currentTaskId"
       v-model="showTaskDetailDialog"
@@ -97,7 +97,7 @@
       @close="showTaskDetailDialog = false"
     />
 
-    <!-- 删除确认对话框 -->
+    
     <Dialog
       v-model="showDeleteDialog"
       title="删除任务"

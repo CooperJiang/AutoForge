@@ -1,25 +1,25 @@
 package controllers
 
 import (
-	"auto-forge/internal/services/tool"
-	"auto-forge/pkg/errors"
+    "auto-forge/internal/services/tool"
+    "auto-forge/pkg/errors"
 
-	"github.com/gin-gonic/gin"
+    "github.com/gin-gonic/gin"
 )
 
-// ToolController 工具控制器
+
 type ToolController struct {
 	toolService *tool.ToolService
 }
 
-// NewToolController 创建工具控制器
+
 func NewToolController() *ToolController {
 	return &ToolController{
 		toolService: tool.GetToolService(),
 	}
 }
 
-// ListTools 获取工具列表
+
 func (c *ToolController) ListTools(ctx *gin.Context) {
 	tools, err := c.toolService.ListTools()
 	if err != nil {
@@ -30,7 +30,7 @@ func (c *ToolController) ListTools(ctx *gin.Context) {
 	errors.ResponseSuccess(ctx, tools, "获取成功")
 }
 
-// GetToolDetail 获取工具详情
+
 func (c *ToolController) GetToolDetail(ctx *gin.Context) {
 	code := ctx.Param("code")
 
@@ -41,4 +41,27 @@ func (c *ToolController) GetToolDetail(ctx *gin.Context) {
 	}
 
 	errors.ResponseSuccess(ctx, tool, "获取成功")
+}
+
+
+func (c *ToolController) DescribeToolOutput(ctx *gin.Context) {
+    code := ctx.Param("code")
+    if code == "" {
+        errors.HandleError(ctx, errors.New(errors.CodeInvalidParameter, "工具代码不能为空"))
+        return
+    }
+
+    var cfg map[string]interface{}
+    if err := ctx.ShouldBindJSON(&cfg); err != nil {
+        errors.HandleError(ctx, errors.New(errors.CodeInvalidParameter, "参数错误: "+err.Error()))
+        return
+    }
+
+    schema, err := c.toolService.DescribeOutput(code, cfg)
+    if err != nil {
+        errors.HandleError(ctx, errors.New(errors.CodeInternal, "获取动态输出结构失败: "+err.Error()))
+        return
+    }
+
+    errors.ResponseSuccess(ctx, schema, "获取成功")
 }

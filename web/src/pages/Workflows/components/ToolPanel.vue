@@ -1,23 +1,23 @@
 <template>
   <div class="w-64 bg-bg-elevated border-r border-border-primary flex flex-col overflow-hidden">
-    <!-- 面板标题 -->
+    
     <div class="px-4 py-3 border-b border-border-primary">
       <h3 class="text-sm font-semibold text-text-primary">工具箱</h3>
       <p class="text-xs text-text-tertiary mt-1">点击添加到画布</p>
     </div>
 
-    <!-- 工具列表 -->
+    
     <div class="flex-1 overflow-y-auto p-3 space-y-2">
-      <!-- 触发器分类 -->
+      
       <div class="mb-4">
         <div class="text-xs font-semibold text-text-secondary mb-2 px-2">触发器</div>
         <div class="space-y-2">
-          <!-- 外部 API 触发 -->
+          
           <button
             @click="handleAddExternalTrigger"
             draggable="true"
             @dragstart="handleDragStartExternalTrigger($event)"
-            class="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg border border-border-primary hover:border-blue-500 hover:bg-blue-50 transition-all group cursor-move"
+            class="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg border border-border-primary hover:border-blue-500 hover:bg-blue-500/10 transition-all group cursor-move"
           >
             <div
               class="flex-shrink-0 w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center text-white shadow-sm"
@@ -30,7 +30,7 @@
             </div>
           </button>
 
-          <!-- 定时触发 -->
+          
           <button
             @click="handleAddTrigger"
             draggable="true"
@@ -50,11 +50,11 @@
         </div>
       </div>
 
-      <!-- 流程控制 -->
+      
       <div class="mb-4">
         <div class="text-xs font-semibold text-text-secondary mb-2 px-2">流程控制</div>
         <div class="space-y-2">
-          <!-- 条件判断 -->
+          
           <button
             @click="handleAddCondition"
             draggable="true"
@@ -72,7 +72,7 @@
             </div>
           </button>
 
-          <!-- 开关分支 -->
+          
           <button
             @click="handleAddSwitch"
             draggable="true"
@@ -90,7 +90,7 @@
             </div>
           </button>
 
-          <!-- 延迟 -->
+          
           <button
             @click="handleAddDelay"
             draggable="true"
@@ -110,7 +110,7 @@
         </div>
       </div>
 
-      <!-- 工具分类 -->
+      
       <div>
         <div class="text-xs font-semibold text-text-secondary mb-2 px-2">工具</div>
         <div class="space-y-2">

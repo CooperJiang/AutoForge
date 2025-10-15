@@ -1,6 +1,6 @@
 <template>
   <div>
-    <!-- 搜索筛选栏 -->
+    
     <div class="flex gap-3 mb-6 items-center">
       <div class="flex-shrink-0" style="width: 200px">
         <BaseInput v-model="filters.keyword" placeholder="搜索用户名或邮箱" />
@@ -19,7 +19,7 @@
       <BaseButton @click="loadUsers" variant="primary" class="flex-shrink-0"> 搜索 </BaseButton>
     </div>
 
-    <!-- 表格 -->
+    
     <div class="overflow-x-auto">
       <table class="w-full">
         <thead>
@@ -105,7 +105,7 @@
       </table>
     </div>
 
-    <!-- 分页 -->
+    
     <div class="flex justify-between items-center mt-6">
       <div class="text-sm text-text-secondary">共 {{ total }} 条记录</div>
       <div class="flex gap-2">

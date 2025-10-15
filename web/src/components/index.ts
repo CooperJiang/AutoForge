@@ -35,7 +35,7 @@ export { message } from '@/utils/message'
 
 /* 组件映射表 - 用于全局注册 */
 const componentMap = {
-  // 基础组件
+
   BaseButton,
   BaseInput,
   BaseSelect,
@@ -44,29 +44,29 @@ const componentMap = {
   Message,
   MessageContainer,
 
-  // 布局组件
+
   Pagination,
   Table,
   AppHeader,
   Tabs,
 
-  // 表单组件
+
   TimePicker,
   ParamInput,
   WeekDayPicker,
   MonthDayPicker,
   Slider,
 
-  // 展示组件
+
   JsonViewer,
   NextRunCountdown,
 
-  // 对话框组件
+
   TestResultDialog,
   TaskDetailDialog,
   ExecutionDetailDialog,
 
-  // 高级组件
+
   VariableSelector,
   RetryConfig,
 }

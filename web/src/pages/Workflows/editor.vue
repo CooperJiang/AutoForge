@@ -1,6 +1,6 @@
 <template>
   <div class="fixed inset-0 bg-bg-hover flex flex-col">
-    <!-- 顶部工具栏 -->
+    
     <div
       class="bg-bg-elevated border-b border-border-primary px-6 py-3 flex items-center justify-between flex-shrink-0"
     >
@@ -24,7 +24,7 @@
         </div>
       </div>
       <div class="flex items-center gap-3">
-        <!-- 状态指示 -->
+        
         <div
           :class="[
             'px-3 py-1.5 rounded-full text-xs font-medium flex items-center gap-1.5 transition-colors border',
@@ -43,7 +43,7 @@
 
         <div class="h-6 w-px bg-bg-tertiary"></div>
 
-        <!-- 次要操作 -->
+        
         <Tooltip text="API 设置" position="bottom">
           <BaseButton size="sm" variant="ghost" @click="showAPISettings = true">
             <Globe class="w-4 h-4" />
@@ -72,7 +72,7 @@
 
         <div class="h-6 w-px bg-bg-tertiary"></div>
 
-        <!-- 主要操作 -->
+        
         <BaseButton
           size="sm"
           variant="secondary"
@@ -89,12 +89,12 @@
       </div>
     </div>
 
-    <!-- 主要内容区 -->
+    
     <div class="flex-1 flex overflow-hidden">
-      <!-- 左侧工具面板 -->
+      
       <ToolPanel @add-node="handleAddNode" />
 
-      <!-- 画布区域 -->
+      
       <div class="flex-1 relative" @drop="handleDrop" @dragover.prevent @dragenter.prevent>
         <VueFlow
           v-model:nodes="vueFlowNodes"
@@ -134,7 +134,7 @@
           </template>
         </VueFlow>
 
-        <!-- 空状态提示 -->
+        
         <div
           v-if="nodes.length === 0"
           class="absolute inset-0 flex items-center justify-center pointer-events-none"
@@ -148,7 +148,7 @@
       </div>
     </div>
 
-    <!-- 节点配置抽屉 -->
+    
     <NodeConfigDrawer
       v-model="showConfigDrawer"
       :node="selectedNode"
@@ -158,27 +158,27 @@
       @delete="handleDeleteNode"
     />
 
-    <!-- API 设置 -->
+    
     <WorkflowAPISettings v-model="showAPISettings" :workflow="workflow" @refresh="loadWorkflow" />
 
-    <!-- 环境变量管理 -->
+    
     <EnvVarManager
       v-model="showEnvVarManager"
       :env-vars="envVars"
       @update:env-vars="handleUpdateEnvVars"
     />
 
-    <!-- 导入对话框 -->
+    
     <ImportExportDialog v-model="showImportDialog" mode="import" @import="handleImportData" />
 
-    <!-- 导出对话框 -->
+    
     <ImportExportDialog
       v-model="showExportDialog"
       mode="export"
       :workflow-data="exportWorkflowData"
     />
 
-    <!-- 执行参数对话框 -->
+    
     <ExecuteWithParamsDialog
       :visible="showExecuteDialog"
       :workflow="workflow"
@@ -186,7 +186,7 @@
       @execute="executeWorkflow"
     />
 
-    <!-- 确认对话框 -->
+    
     <ConfirmDialog
       v-model="confirmDialog.show"
       :title="confirmDialog.title"
@@ -198,7 +198,7 @@
       @cancel="confirmDialog.resolve?.(false)"
     />
 
-    <!-- 画布删除节点确认对话框 -->
+    
     <Dialog
       v-model="showDeleteConfirm"
       title="删除节点"

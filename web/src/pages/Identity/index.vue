@@ -2,7 +2,7 @@
   <div
     class="min-h-screen bg-gradient-to-br from-bg-secondary via-bg-secondary to-bg-secondary flex items-center justify-center p-4 overflow-hidden relative"
   >
-    <!-- 背景装饰 -->
+    
     <div class="absolute inset-0 overflow-hidden pointer-events-none">
       <div
         class="absolute top-20 left-10 w-72 h-72 bg-green-200 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-blob"
@@ -16,7 +16,7 @@
     </div>
 
     <div class="max-w-6xl w-full grid lg:grid-cols-2 gap-8 items-center relative z-10">
-      <!-- 左侧介绍区域 -->
+      
       <div class="hidden lg:block space-y-8 animate-fade-in-left">
         <div class="space-y-4">
           <div
@@ -36,7 +36,7 @@
           </p>
         </div>
 
-        <!-- 功能亮点 -->
+        
         <div class="space-y-4">
           <div
             v-for="(feature, index) in features"
@@ -57,12 +57,12 @@
         </div>
       </div>
 
-      <!-- 右侧登录/注册表单 -->
+      
       <div class="flex justify-center lg:justify-end">
         <div
           class="bg-bg-elevated/80 backdrop-blur-xl border-2 border-bg-elevated shadow-2xl rounded-2xl p-8 max-w-md w-full animate-fade-in-up"
         >
-          <!-- 图标和标题 -->
+          
           <div class="text-center mb-6">
             <div
               class="inline-flex items-center justify-center w-20 h-20 mb-4 animate-bounce-subtle"
@@ -73,7 +73,7 @@
             <p class="text-sm text-text-secondary">定时任务管理系统</p>
           </div>
 
-          <!-- Tab 切换 -->
+          
           <div class="flex bg-bg-tertiary rounded-lg p-1 mb-6">
             <button
               @click="activeTab = 'login'"
@@ -99,7 +99,7 @@
             </button>
           </div>
 
-          <!-- 登录表单 -->
+          
           <form v-if="activeTab === 'login'" @submit.prevent="handleLogin" class="space-y-4">
             <BaseInput
               v-model="loginForm.account"
@@ -120,15 +120,15 @@
               登录
             </BaseButton>
 
-            <!-- OAuth2 登录（根据配置显示） -->
+            
             <template v-if="oauth2Config.linuxdo.enabled">
-              <!-- 分隔线 -->
+              
               <div class="relative flex items-center justify-center my-4">
                 <div class="border-t border-border-primary w-full absolute"></div>
                 <span class="bg-bg-elevated px-3 text-sm text-text-tertiary relative z-10">或</span>
               </div>
 
-              <!-- Linux.do OAuth2 登录 -->
+              
               <a
                 href="/api/v1/auth/linuxdo"
                 class="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-bg-elevated border-2 border-border-primary text-text-secondary font-medium rounded-lg hover:bg-bg-hover hover:border-slate-300 transition-all duration-200 shadow-sm"
@@ -155,7 +155,7 @@
             </template>
           </form>
 
-          <!-- 注册表单 -->
+          
           <form v-else @submit.prevent="handleRegister" class="space-y-4">
             <BaseInput
               v-model="registerForm.username"

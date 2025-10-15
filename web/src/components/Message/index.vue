@@ -10,7 +10,7 @@
           class="message-item px-4 py-2.5 rounded-lg shadow-lg border flex items-center gap-2 min-w-[300px] max-w-[500px] pointer-events-auto backdrop-blur-sm"
           :class="getMessageClass(msg.type)"
         >
-          <!-- Icon -->
+          
           <div class="flex-shrink-0">
             <CheckCircle v-if="msg.type === 'success'" :size="20" />
             <XCircle v-else-if="msg.type === 'error'" :size="20" />
@@ -18,10 +18,10 @@
             <Info v-else :size="20" />
           </div>
 
-          <!-- Content -->
+          
           <div class="flex-1 text-sm font-medium">{{ msg.content }}</div>
 
-          <!-- Close button -->
+          
           <button
             @click="removeMessage(msg.id)"
             class="flex-shrink-0 hover:opacity-70 transition-opacity"

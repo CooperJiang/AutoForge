@@ -2,13 +2,13 @@
   <div v-if="show" class="mb-2 p-3 bg-bg-hover rounded-lg border border-border-primary">
     <div class="text-xs font-semibold text-text-secondary mb-2">可用变量：</div>
     <div class="space-y-3">
-      <!-- 前置节点 - 使用树形选择器 -->
+      
       <div v-if="previousNodes && previousNodes.length > 0">
         <div class="text-xs text-text-secondary mb-2">前置节点输出：</div>
         <VariableTreeSelector :previous-nodes="previousNodes" />
       </div>
 
-      <!-- 环境变量 -->
+      
       <div v-if="envVars && envVars.length > 0">
         <div class="text-xs text-text-secondary mb-1">环境变量：</div>
         <div class="space-y-1">

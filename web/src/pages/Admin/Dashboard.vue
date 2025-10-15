@@ -1,57 +1,91 @@
 <template>
   <div class="px-6 py-6">
-    <!-- 统计卡片 -->
-    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 mb-6">
+    
+    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 mb-6">
+      
       <div
-        class="bg-gradient-to-br from-primary to-primary-hover rounded-xl p-6 text-white shadow-lg"
+        class="bg-bg-elevated border-2 border-border-primary rounded-xl p-5 shadow-sm hover:shadow-lg transition-all group"
       >
-        <div class="flex items-center justify-between">
-          <div>
-            <p class="text-blue-100 text-sm font-medium">总用户数</p>
-            <p class="text-3xl font-bold mt-2">{{ stats.total_users }}</p>
+        <div class="flex items-start justify-between mb-3">
+          <div class="p-3 bg-blue-500/10 rounded-lg">
+            <Users class="w-6 h-6 text-blue-600 dark:text-blue-400" />
           </div>
-          <div class="text-4xl opacity-50">👥</div>
+          <div
+            class="text-xs font-semibold px-2 py-1 bg-blue-500/10 text-blue-600 dark:text-blue-400 rounded-full"
+          >
+            用户
+          </div>
+        </div>
+        <div>
+          <p class="text-text-tertiary text-xs font-medium mb-1">总用户数</p>
+          <p class="text-3xl font-bold text-text-primary">{{ stats.total_users }}</p>
         </div>
       </div>
 
+      
       <div
-        class="bg-gradient-to-br from-success to-success-hover rounded-xl p-6 text-white shadow-lg"
+        class="bg-bg-elevated border-2 border-border-primary rounded-xl p-5 shadow-sm hover:shadow-lg transition-all group"
       >
-        <div class="flex items-center justify-between">
-          <div>
-            <p class="text-green-100 text-sm font-medium">总任务数</p>
-            <p class="text-3xl font-bold mt-2">{{ stats.total_tasks }}</p>
+        <div class="flex items-start justify-between mb-3">
+          <div class="p-3 bg-purple-500/10 rounded-lg">
+            <ListTodo class="w-6 h-6 text-purple-600 dark:text-purple-400" />
           </div>
-          <div class="text-4xl opacity-50">📋</div>
+          <div
+            class="text-xs font-semibold px-2 py-1 bg-purple-500/10 text-purple-600 dark:text-purple-400 rounded-full"
+          >
+            任务
+          </div>
+        </div>
+        <div>
+          <p class="text-text-tertiary text-xs font-medium mb-1">总任务数</p>
+          <p class="text-3xl font-bold text-text-primary">{{ stats.total_tasks }}</p>
         </div>
       </div>
 
+      
       <div
-        class="bg-gradient-to-br from-accent to-accent-hover rounded-xl p-6 text-white shadow-lg"
+        class="bg-bg-elevated border-2 border-border-primary rounded-xl p-5 shadow-sm hover:shadow-lg transition-all group"
       >
-        <div class="flex items-center justify-between">
-          <div>
-            <p class="text-purple-100 text-sm font-medium">今日执行</p>
-            <p class="text-3xl font-bold mt-2">{{ stats.today_executions }}</p>
+        <div class="flex items-start justify-between mb-3">
+          <div class="p-3 bg-green-500/10 rounded-lg">
+            <Activity class="w-6 h-6 text-green-600 dark:text-green-400" />
           </div>
-          <div class="text-4xl opacity-50">✅</div>
+          <div
+            class="text-xs font-semibold px-2 py-1 bg-green-500/10 text-green-600 dark:text-green-400 rounded-full"
+          >
+            执行
+          </div>
+        </div>
+        <div>
+          <p class="text-text-tertiary text-xs font-medium mb-1">今日执行</p>
+          <p class="text-3xl font-bold text-text-primary">{{ stats.today_executions }}</p>
         </div>
       </div>
 
+      
       <div
-        class="bg-gradient-to-br from-orange-500 to-orange-600 rounded-xl p-6 text-white shadow-lg"
+        class="bg-bg-elevated border-2 border-border-primary rounded-xl p-5 shadow-sm hover:shadow-lg transition-all group"
       >
-        <div class="flex items-center justify-between">
-          <div>
-            <p class="text-orange-100 text-sm font-medium">成功率</p>
-            <p class="text-3xl font-bold mt-2">{{ stats.success_rate.toFixed(1) }}%</p>
+        <div class="flex items-start justify-between mb-3">
+          <div class="p-3 bg-orange-500/10 rounded-lg">
+            <TrendingUp class="w-6 h-6 text-orange-600 dark:text-orange-400" />
           </div>
-          <div class="text-4xl opacity-50">📊</div>
+          <div
+            class="text-xs font-semibold px-2 py-1 bg-orange-500/10 text-orange-600 dark:text-orange-400 rounded-full"
+          >
+            成功率
+          </div>
+        </div>
+        <div>
+          <p class="text-text-tertiary text-xs font-medium mb-1">执行成功率</p>
+          <p class="text-3xl font-bold text-text-primary">
+            {{ stats.success_rate.toFixed(1) }}<span class="text-xl">%</span>
+          </p>
         </div>
       </div>
     </div>
 
-    <!-- Tab 导航 -->
+    
     <div class="bg-bg-elevated rounded-t-xl shadow-lg border-2 border-b-0 border-border-primary">
       <div class="flex border-b border-border-primary">
         <button
@@ -102,8 +136,8 @@
       </div>
     </div>
 
-    <!-- Tab 内容 -->
-    <!-- 执行记录 Tab -->
+    
+    
     <div
       v-show="activeTab === 'executions'"
       class="bg-bg-elevated rounded-b-xl shadow-lg border-2 border-t-0 border-border-primary p-6"
@@ -111,7 +145,7 @@
       <ExecutionsTab />
     </div>
 
-    <!-- 任务列表 Tab -->
+    
     <div
       v-show="activeTab === 'tasks'"
       class="bg-bg-elevated rounded-b-xl shadow-lg border-2 border-t-0 border-border-primary p-6"
@@ -132,7 +166,7 @@
       />
     </div>
 
-    <!-- 用户管理 Tab -->
+    
     <div
       v-show="activeTab === 'users'"
       class="bg-bg-elevated rounded-b-xl shadow-lg border-2 border-t-0 border-border-primary p-6"
@@ -140,7 +174,7 @@
       <UsersTab />
     </div>
 
-    <!-- 删除确认对话框 -->
+    
     <Dialog
       v-model="showDeleteDialog"
       title="确认删除"
@@ -151,16 +185,17 @@
       @confirm="deleteTask"
     />
 
-    <!-- 测试结果对话框 -->
+    
     <TestResultDialog v-model="showTestResult" :result="testResult" />
 
-    <!-- 任务详情对话框 -->
+    
     <TaskDetailDialog v-model="showTaskDetail" :task="selectedTask" />
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue'
+import { Users, ListTodo, Activity, TrendingUp } from 'lucide-vue-next'
 import * as adminApi from '@/api/admin'
 import type { Task } from '@/api/task'
 import type { StatsResponse } from '@/api/admin'

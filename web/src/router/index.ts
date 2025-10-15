@@ -102,7 +102,7 @@ const router = createRouter({
         },
       ],
     },
-    // 管理员路由
+
     {
       path: '/admin/login',
       name: 'admin-login',
@@ -144,22 +144,22 @@ const router = createRouter({
   ],
 })
 
-// 路由守卫 - 检查用户登录状态
+
 router.beforeEach((to, from, next) => {
-  // 从SecureStorage获取token
+
   const token = SecureStorage.getItem<string>(STORAGE_KEYS.AUTH_TOKEN)
 
-  // 白名单：不需要登录的页面
+
   const publicPaths = ['/auth', '/admin/login']
   const isPublicPath = publicPaths.includes(to.path)
 
-  // 如果访问需要登录的页面但没有token，跳转到登录页
+
   if (!isPublicPath && !token) {
     next({ name: 'auth' })
     return
   }
 
-  // 如果已登录且访问登录页，跳转到首页
+
   if (to.path === '/auth' && token) {
     next({ name: 'home' })
     return
@@ -168,7 +168,7 @@ router.beforeEach((to, from, next) => {
   next()
 })
 
-// 路由后置守卫 - 设置页面标题
+
 router.afterEach((to) => {
   const defaultTitle = '定时任务系统'
   const pageTitle = to.meta.title as string

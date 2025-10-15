@@ -7,7 +7,7 @@
     @confirm="handleSave"
   >
     <div v-if="toolCode === 'http_request'" class="space-y-4">
-      <!-- Curl 粘贴提示 -->
+      
       <div class="bg-primary-light border border-primary rounded-lg p-3 text-xs text-primary">
         💡 小提示：按
         <kbd class="px-1.5 py-0.5 bg-bg-elevated border border-primary rounded">{{
@@ -35,7 +35,7 @@
         />
       </div>
 
-      <!-- Headers -->
+      
       <div>
         <label class="block text-sm font-medium text-text-secondary mb-2"> 请求头（可选） </label>
         <div class="space-y-2">
@@ -58,7 +58,7 @@
         </div>
       </div>
 
-      <!-- Params -->
+      
       <div>
         <label class="block text-sm font-medium text-text-secondary mb-2"> 请求参数（可选） </label>
         <div class="space-y-2">
@@ -81,7 +81,7 @@
         </div>
       </div>
 
-      <!-- Body -->
+      
       <div>
         <button
           type="button"

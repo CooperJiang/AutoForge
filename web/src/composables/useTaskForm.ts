@@ -68,7 +68,7 @@ export function useTaskForm() {
       tool_code: task.tool_code,
     }
 
-    // Parse existing config
+
     if (task.config) {
       try {
         const config = JSON.parse(task.config)
@@ -94,7 +94,7 @@ export function useTaskForm() {
       tool_code: task.tool_code,
     }
 
-    // Parse existing config
+
     if (task.config) {
       try {
         const config = JSON.parse(task.config)

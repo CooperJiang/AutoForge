@@ -1,7 +1,6 @@
 package context
 
 import (
-    gocontext "context"
     "encoding/json"
     "fmt"
     "time"
@@ -10,12 +9,12 @@ import (
     "auto-forge/pkg/utools"
 )
 
-// RedisContextTool 提供基于缓存(优先Redis,降级内存)的简单KV读写/删除能力
+
 type RedisContextTool struct {
     *utools.BaseTool
 }
 
-// NewRedisContextTool 创建工具实例
+
 func NewRedisContextTool() *RedisContextTool {
     metadata := &utools.ToolMetadata{
         Code:        "redis_context",
@@ -26,6 +25,15 @@ func NewRedisContextTool() *RedisContextTool {
         Author:      "AutoForge",
         AICallable:  false,
         Tags:        []string{"redis", "storage", "context", "state"},
+        OutputFieldsSchema: map[string]utools.OutputFieldDef{
+            "action": {Type: "string", Label: "执行的操作 (get/set/delete)"},
+            "key":    {Type: "string", Label: "键名"},
+            "value":  {Type: "string", Label: "读取的值 (仅 get)"},
+            "exists": {Type: "boolean", Label: "键是否存在 (仅 get)"},
+            "json":   {Type: "object", Label: "解析后的 JSON 对象 (若可解析)"},
+            "ttl_ms": {Type: "number", Label: "剩余过期时间 (毫秒, -1 表示永不过期)"},
+            "redis_enabled": {Type: "boolean", Label: "是否使用 Redis (仅 set)"},
+        },
     }
 
     schema := &utools.ConfigSchema{
@@ -63,7 +71,41 @@ func NewRedisContextTool() *RedisContextTool {
     return &RedisContextTool{BaseTool: utools.NewBaseTool(metadata, schema)}
 }
 
-// Validate 额外校验
+
+func (t *RedisContextTool) GetOutputFieldsSchema() map[string]utools.OutputFieldDef {
+	return map[string]utools.OutputFieldDef{
+		"action": {
+			Type:  "string",
+			Label: "执行的操作 (get/set/delete)",
+		},
+		"key": {
+			Type:  "string",
+			Label: "键名",
+		},
+		"value": {
+			Type:  "string",
+			Label: "读取的值 (仅 get 操作)",
+		},
+		"exists": {
+			Type:  "boolean",
+			Label: "键是否存在 (仅 get 操作)",
+		},
+		"json": {
+			Type:  "object",
+			Label: "解析后的 JSON 对象 (仅当值为有效 JSON 时)",
+		},
+		"ttl_ms": {
+			Type:  "number",
+			Label: "剩余过期时间 (毫秒, -1 表示永不过期)",
+		},
+		"redis_enabled": {
+			Type:  "boolean",
+			Label: "是否使用 Redis (仅 set 操作返回)",
+		},
+	}
+}
+
+
 func (t *RedisContextTool) Validate(config map[string]interface{}) error {
     if err := t.BaseTool.Validate(config); err != nil {
         return err
@@ -77,10 +119,10 @@ func (t *RedisContextTool) Validate(config map[string]interface{}) error {
     return nil
 }
 
-// Execute 执行操作
+
 func (t *RedisContextTool) Execute(ctx *utools.ExecutionContext, config map[string]interface{}) (*utools.ExecutionResult, error) {
     start := time.Now()
-    // Ensure cache initialized
+
     _ = cache.GetCache()
 
     action, _ := config["action"].(string)
@@ -89,38 +131,42 @@ func (t *RedisContextTool) Execute(ctx *utools.ExecutionContext, config map[stri
     switch action {
     case "get":
         val, err := cache.Get(key)
+        exists := err == nil
+
+
         if err != nil {
-            return &utools.ExecutionResult{
-                Success:    false,
-                Message:    "读取失败",
-                Error:      err.Error(),
-                DurationMs: time.Since(start).Milliseconds(),
-                Output: map[string]interface{}{
-                    "action": action,
-                    "key":    key,
-                },
-            }, err
+            val = ""
         }
 
         output := map[string]interface{}{
             "action": action,
             "key":    key,
             "value":  val,
+            "exists": exists,
         }
-        // 尝试解析JSON
-        var anyJSON interface{}
-        if err := json.Unmarshal([]byte(val), &anyJSON); err == nil {
-            output["json"] = anyJSON
+
+
+        if exists {
+
+            var anyJSON interface{}
+            if err := json.Unmarshal([]byte(val), &anyJSON); err == nil {
+                output["json"] = anyJSON
+            }
+
+            if ttl, err := cache.TTL(key); err == nil {
+
+                output["ttl_ms"] = ttl.Milliseconds()
+            }
         }
-        // 读取TTL
-        if ttl, err := cache.TTL(key); err == nil {
-            // -1 表示无过期，其他为剩余时间
-            output["ttl_ms"] = ttl.Milliseconds()
+
+        message := "读取成功"
+        if !exists {
+            message = "键不存在，返回空值"
         }
 
         return &utools.ExecutionResult{
             Success:    true,
-            Message:    "读取成功",
+            Message:    message,
             Output:     output,
             DurationMs: time.Since(start).Milliseconds(),
         }, nil
@@ -144,7 +190,7 @@ func (t *RedisContextTool) Execute(ctx *utools.ExecutionContext, config map[stri
                 },
             }, err
         }
-        // 返回TTL（如果有）
+
         var ttlMs int64 = -1
         if exp > 0 {
             ttlMs = exp.Milliseconds()
@@ -186,7 +232,7 @@ func (t *RedisContextTool) Execute(ctx *utools.ExecutionContext, config map[stri
         }, nil
     }
 
-    // 未知action
+
     return &utools.ExecutionResult{
         Success:    false,
         Message:    fmt.Sprintf("不支持的操作: %s", action),
@@ -195,12 +241,10 @@ func (t *RedisContextTool) Execute(ctx *utools.ExecutionContext, config map[stri
     }, nil
 }
 
-// init 自动注册工具
+
 func init() {
-    _ = gocontext.Background() // 避免未使用导入别名的lint
     tool := NewRedisContextTool()
     if err := utools.Register(tool); err != nil {
         panic(fmt.Sprintf("Failed to register Redis Context tool: %v", err))
     }
 }
-

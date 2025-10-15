@@ -2,17 +2,18 @@ package formatter
 
 import (
 	"auto-forge/pkg/utools"
+	"encoding/json"
 	"fmt"
 	"time"
 )
 
-// OutputFormatterTool 输出格式化工具
-// 用于将上��节点的输出数据格式化为特定的展示类型
+
+
 type OutputFormatterTool struct {
-	*utools.BaseTool
+    *utools.BaseTool
 }
 
-// NewOutputFormatterTool 创建输出格式化工具实例
+
 func NewOutputFormatterTool() *OutputFormatterTool {
 	metadata := &utools.ToolMetadata{
 		Code:        "output_formatter",
@@ -21,7 +22,7 @@ func NewOutputFormatterTool() *OutputFormatterTool {
 		Category:    "utility",
 		Version:     "1.0.0",
 		Author:      "AutoForge",
-		AICallable:  false, // 通常不被 AI 直接调用
+		AICallable:  false,
 		Tags:        []string{"formatter", "output", "display", "render"},
 		OutputFieldsSchema: map[string]utools.OutputFieldDef{
 			"content": {
@@ -56,14 +57,14 @@ func NewOutputFormatterTool() *OutputFormatterTool {
 				Description: "指定输出的展示类型",
 				Default:     "json",
 				Enum: []interface{}{
-					"image",    // 单张图片
-					"video",    // 视频
-					"html",     // HTML 内容
-					"html-url", // HTML URL 预览
-					"markdown", // Markdown 文本
-					"text",     // 纯文本
-					"gallery",  // 图片画廊（多张图片）
-					"json",     // JSON 数据（默认）
+					"image",
+					"video",
+					"html",
+					"html-url",
+					"markdown",
+					"text",
+					"gallery",
+					"json",
 				},
 			},
 			"title": {
@@ -79,7 +80,7 @@ func NewOutputFormatterTool() *OutputFormatterTool {
 			"content": {
 				Type:        "string",
 				Title:       "主要内容",
-				Description: "根据类型不同，内容含义不同：\n- image: 图片 URL（支持变量，如 {{nodes.xxx.response.data[0].url}}）\n- video: 视频 URL\n- html: HTML 字符串\n- html-url: HTML 页面的 URL 地址\n- markdown: Markdown 文本\n- text: 纯文本\n- gallery: 图片 URL 数组（JSON 字符串）\n- json: JSON 数据",
+				Description: "根据类型不同，内容含义不同：\n- image: 图片 URL（支持变量，如 {{nodes.xxx.response.data[0].url}}）\n- video: 视频 URL\n- html: HTML 字符串\n- html-url: HTML 页面的 URL 地址\n- markdown: Markdown 文本\n- text: 纯文本\n- gallery: 图片 URL 数组（JSON 字符串）\n- json: JSON 对象（支持变量引用和 JSON 字符串）",
 			},
 			"alt_text": {
 				Type:        "string",
@@ -105,11 +106,11 @@ func NewOutputFormatterTool() *OutputFormatterTool {
 	}
 }
 
-// Execute 执行输出格式化
+
 func (t *OutputFormatterTool) Execute(ctx *utools.ExecutionContext, toolConfig map[string]interface{}) (*utools.ExecutionResult, error) {
 	startTime := time.Now()
 
-	// 获取配置 - 注意：这里的 toolConfig 已经是替换过变量的了
+
 	outputType, _ := toolConfig["output_type"].(string)
 	if outputType == "" {
 		outputType = "json"
@@ -117,13 +118,40 @@ func (t *OutputFormatterTool) Execute(ctx *utools.ExecutionContext, toolConfig m
 
 	title, _ := toolConfig["title"].(string)
 	description, _ := toolConfig["description"].(string)
-	content, _ := toolConfig["content"].(string)
 	altText, _ := toolConfig["alt_text"].(string)
 	thumbnail, _ := toolConfig["thumbnail"].(string)
 	metadataStr, _ := toolConfig["metadata"].(string)
 
-	// 验证必填字段
-	if content == "" {
+
+	var contentValue interface{}
+	if contentStr, ok := toolConfig["content"].(string); ok {
+
+		if contentStr == "" {
+			return &utools.ExecutionResult{
+				Success:    false,
+				Message:    "content 字段不能为空",
+				Error:      "missing content",
+				DurationMs: time.Since(startTime).Milliseconds(),
+			}, fmt.Errorf("content is required")
+		}
+
+
+		if outputType == "json" {
+			var jsonObj interface{}
+			if err := json.Unmarshal([]byte(contentStr), &jsonObj); err == nil {
+
+				contentValue = jsonObj
+			} else {
+
+				contentValue = contentStr
+			}
+		} else {
+			contentValue = contentStr
+		}
+	} else if contentObj := toolConfig["content"]; contentObj != nil {
+
+		contentValue = contentObj
+	} else {
 		return &utools.ExecutionResult{
 			Success:    false,
 			Message:    "content 字段不能为空",
@@ -132,16 +160,13 @@ func (t *OutputFormatterTool) Execute(ctx *utools.ExecutionContext, toolConfig m
 		}, fmt.Errorf("content is required")
 	}
 
-	// Debug: 打印 content 的值
-	fmt.Printf("[OutputFormatter] Content value: %s\n", content)
 
-	// 确定实际渲染类型
 	renderType := outputType
 	if outputType == "html-url" {
-		renderType = "url" // html-url 使用 url 渲染器（UrlViewer）
+		renderType = "url"
 	}
 
-	// 构建输出渲染配置
+
 	outputRender := &utools.OutputRenderConfig{
 		Type:    renderType,
 		Primary: "content",
@@ -154,7 +179,7 @@ func (t *OutputFormatterTool) Execute(ctx *utools.ExecutionContext, toolConfig m
 		},
 	}
 
-	// 根据输出类型添加相应的字段配置
+
 	if description != "" {
 		outputRender.Fields["description"] = utools.FieldRender{
 			Type:    "text",
@@ -167,7 +192,7 @@ func (t *OutputFormatterTool) Execute(ctx *utools.ExecutionContext, toolConfig m
 		outputRender.Fields["alt_text"] = utools.FieldRender{
 			Type:    "text",
 			Label:   "替代文本",
-			Display: false, // 不直接显示，用于图片 alt 属性
+			Display: false,
 		}
 	}
 
@@ -175,30 +200,47 @@ func (t *OutputFormatterTool) Execute(ctx *utools.ExecutionContext, toolConfig m
 		outputRender.Fields["thumbnail"] = utools.FieldRender{
 			Type:    "image",
 			Label:   "缩略图",
-			Display: outputType == "video", // 视频类型时显示缩略图
+			Display: outputType == "video",
 		}
 	}
 
-	// 构建输出数据
-	output := map[string]interface{}{
-		"content": content,
-		"type":    outputType,
-	}
 
-	if title != "" {
-		output["title"] = title
-	}
-	if description != "" {
-		output["description"] = description
-	}
-	if altText != "" {
-		output["alt_text"] = altText
-	}
-	if thumbnail != "" {
-		output["thumbnail"] = thumbnail
-	}
-	if metadataStr != "" {
-		output["metadata"] = metadataStr
+	var output map[string]interface{}
+
+
+	if outputType == "json" {
+		if contentObj, ok := contentValue.(map[string]interface{}); ok {
+
+			output = contentObj
+		} else {
+
+			output = map[string]interface{}{
+				"content": contentValue,
+				"type":    outputType,
+			}
+		}
+	} else {
+
+		output = map[string]interface{}{
+			"content": contentValue,
+			"type":    outputType,
+		}
+
+		if title != "" {
+			output["title"] = title
+		}
+		if description != "" {
+			output["description"] = description
+		}
+		if altText != "" {
+			output["alt_text"] = altText
+		}
+		if thumbnail != "" {
+			output["thumbnail"] = thumbnail
+		}
+		if metadataStr != "" {
+			output["metadata"] = metadataStr
+		}
 	}
 
 	return &utools.ExecutionResult{
@@ -210,7 +252,18 @@ func (t *OutputFormatterTool) Execute(ctx *utools.ExecutionContext, toolConfig m
 	}, nil
 }
 
-// init 自动注册工具
+
+func (t *OutputFormatterTool) DescribeOutput(config map[string]interface{}) map[string]utools.OutputFieldDef {
+
+    return map[string]utools.OutputFieldDef{
+        "content":     {Type: "string", Label: "格式化后的内容/主内容"},
+        "type":        {Type: "string", Label: "输出类型"},
+        "title":       {Type: "string", Label: "标题"},
+        "description": {Type: "string", Label: "描述"},
+    }
+}
+
+
 func init() {
 	tool := NewOutputFormatterTool()
 	if err := utools.Register(tool); err != nil {

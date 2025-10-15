@@ -1,6 +1,6 @@
 <template>
   <div class="output-viewer max-w-full overflow-auto">
-    <!-- 有渲染配置时使用专门的子组件 -->
+    
     <component
       v-if="hasRenderConfig"
       :is="viewerComponent"
@@ -8,7 +8,7 @@
       @error="handleError"
     />
 
-    <!-- 无渲染配置时使用默认 JSON 显示 -->
+    
     <JsonViewer v-else :content="jsonContent" />
   </div>
 </template>

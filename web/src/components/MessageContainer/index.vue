@@ -11,17 +11,17 @@
               messageClasses[message.type],
             ]"
           >
-            <!-- 图标 -->
+            
             <div class="flex-shrink-0">
               <component :is="messageIcons[message.type]" class="w-6 h-6" />
             </div>
 
-            <!-- 消息内容 -->
+            
             <div class="flex-1 text-sm font-medium leading-relaxed">
               {{ message.content }}
             </div>
 
-            <!-- 关闭按钮 -->
+            
             <button
               v-if="message.showClose"
               @click="removeMessage(message.id)"

@@ -7,9 +7,9 @@
     @confirm="handleConfirm"
     @cancel="handleCancel"
   >
-    <!-- 导入模式 -->
+    
     <div v-if="mode === 'import'" class="space-y-4">
-      <!-- JSON编辑区 -->
+      
       <div class="space-y-3">
         <div class="flex items-center justify-between">
           <label class="text-sm font-medium text-text-secondary">工作流JSON：</label>
@@ -31,23 +31,25 @@
         <textarea
           v-model="jsonText"
           placeholder="粘贴或上传工作流JSON..."
-          class="w-full h-96 px-3 py-2 border-2 border-border-primary rounded-lg focus:outline-none focus:border-primary font-mono text-xs resize-none"
+          class="w-full h-96 px-3 py-2 border-2 border-border-primary rounded-lg focus:outline-none focus:border-primary bg-bg-elevated text-text-primary font-mono text-xs resize-none"
         />
 
-        <div v-if="jsonError" class="p-3 bg-red-50 border border-red-200 rounded-lg">
-          <p class="text-xs text-red-700">{{ jsonError }}</p>
+        <div v-if="jsonError" class="p-3 bg-red-500/10 border border-red-500/20 rounded-lg">
+          <p class="text-xs text-red-600 dark:text-red-400">{{ jsonError }}</p>
         </div>
       </div>
 
-      <!-- 导入提示 -->
-      <div class="bg-amber-50 border border-amber-200 rounded-lg p-3">
-        <p class="text-xs text-amber-800">⚠️ 导入将覆盖当前工作流内容，请确保已保存重要数据</p>
+      
+      <div class="bg-amber-500/10 border border-amber-500/20 rounded-lg p-3">
+        <p class="text-xs text-amber-800 dark:text-amber-200">
+          ⚠️ 导入将覆盖当前工作流内容，请确保已保存重要数据
+        </p>
       </div>
     </div>
 
-    <!-- 导出模式 -->
+    
     <div v-if="mode === 'export'" class="space-y-4">
-      <!-- JSON编辑区 -->
+      
       <div class="space-y-3">
         <div class="flex items-center justify-between">
           <label class="text-sm font-medium text-text-secondary">编辑JSON内容：</label>
@@ -65,15 +67,15 @@
 
         <textarea
           v-model="editableJson"
-          class="w-full h-96 px-3 py-2 border-2 border-border-primary rounded-lg focus:outline-none focus:border-primary font-mono text-xs resize-none"
+          class="w-full h-96 px-3 py-2 border-2 border-border-primary rounded-lg focus:outline-none focus:border-primary bg-bg-elevated text-text-primary font-mono text-xs resize-none"
         />
 
-        <div v-if="exportError" class="p-3 bg-red-50 border border-red-200 rounded-lg">
-          <p class="text-xs text-red-700">{{ exportError }}</p>
+        <div v-if="exportError" class="p-3 bg-red-500/10 border border-red-500/20 rounded-lg">
+          <p class="text-xs text-red-600 dark:text-red-400">{{ exportError }}</p>
         </div>
       </div>
 
-      <!-- 导出提示 -->
+      
       <div class="bg-primary-light border border-primary rounded-lg p-3">
         <p class="text-xs text-primary mb-2">💡 <strong>提示：</strong></p>
         <ul class="text-xs text-primary space-y-1 ml-4">

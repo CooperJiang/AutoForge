@@ -19,13 +19,16 @@
       </label>
       <BaseInput
         v-model="localConfig.field"
-        placeholder="例如: status, type, level"
+        placeholder="例如: status"
         @update:model-value="emitUpdate"
       />
-      <p class="text-xs text-text-tertiary mt-1">从上一个节点的输出结果中读取该字段</p>
+      <p class="text-xs text-text-tertiary mt-1">
+        可以使用变量引用前置节点的字段，例如:
+        <code class="text-primary font-mono" v-text="'{{nodes.xxx.status}}'"></code>
+      </p>
     </div>
 
-    <!-- 分支配置 -->
+    
     <div class="border-t border-border-primary pt-4">
       <div class="flex items-center justify-between mb-3">
         <label class="block text-sm font-medium text-text-secondary">
@@ -67,16 +70,18 @@
             <div>
               <BaseInput
                 v-model="caseItem.value"
-                placeholder="匹配值"
+                placeholder="匹配值，如: 200"
                 size="sm"
                 @update:model-value="emitUpdate"
               />
-              <p class="text-xs text-text-tertiary mt-1">当字段值等于此值时，执行该分支</p>
+              <p class="text-xs text-text-tertiary mt-1">
+                当字段值等于此值时，执行该分支（支持变量）
+              </p>
             </div>
           </div>
         </div>
 
-        <!-- Default 分支说明 -->
+        
         <div class="bg-bg-tertiary rounded-lg p-3 border border-slate-300">
           <div class="flex items-center gap-2 mb-1">
             <div
@@ -91,7 +96,7 @@
       </div>
     </div>
 
-    <!-- 示例 -->
+    
     <div class="bg-bg-hover rounded-lg p-3">
       <div class="text-xs font-semibold text-text-secondary mb-2">示例：根据HTTP状态码分支</div>
       <div class="text-xs text-text-secondary space-y-1 font-mono">
@@ -110,12 +115,18 @@ import { ref, watch } from 'vue'
 import { X } from 'lucide-vue-next'
 import BaseInput from '@/components/BaseInput'
 import BaseButton from '@/components/BaseButton'
+import type { WorkflowNode, WorkflowEnvVar } from '@/types/workflow'
 
 interface Props {
   config: Record<string, any>
+  previousNodes?: WorkflowNode[]
+  envVars?: WorkflowEnvVar[]
 }
 
-const props = defineProps<Props>()
+const props = withDefaults(defineProps<Props>(), {
+  previousNodes: () => [],
+  envVars: () => [],
+})
 
 const emit = defineEmits<{
   'update:config': [config: Record<string, any>]

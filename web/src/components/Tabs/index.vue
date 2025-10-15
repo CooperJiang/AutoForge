@@ -1,6 +1,6 @@
 <template>
   <div class="tabs-container">
-    <!-- Tab 导航 -->
+    
     <div class="border-b border-border-primary">
       <div class="flex gap-1">
         <button
@@ -23,7 +23,7 @@
       </div>
     </div>
 
-    <!-- Tab 内容 -->
+    
     <div class="tabs-content mt-6">
       <slot></slot>
     </div>

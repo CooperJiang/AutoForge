@@ -44,7 +44,7 @@ export interface PaginationResponse<T> {
   page_size: number
 }
 
-// 创建任务
+
 export const createTask = async (data: {
   name: string
   description?: string
@@ -53,27 +53,27 @@ export const createTask = async (data: {
   schedule_type: string
   schedule_value: string
 }) => {
-  // request拦截器提取了data.data到response.data
+
   const response = await request.post<Task>('/api/v1/tasks', data)
   return response.data
 }
 
-// 获取任务列表
+
 export const getTaskList = async (page = 1, pageSize = 20) => {
-  // request拦截器提取了data.data到response.data
+
   const response = await request.get<PaginationResponse<Task>>('/api/v1/tasks', {
     params: { page, page_size: pageSize },
   })
   return response.data
 }
 
-// 获取任务详情
+
 export const getTask = async (id: string) => {
   const response = await request.get<Task>(`/api/v1/tasks/${id}`)
   return response.data
 }
 
-// 更新任务
+
 export const updateTask = async (
   id: string,
   data: {
@@ -89,31 +89,31 @@ export const updateTask = async (
   return response.data
 }
 
-// 删除任务
+
 export const deleteTask = async (id: string) => {
   const response = await request.delete<null>(`/api/v1/tasks/${id}`)
   return response.data
 }
 
-// 启用任务
+
 export const enableTask = async (id: string) => {
   const response = await request.post<null>(`/api/v1/tasks/${id}/enable`)
   return response.data
 }
 
-// 禁用任务
+
 export const disableTask = async (id: string) => {
   const response = await request.post<null>(`/api/v1/tasks/${id}/disable`)
   return response.data
 }
 
-// 手动触发任务
+
 export const triggerTask = async (id: string) => {
   const response = await request.post<null>(`/api/v1/tasks/${id}/trigger`)
   return response.data
 }
 
-// 获取任务执行记录
+
 export const getTaskExecutions = async (taskId: string, page = 1, pageSize = 20) => {
   const response = await request.get<PaginationResponse<TaskExecution>>(
     `/api/v1/tasks/${taskId}/executions`,
@@ -124,25 +124,25 @@ export const getTaskExecutions = async (taskId: string, page = 1, pageSize = 20)
   return response.data
 }
 
-// 获取执行记录详情
+
 export const getExecution = async (id: string) => {
   const response = await request.get<TaskExecution>(`/api/v1/executions/${id}`)
   return response.data
 }
 
-// 删除执行记录
+
 export const deleteExecution = async (id: string) => {
   const response = await request.delete<null>(`/api/v1/executions/${id}`)
   return response.data
 }
 
-// 删除任务的所有执行记录
+
 export const deleteAllExecutions = async (taskId: string) => {
   const response = await request.delete<null>(`/api/v1/tasks/${taskId}/executions`)
   return response.data
 }
 
-// 测试任务配置
+
 export interface TestTaskRequest {
   url?: string
   method?: string

@@ -4,7 +4,7 @@ import (
 	"auto-forge/pkg/logger"
 )
 
-// InitTools 初始化工具系统
+
 func InitTools() {
 	count := GetRegistry().Count()
 	logger.Info("Tool system initialized with %d tools", count)

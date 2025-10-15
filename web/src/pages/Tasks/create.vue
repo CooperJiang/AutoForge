@@ -1,6 +1,6 @@
 <template>
   <main class="flex h-screen bg-bg-hover">
-    <!-- 左侧表单区域 -->
+    
     <div class="w-[480px] bg-bg-elevated border-r border-border-primary overflow-y-auto">
       <div class="p-6">
         <div class="mb-6">
@@ -13,7 +13,7 @@
         </div>
 
         <form @submit.prevent="handleSubmit">
-          <!-- 任务名称 -->
+          
           <div class="mb-4">
             <label class="block text-sm font-medium text-text-secondary mb-2">
               任务名称 <span class="text-red-500">*</span>
@@ -21,7 +21,7 @@
             <BaseInput v-model="form.name" placeholder="例如：每日签到" required />
           </div>
 
-          <!-- 执行规则 -->
+          
           <div class="mb-4">
             <label class="block text-sm font-medium text-text-secondary mb-2">
               执行规则 <span class="text-red-500">*</span>
@@ -40,7 +40,7 @@
             </p>
           </div>
 
-          <!-- 选择工具 -->
+          
           <div class="mb-4">
             <label class="block text-sm font-medium text-text-secondary mb-2">
               选择工具 <span class="text-red-500">*</span>
@@ -54,7 +54,7 @@
             />
           </div>
 
-          <!-- 工具配置按钮 -->
+          
           <div v-if="form.tool_code" class="mb-4">
             <label class="block text-sm font-medium text-text-secondary mb-2">
               工具配置 <span class="text-red-500">*</span>
@@ -69,7 +69,7 @@
             </BaseButton>
           </div>
 
-          <!-- 提交按钮 -->
+          
           <div class="flex gap-2 mt-6">
             <BaseButton type="button" variant="secondary" @click="goBack" class="flex-1">
               取消
@@ -87,7 +87,7 @@
       </div>
     </div>
 
-    <!-- 右侧预览区域 -->
+    
     <div class="flex-1 p-6 overflow-y-auto">
       <div class="bg-bg-elevated border-2 border-border-primary rounded-lg p-6">
         <h2 class="text-lg font-semibold text-text-primary mb-4">任务预览</h2>
@@ -118,7 +118,7 @@
       </div>
     </div>
 
-    <!-- 工具配置弹窗 -->
+    
     <Dialog
       v-model="showConfigDialog"
       title="配置工具参数"

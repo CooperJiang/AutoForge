@@ -12,9 +12,9 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// CreateTask 创建任务
+
 func CreateTask(c *gin.Context) {
-	// 从认证中间件设置的上下文中获取user_id
+
 	userID, exists := c.Get("user_id")
 	if !exists {
 		errors.HandleError(c, errors.New(errors.CodeUnauthorized, "用户未登录"))
@@ -33,7 +33,7 @@ func CreateTask(c *gin.Context) {
 		return
 	}
 
-	// 序列化配置
+
 	configJSON, err := json.Marshal(req.Config)
 	if err != nil {
 		errors.HandleError(c, errors.New(errors.CodeInvalidParameter, "配置序列化失败"))
@@ -58,9 +58,9 @@ func CreateTask(c *gin.Context) {
 	errors.ResponseSuccess(c, response.ConvertTaskToResponse(task), "创建任务成功")
 }
 
-// GetTaskList 获取任务列表
+
 func GetTaskList(c *gin.Context) {
-	// 从认证中间件设置的上下文中获取user_id
+
 	userID, exists := c.Get("user_id")
 	if !exists {
 		errors.HandleError(c, errors.New(errors.CodeUnauthorized, "用户未登录"))
@@ -102,9 +102,9 @@ func GetTaskList(c *gin.Context) {
 	errors.ResponseSuccess(c, resp, "获取任务列表成功")
 }
 
-// GetTask 获取任务详情
+
 func GetTask(c *gin.Context) {
-	// 从认证中间件设置的上下文中获取user_id
+
 	userID, exists := c.Get("user_id")
 	if !exists {
 		errors.HandleError(c, errors.New(errors.CodeUnauthorized, "用户未登录"))
@@ -129,9 +129,9 @@ func GetTask(c *gin.Context) {
 	errors.ResponseSuccess(c, response.ConvertTaskToResponse(task), "获取任务详情成功")
 }
 
-// UpdateTask 更新任务
+
 func UpdateTask(c *gin.Context) {
-	// 从认证中间件设置的上下文中获取user_id
+
 	userID, exists := c.Get("user_id")
 	if !exists {
 		errors.HandleError(c, errors.New(errors.CodeUnauthorized, "用户未登录"))
@@ -152,7 +152,7 @@ func UpdateTask(c *gin.Context) {
 		return
 	}
 
-	// 序列化配置
+
 	configJSON, err := json.Marshal(req.Config)
 	if err != nil {
 		errors.HandleError(c, errors.New(errors.CodeInvalidParameter, "配置序列化失败"))
@@ -178,9 +178,9 @@ func UpdateTask(c *gin.Context) {
 	errors.ResponseSuccess(c, response.ConvertTaskToResponse(task), "更新任务成功")
 }
 
-// DeleteTask 删除任务
+
 func DeleteTask(c *gin.Context) {
-	// 从认证中间件设置的上下文中获取user_id
+
 	userID, exists := c.Get("user_id")
 	if !exists {
 		errors.HandleError(c, errors.New(errors.CodeUnauthorized, "用户未登录"))
@@ -204,11 +204,11 @@ func DeleteTask(c *gin.Context) {
 	errors.ResponseSuccess(c, nil, "删除任务成功")
 }
 
-// EnableTask 启用任务
+
 func EnableTask(c *gin.Context) {
 	id := c.Param("id")
 
-	// 从认证中间件设置的上下文中获取user_id
+
 	userID, exists := c.Get("user_id")
 	if !exists {
 		errors.HandleError(c, errors.New(errors.CodeUnauthorized, "用户未登录"))
@@ -230,11 +230,11 @@ func EnableTask(c *gin.Context) {
 	errors.ResponseSuccess(c, nil, "启用任务成功")
 }
 
-// DisableTask 禁用任务
+
 func DisableTask(c *gin.Context) {
 	id := c.Param("id")
 
-	// 从认证中间件设置的上下文中获取user_id
+
 	userID, exists := c.Get("user_id")
 	if !exists {
 		errors.HandleError(c, errors.New(errors.CodeUnauthorized, "用户未登录"))
@@ -256,7 +256,7 @@ func DisableTask(c *gin.Context) {
 	errors.ResponseSuccess(c, nil, "禁用任务成功")
 }
 
-// GetTaskExecutions 获取任务执行记录
+
 func GetTaskExecutions(c *gin.Context) {
 	taskID := c.Param("id")
 	page := c.DefaultQuery("page", "1")
@@ -288,7 +288,7 @@ func GetTaskExecutions(c *gin.Context) {
 	errors.ResponseSuccess(c, resp, "获取执行记录成功")
 }
 
-// GetExecution 获取执行记录详情
+
 func GetExecution(c *gin.Context) {
 	id := c.Param("id")
 
@@ -302,7 +302,7 @@ func GetExecution(c *gin.Context) {
 	errors.ResponseSuccess(c, response.ConvertTaskExecutionToResponse(execution), "获取执行记录详情成功")
 }
 
-// TriggerTask 手动触发任务
+
 func TriggerTask(c *gin.Context) {
 	id := c.Param("id")
 	userID := c.Query("user_id")

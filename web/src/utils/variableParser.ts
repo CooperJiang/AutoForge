@@ -4,9 +4,9 @@
  */
 
 export interface VariableContext {
-  nodes: Record<string, any> // 节点输出数据
-  env: Record<string, any> // 环境变量
-  trigger?: any // 触发器数据
+  nodes: Record<string, any>
+  env: Record<string, any>
+  trigger?: any
 }
 
 /**
@@ -16,7 +16,7 @@ export interface VariableContext {
 export function parseVariables(text: string, context: VariableContext): any {
   if (typeof text !== 'string') return text
 
-  // 匹配 {{...}} 格式的变量
+
   const variableRegex = /\{\{([^}]+)\}\}/g
 
   return text.replace(variableRegex, (match, variable) => {
@@ -60,7 +60,7 @@ function resolveVariable(path: string, context: VariableContext): any {
 
   let value: any
 
-  // 判断变量类型
+
   if (root === 'env') {
     value = context.env
   } else if (root === 'trigger') {
@@ -71,7 +71,7 @@ function resolveVariable(path: string, context: VariableContext): any {
     return undefined
   }
 
-  // 遍历路径获取嵌套值
+
   for (let i = 1; i < parts.length; i++) {
     if (value === undefined || value === null) return undefined
     value = value[parts[i]]
@@ -136,12 +136,12 @@ export function validateVariable(
   const parts = variable.split('.')
   const root = parts[0]
 
-  // 检查根节点
+
   if (root === 'env' || root === 'trigger') {
     return { valid: true }
   }
 
-  // 检查节点是否存在
+
   if (!availableNodes.includes(root)) {
     return {
       valid: false,
@@ -156,7 +156,7 @@ export function validateVariable(
  * 获取节点的可用输出字段（用于UI提示）
  */
 export function getNodeOutputSchema(nodeType: string, toolCode?: string): Record<string, string> {
-  // HTTP 请求
+
   if (toolCode === 'http_request') {
     return {
       'response.status': '响应状态码',
@@ -166,7 +166,7 @@ export function getNodeOutputSchema(nodeType: string, toolCode?: string): Record
     }
   }
 
-  // 邮件发送
+
   if (toolCode === 'email_sender') {
     return {
       success: '是否发送成功',
@@ -175,7 +175,7 @@ export function getNodeOutputSchema(nodeType: string, toolCode?: string): Record
     }
   }
 
-  // 健康检查
+
   if (toolCode === 'health_checker') {
     return {
       healthy: '是否健康',
@@ -185,7 +185,7 @@ export function getNodeOutputSchema(nodeType: string, toolCode?: string): Record
     }
   }
 
-  // 条件判断
+
   if (nodeType === 'condition') {
     return {
       result: '条件结果 (true/false)',
@@ -193,7 +193,7 @@ export function getNodeOutputSchema(nodeType: string, toolCode?: string): Record
     }
   }
 
-  // 开关
+
   if (nodeType === 'switch') {
     return {
       matchedCase: '匹配的分支',
@@ -201,7 +201,7 @@ export function getNodeOutputSchema(nodeType: string, toolCode?: string): Record
     }
   }
 
-  // 触发器
+
   if (nodeType === 'trigger') {
     return {
       timestamp: '触发时间',

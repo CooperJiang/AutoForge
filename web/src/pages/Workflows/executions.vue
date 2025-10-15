@@ -1,6 +1,6 @@
 <template>
   <div class="space-y-6">
-    <!-- 顶部面包屑 -->
+    
     <div class="flex items-center justify-between">
       <div class="flex items-center gap-3">
         <div>
@@ -8,13 +8,20 @@
           <p class="text-sm text-text-tertiary">{{ workflowName }}</p>
         </div>
       </div>
-      <BaseButton size="sm" @click="handleRefresh">
-        <RefreshCw :class="['w-4 h-4 mr-1', refreshing && 'animate-spin']" />
-        刷新
-      </BaseButton>
+      <div class="flex items-center gap-2">
+        <BaseButton size="sm" @click="handleRefresh">
+          <RefreshCw :class="['w-4 h-4 mr-1', refreshing && 'animate-spin']" />
+          刷新
+        </BaseButton>
+        <ExecuteWorkflowButton
+          :workflow-id="workflowId"
+          :workflow="workflowInfo"
+          @executed="onExecuted"
+        />
+      </div>
     </div>
 
-    <!-- 下次执行时间提示 -->
+    
     <div
       v-if="
         workflowInfo &&
@@ -44,7 +51,7 @@
       </div>
     </div>
 
-    <!-- 筛选器 -->
+    
     <div class="bg-bg-elevated rounded-lg border border-border-primary p-4">
       <div class="flex items-center gap-3">
         <BaseSelect v-model="statusFilter" :options="statusOptions" class="w-40" />
@@ -52,12 +59,12 @@
       </div>
     </div>
 
-    <!-- 加载状态 -->
+    
     <div v-if="loading" class="flex justify-center items-center py-20">
       <div class="text-text-tertiary">加载中...</div>
     </div>
 
-    <!-- 执行列表 -->
+    
     <div v-else class="space-y-3">
       <div
         v-for="execution in filteredExecutions"
@@ -67,7 +74,7 @@
         <div class="flex items-start justify-between">
           <div class="flex-1 cursor-pointer" @click="handleViewExecution(execution)">
             <div class="flex items-center gap-3 mb-2">
-              <!-- 状态标签 -->
+              
               <span
                 :class="[
                   'px-2.5 py-1 rounded-full text-xs font-semibold',
@@ -83,17 +90,17 @@
                 {{ getStatusText(execution.status) }}
               </span>
 
-              <!-- 执行ID -->
+              
               <span class="text-xs font-mono text-text-tertiary">{{ execution.id }}</span>
 
-              <!-- 触发方式 -->
+              
               <span class="text-xs text-text-tertiary flex items-center gap-1">
                 <component :is="getTriggerIcon(execution.trigger_type)" class="w-3.5 h-3.5" />
                 {{ getTriggerText(execution.trigger_type) }}
               </span>
             </div>
 
-            <!-- 时间信息 -->
+            
             <div class="flex items-center gap-4 text-sm text-text-secondary">
               <div class="flex items-center gap-1">
                 <Clock class="w-4 h-4" />
@@ -106,7 +113,7 @@
               <div v-else class="text-primary font-medium">执行中...</div>
             </div>
 
-            <!-- 节点执行进度 -->
+            
             <div class="mt-3 flex items-center gap-2">
               <div class="flex-1 bg-bg-tertiary rounded-full h-2 overflow-hidden">
                 <div
@@ -130,7 +137,7 @@
               </span>
             </div>
 
-            <!-- 错误信息 -->
+            
             <div
               v-if="execution.error"
               class="mt-2 text-sm text-red-600 bg-red-50 rounded px-2 py-1"
@@ -139,7 +146,7 @@
             </div>
           </div>
 
-          <!-- 操作按钮 -->
+          
           <div class="flex items-center gap-2 flex-shrink-0 ml-4">
             <button
               @click.stop="handleDeleteExecution(execution)"
@@ -156,14 +163,14 @@
         </div>
       </div>
 
-      <!-- 空状态 -->
+      
       <div v-if="filteredExecutions.length === 0" class="text-center py-16">
         <Activity class="w-16 h-16 mx-auto mb-4 text-slate-300" />
         <p class="text-text-tertiary">暂无执行记录</p>
       </div>
     </div>
 
-    <!-- 删除确认对话框 -->
+    
     <Dialog
       v-model="showDeleteDialog"
       title="确认删除"
@@ -195,6 +202,7 @@ import BaseSelect from '@/components/BaseSelect'
 import BaseInput from '@/components/BaseInput'
 import Dialog from '@/components/Dialog'
 import CountdownDisplay from '@/components/CountdownDisplay'
+import ExecuteWorkflowButton from '@/components/ExecuteWorkflowButton.vue'
 import type { WorkflowExecution } from '@/types/workflow'
 import { workflowApi } from '@/api/workflow'
 import { message } from '@/utils/message'
@@ -439,4 +447,9 @@ onMounted(() => {
   loadWorkflow()
   loadExecutions()
 })
+
+const onExecuted = async () => {
+  // 执行后刷新列表
+  await loadExecutions()
+}
 </script>

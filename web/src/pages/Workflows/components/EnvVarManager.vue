@@ -1,7 +1,7 @@
 <template>
   <Drawer v-model="isOpen" title="环境变量管理" size="md" @close="handleClose">
     <div class="space-y-4">
-      <!-- 说明 -->
+      
       <div class="bg-primary-light border border-primary rounded-lg p-3 text-sm">
         <div class="font-semibold text-text-primary mb-1">💡 什么是环境变量？</div>
         <div class="text-primary text-xs space-y-1">
@@ -14,7 +14,7 @@
         </div>
       </div>
 
-      <!-- 变量列表 -->
+      
       <div class="space-y-2">
         <div
           v-for="(envVar, index) in localEnvVars"
@@ -74,7 +74,7 @@
           </div>
         </div>
 
-        <!-- 添加按钮 -->
+        
         <button
           type="button"
           @click="addEnvVar"
@@ -84,7 +84,7 @@
         </button>
       </div>
 
-      <!-- 操作按钮 -->
+      
       <div class="flex gap-2 pt-4 border-t border-border-primary">
         <BaseButton size="sm" variant="ghost" class="flex-1" @click="handleClose">
           取消

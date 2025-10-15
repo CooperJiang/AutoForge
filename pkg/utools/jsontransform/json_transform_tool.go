@@ -13,7 +13,7 @@ import (
 )
 
 type JSONTransformTool struct {
-	*utools.BaseTool
+    *utools.BaseTool
 }
 
 func NewJSONTransformTool() *JSONTransformTool {
@@ -115,6 +115,18 @@ func (t *JSONTransformTool) Execute(ctx *utools.ExecutionContext, config map[str
 		Output:     output,
 		DurationMs: time.Since(start).Milliseconds(),
 	}, nil
+}
+
+
+func (t *JSONTransformTool) DescribeOutput(config map[string]interface{}) map[string]utools.OutputFieldDef {
+    name := "result"
+    if v, ok := config["output_name"].(string); ok && strings.TrimSpace(v) != "" {
+        name = strings.TrimSpace(v)
+    }
+    return map[string]utools.OutputFieldDef{
+        name:    {Type: "object", Label: "转换结果（类型依表达式而定）"},
+        "preview": {Type: "string", Label: "预览文本"},
+    }
 }
 
 func failureResult(start time.Time, message string, err error) (*utools.ExecutionResult, error) {

@@ -1,6 +1,6 @@
 <template>
   <div class="space-y-4">
-    <!-- 变量助手 -->
+    
     <div class="bg-bg-hover rounded-lg p-3 border border-border-primary">
       <VariableHelper
         v-if="showHelper"
@@ -13,7 +13,7 @@
       />
     </div>
 
-    <!-- HTML 内容 -->
+    
     <div>
       <label class="block text-sm font-medium text-text-primary mb-2">
         HTML 内容 <span class="text-error">*</span>
@@ -29,7 +29,7 @@
       <p class="mt-1 text-xs text-text-tertiary">要保存的 HTML 内容，将自动生成可访问的预览 URL</p>
     </div>
 
-    <!-- 页面标题 -->
+    
     <div>
       <label class="block text-sm font-medium text-text-primary mb-2"> 页面标题 </label>
       <input
@@ -42,7 +42,7 @@
       />
     </div>
 
-    <!-- 过期时间 -->
+    
     <div>
       <label class="block text-sm font-medium text-text-primary mb-2"> 过期时间（小时） </label>
       <input
@@ -55,7 +55,7 @@
       <p class="mt-1 text-xs text-text-tertiary">生成的预览链接过期时间，0 表示永不过期</p>
     </div>
 
-    <!-- 功能说明 -->
+    
     <div class="bg-primary-light border border-primary rounded-lg p-3">
       <div class="text-xs text-primary space-y-1">
         <div class="font-medium">功能说明：</div>

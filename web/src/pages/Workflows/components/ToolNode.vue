@@ -2,7 +2,7 @@
   <div
     class="tool-node bg-bg-elevated rounded-lg shadow-lg border-2 border-border-primary hover:border-primary transition-all group relative"
   >
-    <!-- 删除按钮 (hover 显示) -->
+    
     <button
       class="absolute -top-2 -right-2 w-6 h-6 bg-red-500 hover:bg-red-600 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center z-10 shadow-lg"
       @click.stop="handleDelete"
@@ -11,13 +11,18 @@
       <X class="w-4 h-4" />
     </button>
 
-    <!-- 节点头部 -->
+    
     <div :class="['px-3 py-2 rounded-t-lg flex items-center gap-2', getToolBgClass(data.toolCode)]">
-      <component :is="getToolIcon(data.toolCode)" class="w-4 h-4 text-white flex-shrink-0" />
+      <component
+        v-if="isLucideIcon(data.toolCode)"
+        :is="getToolIcon(data.toolCode)"
+        class="w-4 h-4 text-white flex-shrink-0"
+      />
+      <img v-else :src="getToolIcon(data.toolCode)" alt="" class="w-4 h-4 object-contain" />
       <span class="text-sm font-medium text-white truncate">{{ data.name }}</span>
     </div>
 
-    <!-- 节点内容 -->
+    
     <div class="px-3 py-2 text-xs text-text-secondary">
       <div v-if="hasConfig" class="flex items-center gap-1">
         <CheckCircle2 class="w-3 h-3 text-green-600" />
@@ -29,7 +34,7 @@
       </div>
     </div>
 
-    <!-- 连接点 -->
+    
     <Handle type="target" :position="Position.Top" class="handle-top" />
     <Handle type="source" :position="Position.Bottom" class="handle-bottom" />
   </div>
@@ -38,16 +43,8 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { Handle, Position } from '@vue-flow/core'
-import {
-  Globe,
-  Mail,
-  HeartPulse,
-  Braces,
-  Database,
-  CheckCircle2,
-  AlertCircle,
-  X,
-} from 'lucide-vue-next'
+import { CheckCircle2, AlertCircle, X } from 'lucide-vue-next'
+import { getToolIcon as getToolIconFromConfig, getToolIconBg } from '@/config/tools'
 import type { WorkflowNode } from '@/types/workflow'
 
 interface Props {
@@ -70,28 +67,23 @@ const hasConfig = computed(() => {
   return Object.keys(props.data.config).length > 0
 })
 
-// 获取工具图标
+// 获取工具图标 - 使用统一配置
 const getToolIcon = (code?: string) => {
-  const iconMap: Record<string, any> = {
-    http_request: Globe,
-    email_sender: Mail,
-    health_checker: HeartPulse,
-    json_transform: Braces,
-    redis_context: Database,
-  }
-  return iconMap[code || ''] || Globe
+  if (!code) return null
+  return getToolIconFromConfig(code)
 }
 
-// 获取工具背景色
+// 判断是否为 Lucide 图标
+const isLucideIcon = (code?: string) => {
+  if (!code) return false
+  const icon = getToolIcon(code)
+  return typeof icon !== 'string'
+}
+
+// 获取工具背景色 - 使用统一配置
 const getToolBgClass = (code?: string) => {
-  const colorMap: Record<string, string> = {
-    http_request: 'bg-gradient-to-r from-primary to-accent',
-    email_sender: 'bg-gradient-to-r from-purple-500 to-pink-600',
-    health_checker: 'bg-gradient-to-r from-primary to-accent',
-    json_transform: 'bg-gradient-to-r from-emerald-500 to-teal-600',
-    redis_context: 'bg-gradient-to-r from-slate-500 to-slate-700',
-  }
-  return colorMap[code || ''] || 'bg-gradient-to-r from-primary to-accent'
+  if (!code) return 'bg-gradient-to-r from-primary to-accent'
+  return getToolIconBg(code)
 }
 </script>
 

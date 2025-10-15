@@ -19,10 +19,8 @@
       </label>
       <div class="grid grid-cols-2 gap-2">
         <BaseInput
-          v-model.number="localConfig.duration"
-          type="number"
-          :min="1"
-          placeholder="1"
+          v-model="localConfig.duration"
+          placeholder="输入数字或变量"
           @update:model-value="emitUpdate"
         />
         <BaseSelect
@@ -31,9 +29,13 @@
           @update:model-value="emitUpdate"
         />
       </div>
+      <p class="text-xs text-text-tertiary mt-1">
+        支持变量引用，例如:
+        <code class="text-primary font-mono" v-text="'{{nodes.xxx.delay}}'"></code>
+      </p>
     </div>
 
-    <!-- 示例说明 -->
+    
     <div class="bg-bg-hover rounded-lg p-3">
       <div class="text-xs font-semibold text-text-secondary mb-2">使用场景：</div>
       <div class="text-xs text-text-secondary space-y-1">
@@ -57,12 +59,18 @@
 import { ref, watch } from 'vue'
 import BaseInput from '@/components/BaseInput'
 import BaseSelect from '@/components/BaseSelect'
+import type { WorkflowNode, WorkflowEnvVar } from '@/types/workflow'
 
 interface Props {
   config: Record<string, any>
+  previousNodes?: WorkflowNode[]
+  envVars?: WorkflowEnvVar[]
 }
 
-const props = defineProps<Props>()
+const props = withDefaults(defineProps<Props>(), {
+  previousNodes: () => [],
+  envVars: () => [],
+})
 
 const emit = defineEmits<{
   'update:config': [config: Record<string, any>]

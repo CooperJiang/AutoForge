@@ -1,6 +1,6 @@
 <template>
   <div class="variable-tree-selector">
-    <!-- 触发按钮 - 紧凑布局 -->
+    
     <div class="flex flex-wrap gap-2">
       <button
         v-for="node in previousNodes"
@@ -15,7 +15,7 @@
       </button>
     </div>
 
-    <!-- 树形下拉面板 -->
+    
     <Teleport to="body">
       <div
         v-if="activeNodeId"
@@ -25,7 +25,7 @@
         <div
           class="bg-bg-elevated rounded-lg shadow-2xl border border-border-primary max-w-2xl w-full mx-4 max-h-[70vh] flex flex-col"
         >
-          <!-- 头部 -->
+          
           <div class="px-4 py-3 border-b border-border-primary flex items-center justify-between">
             <div>
               <h3 class="text-sm font-semibold text-text-primary">选择变量</h3>
@@ -38,7 +38,7 @@
             </button>
           </div>
 
-          <!-- 提示信息 -->
+          
           <div
             class="px-4 py-2 bg-amber-50 dark:bg-amber-900/20 border-b border-amber-200 dark:border-amber-800"
           >
@@ -47,7 +47,7 @@
             </p>
           </div>
 
-          <!-- 树形结构 -->
+          
           <div class="flex-1 overflow-y-auto p-4">
             <div class="space-y-1">
               <VariableTreeNode
@@ -62,7 +62,7 @@
             </div>
           </div>
 
-          <!-- 底部提示 -->
+          
           <div class="px-4 py-3 border-t border-border-primary bg-bg-hover">
             <p class="text-xs text-text-secondary">
               <strong>提示：</strong>点击任意字段复制变量，格式为
@@ -83,7 +83,7 @@ import { ref, computed, onMounted } from 'vue'
 import { X, Folder } from 'lucide-vue-next'
 import VariableTreeNode from '@/components/VariableTreeNode'
 import { message } from '@/utils/message'
-import { getToolList, type OutputFieldDef } from '@/api/tool'
+import { getToolList, describeToolOutput, type OutputFieldDef } from '@/api/tool'
 
 interface NodeData {
   id: string
@@ -101,6 +101,7 @@ const props = defineProps<Props>()
 
 const toolOutputSchemas = ref<Record<string, Record<string, OutputFieldDef>>>({})
 const activeNodeId = ref<string | null>(null)
+const dynamicSchemas = ref<Record<string, Record<string, OutputFieldDef>>>({})
 
 const activeNode = computed(() => {
   return props.previousNodes?.find((n) => n.id === activeNodeId.value)
@@ -111,6 +112,23 @@ const toggleNodeTree = (nodeId: string) => {
     closeTree()
   } else {
     activeNodeId.value = nodeId
+    // 尝试加载动态输出结构（如工具支持）
+    const node = props.previousNodes?.find((n) => n.id === nodeId)
+    if (node && node.toolCode) {
+      // 仅在未缓存或配置变化时请求；这里简单按节点ID缓存一次
+      if (!dynamicSchemas.value[nodeId]) {
+        const cfg = node.config || {}
+        describeToolOutput(node.toolCode, cfg)
+          .then((schema) => {
+            if (schema && Object.keys(schema).length > 0) {
+              dynamicSchemas.value[nodeId] = schema
+            }
+          })
+          .catch(() => {
+            // 动态描述失败时静默回退
+          })
+      }
+    }
   }
 }
 
@@ -175,6 +193,15 @@ const getNodeStructure = (nodeId: string | null): Record<string, any> => {
 
   const node = props.previousNodes?.find((n) => n.id === nodeId)
   if (!node) return {}
+
+  // 优先使用动态输出结构（如果后端提供）
+  if (dynamicSchemas.value[node.id]) {
+    const structure: Record<string, any> = {}
+    Object.entries(dynamicSchemas.value[node.id]).forEach(([key, fieldDef]) => {
+      structure[key] = convertFieldDefToStructure(fieldDef)
+    })
+    return structure
+  }
 
   if (node.toolCode && toolOutputSchemas.value[node.toolCode]) {
     const schema = toolOutputSchemas.value[node.toolCode]

@@ -7,7 +7,7 @@
         </div>
         <div class="p-6">
           <div class="space-y-8">
-            <!-- 账户设置 -->
+            
             <div>
               <h3 class="text-lg font-medium text-gray-900 mb-4">账户设置</h3>
               <div class="space-y-4">
@@ -36,7 +36,7 @@
               </div>
             </div>
 
-            <!-- 通知设置 -->
+            
             <div>
               <h3 class="text-lg font-medium text-gray-900 mb-4">通知设置</h3>
               <div class="space-y-4">
@@ -56,7 +56,7 @@
               </div>
             </div>
 
-            <!-- 隐私设置 -->
+            
             <div>
               <h3 class="text-lg font-medium text-gray-900 mb-4">隐私设置</h3>
               <div class="space-y-4">

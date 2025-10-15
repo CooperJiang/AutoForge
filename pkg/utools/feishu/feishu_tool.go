@@ -15,24 +15,29 @@ import (
 	"go.uber.org/zap"
 )
 
-// FeishuTool 飞书机器人推送工具
+
 type FeishuTool struct {
 	*utools.BaseTool
 	logger *zap.Logger
 }
 
-// NewFeishuTool 创建飞书工具实例
+
 func NewFeishuTool() *FeishuTool {
-	metadata := &utools.ToolMetadata{
-		Code:        "feishu_bot",
-		Name:        "飞书机器人",
-		Description: "通过飞书机器人 Webhook 发送消息通知，支持文本、富文本、图片和卡片消息",
-		Category:    "notification",
-		Version:     "1.0.0",
-		Author:      "AutoForge",
-		AICallable:  true,
-		Tags:        []string{"feishu", "lark", "notification", "bot", "webhook"},
-	}
+    metadata := &utools.ToolMetadata{
+        Code:        "feishu_bot",
+        Name:        "飞书机器人",
+        Description: "通过飞书机器人 Webhook 发送消息通知，支持文本、富文本、图片和卡片消息",
+        Category:    "notification",
+        Version:     "1.0.0",
+        Author:      "AutoForge",
+        AICallable:  true,
+        Tags:        []string{"feishu", "lark", "notification", "bot", "webhook"},
+        OutputFieldsSchema: map[string]utools.OutputFieldDef{
+            "success": {Type: "boolean", Label: "是否发送成功"},
+            "message": {Type: "string", Label: "执行消息"},
+            "response": {Type: "object", Label: "飞书返回原始响应"},
+        },
+    }
 
 	schema := &utools.ConfigSchema{
 		Type: "object",
@@ -40,7 +45,7 @@ func NewFeishuTool() *FeishuTool {
 			"webhook_url": {
 				Type:        "string",
 				Title:       "Webhook 地址",
-				Description: "飞书机器人的 Webhook URL，格式：https://open.feishu.cn/open-apis/bot/v2/hook/...",
+				Description: "飞书机器人的 Webhook URL，格式：https:
 			},
 			"sign_secret": {
 				Type:        "string",
@@ -84,7 +89,7 @@ func NewFeishuTool() *FeishuTool {
 			"image_url": {
 				Type:        "string",
 				Title:       "图片 URL",
-				Description: "图片的公网访问地址（当消息类型为 image 时使用），格式：https://example.com/image.png",
+				Description: "图片的公网访问地址（当消息类型为 image 时使用），格式：https:
 			},
 			"card_template": {
 				Type:        "string",
@@ -113,7 +118,7 @@ func NewFeishuTool() *FeishuTool {
 			"card_buttons": {
 				Type:        "string",
 				Title:       "卡片按钮",
-				Description: "卡片按钮列表，JSON 格式数组，示例：[{\"text\":\"查看详情\",\"url\":\"https://example.com\"}]",
+				Description: "卡片按钮列表，JSON 格式数组，示例：[{\"text\":\"查看详情\",\"url\":\"https:
 			},
 			"card_custom_json": {
 				Type:        "string",
@@ -132,11 +137,11 @@ func NewFeishuTool() *FeishuTool {
 	}
 }
 
-// Execute 执行飞书消息发送
+
 func (t *FeishuTool) Execute(ctx *utools.ExecutionContext, toolConfig map[string]interface{}) (*utools.ExecutionResult, error) {
 	startTime := time.Now()
 
-	// 获取配置参数
+
 	webhookURL, _ := toolConfig["webhook_url"].(string)
 	signSecret, _ := toolConfig["sign_secret"].(string)
 	msgType, _ := toolConfig["msg_type"].(string)
@@ -150,10 +155,10 @@ func (t *FeishuTool) Execute(ctx *utools.ExecutionContext, toolConfig map[string
 		}, fmt.Errorf("webhook_url is required")
 	}
 
-	// 根据消息类型过滤配置，只保留当前类型需要的参数
+
 	filteredConfig := t.filterConfigByType(toolConfig, msgType)
 
-	// 构建消息体
+
 	var messageBody map[string]interface{}
 	var err error
 
@@ -184,7 +189,7 @@ func (t *FeishuTool) Execute(ctx *utools.ExecutionContext, toolConfig map[string
 		}, err
 	}
 
-	// 添加签名（如果提供了密钥）
+
 	if signSecret != "" {
 		timestamp := time.Now().Unix()
 		sign := t.generateSign(signSecret, timestamp)
@@ -192,7 +197,7 @@ func (t *FeishuTool) Execute(ctx *utools.ExecutionContext, toolConfig map[string
 		messageBody["sign"] = sign
 	}
 
-	// 发送请求
+
 	jsonData, err := json.Marshal(messageBody)
 	if err != nil {
 		return &utools.ExecutionResult{
@@ -214,7 +219,7 @@ func (t *FeishuTool) Execute(ctx *utools.ExecutionContext, toolConfig map[string
 	}
 	defer resp.Body.Close()
 
-	// 读取响应
+
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return &utools.ExecutionResult{
@@ -225,7 +230,7 @@ func (t *FeishuTool) Execute(ctx *utools.ExecutionContext, toolConfig map[string
 		}, err
 	}
 
-	// 解析响应
+
 	var result map[string]interface{}
 	if err := json.Unmarshal(body, &result); err != nil {
 		return &utools.ExecutionResult{
@@ -236,7 +241,7 @@ func (t *FeishuTool) Execute(ctx *utools.ExecutionContext, toolConfig map[string
 		}, err
 	}
 
-	// 检查返回码
+
 	code, _ := result["code"].(float64)
 	if code != 0 {
 		msg, _ := result["msg"].(string)
@@ -260,7 +265,7 @@ func (t *FeishuTool) Execute(ctx *utools.ExecutionContext, toolConfig map[string
 	}, nil
 }
 
-// buildTextMessage 构建文本消息
+
 func (t *FeishuTool) buildTextMessage(config map[string]interface{}) (map[string]interface{}, error) {
 	content, _ := config["content"].(string)
 	if content == "" {
@@ -275,7 +280,7 @@ func (t *FeishuTool) buildTextMessage(config map[string]interface{}) (map[string
 	}, nil
 }
 
-// buildPostMessage 构建富文本消息
+
 func (t *FeishuTool) buildPostMessage(config map[string]interface{}) (map[string]interface{}, error) {
 	title, _ := config["title"].(string)
 	postContent, _ := config["post_content"].(string)
@@ -287,7 +292,7 @@ func (t *FeishuTool) buildPostMessage(config map[string]interface{}) (map[string
 		return nil, fmt.Errorf("富文本内容不能为空")
 	}
 
-	// 将 Markdown 风格的文本转换为飞书富文本格式
+
 	contentLines := t.parseMarkdownToFeishu(postContent)
 
 	return map[string]interface{}{
@@ -303,7 +308,7 @@ func (t *FeishuTool) buildPostMessage(config map[string]interface{}) (map[string
 	}, nil
 }
 
-// buildImageMessage 构建图片消息
+
 func (t *FeishuTool) buildImageMessage(config map[string]interface{}) (map[string]interface{}, error) {
 	imageURL, _ := config["image_url"].(string)
 	if imageURL == "" {
@@ -313,7 +318,7 @@ func (t *FeishuTool) buildImageMessage(config map[string]interface{}) (map[strin
 	appID, _ := config["app_id"].(string)
 	appSecret, _ := config["app_secret"].(string)
 
-	// 如果提供了 app_id 和 app_secret，尝试上传图片获取 image_key
+
 	if appID != "" && appSecret != "" {
 		t.logger.Info("开始上传图片到飞书",
 			zap.String("app_id", appID),
@@ -327,7 +332,7 @@ func (t *FeishuTool) buildImageMessage(config map[string]interface{}) (map[strin
 		} else if imageKey != "" {
 			t.logger.Info("图片上传成功",
 				zap.String("image_key", imageKey))
-			// 使用上传后的 image_key 构建图片消息
+
 			return map[string]interface{}{
 				"msg_type": "image",
 				"content": map[string]interface{}{
@@ -335,12 +340,12 @@ func (t *FeishuTool) buildImageMessage(config map[string]interface{}) (map[strin
 				},
 			}, nil
 		}
-		// 如果上传失败，继续使用链接方案
+
 	} else {
 		t.logger.Info("未提供 App ID/Secret，使用链接方案显示图片")
 	}
 
-	// 使用 Markdown 格式的富文本消息显示图片链接
+
 	title, _ := config["title"].(string)
 	if title == "" {
 		title = "图片"
@@ -351,7 +356,7 @@ func (t *FeishuTool) buildImageMessage(config map[string]interface{}) (map[strin
 		content = "点击查看图片"
 	}
 
-	// 使用富文本消息
+
 	return map[string]interface{}{
 		"msg_type": "post",
 		"content": map[string]interface{}{
@@ -377,7 +382,7 @@ func (t *FeishuTool) buildImageMessage(config map[string]interface{}) (map[strin
 	}, nil
 }
 
-// buildInteractiveMessage 构建卡片消息
+
 func (t *FeishuTool) buildInteractiveMessage(config map[string]interface{}) (map[string]interface{}, error) {
 	cardTemplate, _ := config["card_template"].(string)
 	if cardTemplate == "" {
@@ -388,7 +393,7 @@ func (t *FeishuTool) buildInteractiveMessage(config map[string]interface{}) (map
 	var err error
 
 	if cardTemplate == "custom" {
-		// 自定义卡片 JSON
+
 		customJSON, _ := config["card_custom_json"].(string)
 		if customJSON == "" {
 			return nil, fmt.Errorf("自定义卡片 JSON 不能为空")
@@ -397,7 +402,7 @@ func (t *FeishuTool) buildInteractiveMessage(config map[string]interface{}) (map
 			return nil, fmt.Errorf("自定义卡片 JSON 格式错误: %v", err)
 		}
 	} else {
-		// 使用预设模板
+
 		card, err = t.buildCardByTemplate(cardTemplate, config)
 		if err != nil {
 			return nil, err
@@ -410,7 +415,7 @@ func (t *FeishuTool) buildInteractiveMessage(config map[string]interface{}) (map
 	}, nil
 }
 
-// buildCardByTemplate 根据模板构建卡片
+
 func (t *FeishuTool) buildCardByTemplate(template string, config map[string]interface{}) (map[string]interface{}, error) {
 	title, _ := config["title"].(string)
 	content, _ := config["card_content"].(string)
@@ -425,7 +430,7 @@ func (t *FeishuTool) buildCardByTemplate(template string, config map[string]inte
 		status = "info"
 	}
 
-	// 解析字段列表
+
 	var fields []map[string]string
 	if fieldsJSON != "" {
 		if err := json.Unmarshal([]byte(fieldsJSON), &fields); err != nil {
@@ -433,7 +438,7 @@ func (t *FeishuTool) buildCardByTemplate(template string, config map[string]inte
 		}
 	}
 
-	// 解析按钮列表
+
 	var buttons []map[string]string
 	if buttonsJSON != "" {
 		if err := json.Unmarshal([]byte(buttonsJSON), &buttons); err != nil {
@@ -441,10 +446,10 @@ func (t *FeishuTool) buildCardByTemplate(template string, config map[string]inte
 		}
 	}
 
-	// 构建卡片元素
+
 	elements := make([]interface{}, 0)
 
-	// 添加标题
+
 	statusEmoji := t.getStatusEmoji(status)
 	statusColor := t.getStatusColor(status)
 
@@ -456,12 +461,12 @@ func (t *FeishuTool) buildCardByTemplate(template string, config map[string]inte
 		},
 	})
 
-	// 添加分割线
+
 	elements = append(elements, map[string]interface{}{
 		"tag": "hr",
 	})
 
-	// 添加内容
+
 	if content != "" {
 		elements = append(elements, map[string]interface{}{
 			"tag": "div",
@@ -472,7 +477,7 @@ func (t *FeishuTool) buildCardByTemplate(template string, config map[string]inte
 		})
 	}
 
-	// 添加字段
+
 	if len(fields) > 0 {
 		for _, field := range fields {
 			elements = append(elements, map[string]interface{}{
@@ -490,7 +495,7 @@ func (t *FeishuTool) buildCardByTemplate(template string, config map[string]inte
 		}
 	}
 
-	// 添加按钮
+
 	if len(buttons) > 0 {
 		actions := make([]interface{}, 0)
 		for _, button := range buttons {
@@ -511,12 +516,12 @@ func (t *FeishuTool) buildCardByTemplate(template string, config map[string]inte
 		})
 	}
 
-	// 根据模板设置不同的配置
+
 	config_card := map[string]interface{}{
 		"wide_screen_mode": true,
 	}
 
-	// 根据状态设置头部颜色
+
 	header := map[string]interface{}{
 		"title": map[string]interface{}{
 			"tag":     "plain_text",
@@ -532,11 +537,11 @@ func (t *FeishuTool) buildCardByTemplate(template string, config map[string]inte
 	}, nil
 }
 
-// parseMarkdownToFeishu 将简单的 Markdown 转换为飞书富文本格式
+
 func (t *FeishuTool) parseMarkdownToFeishu(markdown string) [][]interface{} {
 	lines := [][]interface{}{}
 
-	// 简单处理，将每行作为一个段落
+
 	line := []interface{}{
 		map[string]interface{}{
 			"tag":  "text",
@@ -548,7 +553,7 @@ func (t *FeishuTool) parseMarkdownToFeishu(markdown string) [][]interface{} {
 	return lines
 }
 
-// getStatusEmoji 获取状态对应的 emoji
+
 func (t *FeishuTool) getStatusEmoji(status string) string {
 	switch status {
 	case "success":
@@ -564,7 +569,7 @@ func (t *FeishuTool) getStatusEmoji(status string) string {
 	}
 }
 
-// getStatusColor 获取状态对应的颜色
+
 func (t *FeishuTool) getStatusColor(status string) string {
 	switch status {
 	case "success":
@@ -580,9 +585,9 @@ func (t *FeishuTool) getStatusColor(status string) string {
 	}
 }
 
-// filterConfigByType 根据消息类型过滤配置，只保留当前类型需要的参数
+
 func (t *FeishuTool) filterConfigByType(config map[string]interface{}, msgType string) map[string]interface{} {
-	// 公共参数（所有类型都需要）
+
 	filtered := map[string]interface{}{
 		"webhook_url": config["webhook_url"],
 		"sign_secret": config["sign_secret"],
@@ -591,25 +596,25 @@ func (t *FeishuTool) filterConfigByType(config map[string]interface{}, msgType s
 		"msg_type":    config["msg_type"],
 	}
 
-	// 根据消息类型添加特定参数
+
 	switch msgType {
 	case "text":
-		// 文本消息只需要 content
+
 		filtered["content"] = config["content"]
 
 	case "post":
-		// 富文本消息需要 title 和 post_content
+
 		filtered["title"] = config["title"]
 		filtered["post_content"] = config["post_content"]
 
 	case "image":
-		// 图片消息需要 image_url 和 title
+
 		filtered["image_url"] = config["image_url"]
 		filtered["title"] = config["title"]
 		filtered["content"] = config["content"]
 
 	case "interactive":
-		// 卡片消息需要所有卡片相关参数
+
 		filtered["title"] = config["title"]
 		filtered["card_template"] = config["card_template"]
 		filtered["card_content"] = config["card_content"]
@@ -622,24 +627,24 @@ func (t *FeishuTool) filterConfigByType(config map[string]interface{}, msgType s
 	return filtered
 }
 
-// generateSign 生成签名
-// 飞书签名算法：SHA256(timestamp + "\n" + secret)，然后 Base64 编码
+
+
 func (t *FeishuTool) generateSign(secret string, timestamp int64) string {
-	// 拼接 timestamp 和 secret
+
 	stringToSign := fmt.Sprintf("%v", timestamp) + "\n" + secret
 
-	// 对拼接后的字符串进行 SHA-256 哈希（注意：不是 HMAC）
+
 	h := sha256.New()
 	h.Write([]byte(stringToSign))
 
-	// Base64 编码
+
 	signature := base64.StdEncoding.EncodeToString(h.Sum(nil))
 	return signature
 }
 
-// getTenantAccessToken 获取 tenant_access_token
+
 func (t *FeishuTool) getTenantAccessToken(appID, appSecret string) (string, error) {
-	url := "https://open.feishu.cn/open-apis/auth/v3/tenant_access_token/internal"
+	url := "https:
 
 	payload := map[string]string{
 		"app_id":     appID,
@@ -679,9 +684,9 @@ func (t *FeishuTool) getTenantAccessToken(appID, appSecret string) (string, erro
 	return token, nil
 }
 
-// uploadImage 上传图片获取 image_key
+
 func (t *FeishuTool) uploadImage(appID, appSecret, imageURL string) (string, error) {
-	// 1. 获取 tenant_access_token
+
 	t.logger.Info("步骤 1: 获取 tenant_access_token")
 	token, err := t.getTenantAccessToken(appID, appSecret)
 	if err != nil {
@@ -689,7 +694,7 @@ func (t *FeishuTool) uploadImage(appID, appSecret, imageURL string) (string, err
 		return "", err
 	}
 
-	// 2. 下载图片
+
 	t.logger.Info("步骤 2: 下载图片", zap.String("image_url", imageURL))
 	resp, err := http.Get(imageURL)
 	if err != nil {
@@ -705,14 +710,14 @@ func (t *FeishuTool) uploadImage(appID, appSecret, imageURL string) (string, err
 	}
 	t.logger.Info("图片下载成功", zap.Int("size", len(imageData)))
 
-	// 3. 上传图片到飞书
-	uploadURL := "https://open.feishu.cn/open-apis/im/v1/images"
+
+	uploadURL := "https:
 	t.logger.Info("步骤 3: 上传图片到飞书", zap.String("upload_url", uploadURL))
 
-	// 创建 multipart form
+
 	body := &bytes.Buffer{}
 
-	// 构建表单数据
+
 	boundary := "----WebKitFormBoundary7MA4YWxkTrZu0gW"
 	body.WriteString(fmt.Sprintf("--%s\r\n", boundary))
 	body.WriteString("Content-Disposition: form-data; name=\"image_type\"\r\n\r\n")
@@ -763,7 +768,7 @@ func (t *FeishuTool) uploadImage(appID, appSecret, imageURL string) (string, err
 	return imageKey, nil
 }
 
-// init 自动注册工具
+
 func init() {
 	tool := NewFeishuTool()
 	if err := utools.Register(tool); err != nil {

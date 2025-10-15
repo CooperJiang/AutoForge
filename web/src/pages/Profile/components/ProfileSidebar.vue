@@ -2,7 +2,7 @@
   <div
     class="bg-bg-elevated rounded-2xl shadow-lg border border-border-primary overflow-hidden sticky top-6"
   >
-    <!-- 用户信息 -->
+    
     <div class="bg-gradient-to-br from-primary to-accent p-6 text-white">
       <div class="flex flex-col items-center">
         <div
@@ -20,7 +20,7 @@
       </div>
     </div>
 
-    <!-- 菜单列表 -->
+    
     <nav class="p-4 space-y-1">
       <button
         v-for="item in menuItems"

@@ -16,7 +16,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// TestTaskRequest 测试任务请求
+
 type TestTaskRequest struct {
 	ToolCode string                 `json:"tool_code"`
 	URL      string                 `json:"url"`
@@ -27,7 +27,7 @@ type TestTaskRequest struct {
 	Config   map[string]interface{} `json:"config"`
 }
 
-// TestTaskResponse 测试任务响应
+
 type TestTaskResponse struct {
 	Success      bool                   `json:"success"`
 	StatusCode   int                    `json:"status_code"`
@@ -38,7 +38,7 @@ type TestTaskResponse struct {
 	Message      string                 `json:"message,omitempty"`
 }
 
-// TestTask 测试任务配置
+
 func TestTask(c *gin.Context) {
 	req, err := common.ValidateRequest[TestTaskRequest](c)
 	if err != nil {
@@ -46,22 +46,22 @@ func TestTask(c *gin.Context) {
 		return
 	}
 
-	// 判断是否使用新的工具系统（有 tool_code 或 config）
+
 	if req.ToolCode != "" || req.Config != nil {
 		testWithToolSystem(c, req)
 		return
 	}
 
-	// 兼容旧的 HTTP 请求测试
+
 	testHTTPRequest(c, req)
 }
 
-// testWithToolSystem 使用工具系统测试
+
 func testWithToolSystem(c *gin.Context, req *TestTaskRequest) {
-	// 获取工具代码
+
 	toolCode := req.ToolCode
 	if toolCode == "" {
-		// 尝试从 config 推断
+
 		if req.URL != "" {
 			toolCode = "http_request"
 		}
@@ -72,26 +72,26 @@ func testWithToolSystem(c *gin.Context, req *TestTaskRequest) {
 		return
 	}
 
-	// 获取工具
+
 	tool, err := utools.Get(toolCode)
 	if err != nil {
 		errors.HandleError(c, errors.NewValidationError("tool_code", "工具不存在: "+toolCode))
 		return
 	}
 
-	// 构建配置
+
 	var config map[string]interface{}
 	if req.Config != nil {
 		config = req.Config
 	} else {
-		// 从旧格式转换
+
 		config = map[string]interface{}{
 			"url":    req.URL,
 			"method": req.Method,
 			"body":   req.Body,
 		}
 
-		// 处理 headers
+
 		if len(req.Headers) > 0 {
 			headers := make(map[string]string)
 			for _, h := range req.Headers {
@@ -104,7 +104,7 @@ func testWithToolSystem(c *gin.Context, req *TestTaskRequest) {
 		}
 	}
 
-	// 执行工具
+
 	ctx := &utools.ExecutionContext{
 		Context: context.Background(),
 		TaskID:  "test",
@@ -127,7 +127,7 @@ func testWithToolSystem(c *gin.Context, req *TestTaskRequest) {
 		return
 	}
 
-	// 返回结果
+
 	response := TestTaskResponse{
 		Success:      result.Success,
 		StatusCode:   result.StatusCode,
@@ -140,12 +140,12 @@ func testWithToolSystem(c *gin.Context, req *TestTaskRequest) {
 	errors.ResponseSuccess(c, response, "测试完成")
 }
 
-// testHTTPRequest 测试 HTTP 请求（兼容旧接口）
+
 func testHTTPRequest(c *gin.Context, req *TestTaskRequest) {
-	// 清理URL
+
 	targetURL := strings.TrimSpace(req.URL)
 
-	// 处理请求参数
+
 	if len(req.Params) > 0 {
 		params := url.Values{}
 		for _, param := range req.Params {
@@ -163,10 +163,10 @@ func testHTTPRequest(c *gin.Context, req *TestTaskRequest) {
 		}
 	}
 
-	// 记录开始时间
+
 	startTime := time.Now()
 
-	// 创建HTTP请求（支持 body）
+
 	var bodyReader io.Reader
 	if req.Body != "" {
 		bodyReader = strings.NewReader(req.Body)
@@ -181,14 +181,14 @@ func testHTTPRequest(c *gin.Context, req *TestTaskRequest) {
 		return
 	}
 
-	// 添加请求头
+
 	for _, header := range req.Headers {
 		if header.Key != "" {
 			httpReq.Header.Set(header.Key, header.Value)
 		}
 	}
 
-	// 发送请求
+
 	client := &http.Client{
 		Timeout: 30 * time.Second,
 	}
@@ -206,7 +206,7 @@ func testHTTPRequest(c *gin.Context, req *TestTaskRequest) {
 	}
 	defer resp.Body.Close()
 
-	// 读取响应体
+
 	bodyBytes, err := io.ReadAll(resp.Body)
 	if err != nil {
 		errors.ResponseSuccess(c, TestTaskResponse{
@@ -218,10 +218,10 @@ func testHTTPRequest(c *gin.Context, req *TestTaskRequest) {
 		return
 	}
 
-	// 转换为字符串（不截断）
+
 	bodyStr := string(bodyBytes)
 
-	// 判断是否成功
+
 	success := resp.StatusCode >= 200 && resp.StatusCode < 300
 
 	errors.ResponseSuccess(c, TestTaskResponse{

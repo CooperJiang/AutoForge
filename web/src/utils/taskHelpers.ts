@@ -72,7 +72,7 @@ export const formatNextRunTime = (timestamp: number): string => {
   const nextRun = new Date(timestamp * 1000)
   const diff = nextRun.getTime() - now.getTime()
 
-  // 如果时间已过，显示"即将执行"
+
   if (diff < 0) {
     return '即将执行'
   }
@@ -81,26 +81,26 @@ export const formatNextRunTime = (timestamp: number): string => {
   const minutes = Math.floor(seconds / 60)
   const hours = Math.floor(minutes / 60)
 
-  // 小于1分钟
+
   if (seconds < 60) {
     return `${seconds}秒后`
   }
-  // 小于1小时
+
   if (minutes < 60) {
     return `${minutes}分钟后`
   }
-  // 小于24小时
+
   if (hours < 24) {
     return `${hours}小时${minutes % 60}分钟后`
   }
-  // 大于24小时，显示具体日期时间
+
   const year = nextRun.getFullYear()
   const month = String(nextRun.getMonth() + 1).padStart(2, '0')
   const day = String(nextRun.getDate()).padStart(2, '0')
   const hour = String(nextRun.getHours()).padStart(2, '0')
   const minute = String(nextRun.getMinutes()).padStart(2, '0')
 
-  // 如果是今年，不显示年份
+
   if (year === now.getFullYear()) {
     return `${month}-${day} ${hour}:${minute}`
   }

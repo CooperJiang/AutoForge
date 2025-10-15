@@ -3,11 +3,11 @@
  * 支持加密、有效期管理、统一接口
  */
 
-// 简单的Base64编码/解码（可以替换为更强的加密算法）
+
 class SimpleEncryption {
   private static key = 'gin-template-secret-key-2024'
 
-  // 简单的异或加密
+
   static encrypt(text: string): string {
     const keyBytes = new TextEncoder().encode(this.key)
     const textBytes = new TextEncoder().encode(text)
@@ -42,17 +42,17 @@ class SimpleEncryption {
   }
 }
 
-// 存储项接口
+
 interface StorageItem<T = unknown> {
   value: T
   timestamp: number
-  expiry?: number // 过期时间戳
+  expiry?: number
 }
 
-// 存储配置选项
+
 interface StorageOptions {
-  encrypt?: boolean // 是否加密
-  expiry?: number // 有效期（毫秒）
+  encrypt?: boolean
+  expiry?: number
 }
 
 class SecureStorage {
@@ -107,7 +107,7 @@ class SecureStorage {
       if (decrypt) {
         jsonString = SimpleEncryption.decrypt(stored)
         if (!jsonString) {
-          // 解密失败，可能是旧数据或损坏的数据
+
           this.removeItem(key)
           return defaultValue
         }
@@ -115,7 +115,7 @@ class SecureStorage {
 
       const item: StorageItem<T> = JSON.parse(jsonString)
 
-      // 检查是否过期
+
       if (item.expiry && Date.now() > item.expiry) {
         this.removeItem(key)
         return defaultValue
@@ -124,7 +124,7 @@ class SecureStorage {
       return item.value
     } catch (error) {
       console.warn('获取存储项失败:', error)
-      // 清除可能损坏的数据
+
       this.removeItem(key)
       return defaultValue
     }
@@ -271,12 +271,12 @@ class SecureStorage {
           const stored = localStorage.getItem(fullKey)
           if (stored) {
             totalSize += stored.length
-            // 尝试解密，如果成功说明是加密的
+
             try {
               SimpleEncryption.decrypt(stored)
               encryptedItems++
             } catch {
-              // 非加密数据
+
             }
           }
         }
@@ -323,7 +323,7 @@ class SecureStorage {
   }
 }
 
-// 预定义的存储键名常量
+
 export const STORAGE_KEYS = {
   AUTH_TOKEN: 'auth_token',
   AUTH_USER: 'auth_user',
@@ -333,7 +333,7 @@ export const STORAGE_KEYS = {
   REMEMBER_LOGIN: 'remember_login',
 } as const
 
-// 常用的有效期常量（毫秒）
+
 export const EXPIRY_TIME = {
   MINUTE: 60 * 1000,
   HOUR: 60 * 60 * 1000,

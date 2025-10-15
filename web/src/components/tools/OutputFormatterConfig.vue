@@ -1,34 +1,6 @@
 <template>
   <div class="space-y-4">
-    <!-- 变量助手 -->
-    <div class="bg-bg-hover rounded-lg p-3 border border-border-primary">
-      <div class="flex items-center justify-between mb-2">
-        <h4 class="text-sm font-medium text-text-primary">变量助手</h4>
-        <button
-          type="button"
-          @click="showHelper = !showHelper"
-          class="text-xs text-primary hover:underline"
-        >
-          {{ showHelper ? '隐藏' : '显示' }}
-        </button>
-      </div>
-
-      <VariableHelper
-        v-if="showHelper"
-        :show="true"
-        :previous-nodes="props.previousNodes"
-        :env-vars="props.envVars"
-        @insert-field="handleInsertField"
-        @insert-node="handleInsertNode"
-        @insert-env="handleInsertEnv"
-      />
-
-      <p v-if="!showHelper" class="text-xs text-text-tertiary">
-        点击"显示"按钮查看可用的变量，点击变量即可复制到剪贴板
-      </p>
-    </div>
-
-    <!-- 输出类型 -->
+    
     <div>
       <label class="block text-sm font-medium text-text-secondary mb-2">
         输出类型 <span class="text-red-500">*</span>
@@ -37,13 +9,12 @@
       <p class="text-xs text-text-tertiary mt-1">选择最终输出的展示类型</p>
     </div>
 
-    <!-- 主要内容 -->
+    
     <div>
       <label class="block text-sm font-medium text-text-secondary mb-2">
         主要内容 <span class="text-red-500">*</span>
       </label>
       <textarea
-        ref="contentRef"
         v-model="localConfig.content"
         rows="3"
         :placeholder="getContentPlaceholder()"
@@ -54,11 +25,10 @@
       </p>
     </div>
 
-    <!-- 标题（可选） -->
+    
     <div>
       <label class="block text-sm font-medium text-text-secondary mb-2"> 标题（可选） </label>
       <input
-        ref="titleRef"
         v-model="localConfig.title"
         type="text"
         placeholder="如：生成的图片"
@@ -66,11 +36,10 @@
       />
     </div>
 
-    <!-- 描述（可选） -->
+    
     <div>
       <label class="block text-sm font-medium text-text-secondary mb-2"> 描述（可选） </label>
       <textarea
-        ref="descRef"
         v-model="localConfig.description"
         rows="2"
         placeholder="如：{{nodes.xxx.response.data[0].revised_prompt}}"
@@ -78,11 +47,10 @@
       />
     </div>
 
-    <!-- 替代文本（图片/视频专用） -->
+    
     <div v-if="localConfig.output_type === 'image' || localConfig.output_type === 'video'">
       <label class="block text-sm font-medium text-text-secondary mb-2"> 替代文本（可选） </label>
       <input
-        ref="altRef"
         v-model="localConfig.alt_text"
         type="text"
         placeholder="图片的替代描述"
@@ -90,11 +58,10 @@
       />
     </div>
 
-    <!-- 缩略图（视频专用） -->
+    
     <div v-if="localConfig.output_type === 'video'">
       <label class="block text-sm font-medium text-text-secondary mb-2"> 缩略图 URL（可选） </label>
       <input
-        ref="thumbRef"
         v-model="localConfig.thumbnail"
         type="text"
         placeholder="视频封面图片 URL"
@@ -102,11 +69,10 @@
       />
     </div>
 
-    <!-- 元数据（可选） -->
+    
     <div>
       <label class="block text-sm font-medium text-text-secondary mb-2"> 元数据（可选） </label>
       <textarea
-        ref="metaRef"
         v-model="localConfig.metadata"
         rows="2"
         placeholder='JSON 格式的元数据，如 {"model": "dall-e-3"}'
@@ -119,9 +85,7 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'
 import BaseSelect from '@/components/BaseSelect'
-import VariableHelper from '@/components/VariableHelper'
 import type { WorkflowNode, WorkflowEnvVar } from '@/types/workflow'
-import { message } from '@/utils/message'
 
 interface Props {
   config: Record<string, any>
@@ -137,35 +101,6 @@ const props = withDefaults(defineProps<Props>(), {
 const emit = defineEmits<{
   'update:config': [config: Record<string, any>]
 }>()
-
-// 变量助手显示状态
-const showHelper = ref(false)
-
-// 输入框 refs
-const contentRef = ref<HTMLTextAreaElement | null>(null)
-const titleRef = ref<HTMLInputElement | null>(null)
-const descRef = ref<HTMLTextAreaElement | null>(null)
-const altRef = ref<HTMLInputElement | null>(null)
-const thumbRef = ref<HTMLInputElement | null>(null)
-const metaRef = ref<HTMLTextAreaElement | null>(null)
-
-// 当前聚焦的输入框
-const activeInputRef = ref<HTMLTextAreaElement | HTMLInputElement | null>(null)
-
-// 监听所有输入框的 focus 事件
-const setupFocusListeners = () => {
-  const refs = [contentRef, titleRef, descRef, altRef, thumbRef, metaRef]
-  refs.forEach((r) => {
-    if (r.value) {
-      r.value.addEventListener('focus', () => {
-        activeInputRef.value = r.value
-      })
-    }
-  })
-}
-
-// 在组件挂载后设置监听器
-setTimeout(setupFocusListeners, 100)
 
 // 本地配置
 const localConfig = ref({
@@ -220,66 +155,6 @@ const getContentDescription = () => {
     json: '填写 JSON 格式的数据',
   }
   return descriptions[type] || ''
-}
-
-// 处理变量插入 - 插入字段
-const handleInsertField = (nodeId: string, fieldName: string) => {
-  const variable = `{{nodes.${nodeId}.${fieldName}}}`
-  insertVariable(variable)
-}
-
-// 处理变量插入 - 插入整个节点
-const handleInsertNode = (nodeId: string) => {
-  const variable = `{{nodes.${nodeId}}}`
-  insertVariable(variable)
-}
-
-// 处理变量插入 - 插入环境变量
-const handleInsertEnv = (key: string) => {
-  const variable = `{{env.${key}}}`
-  insertVariable(variable)
-}
-
-// 插入变量到当前聚焦的输入框
-const insertVariable = (variable: string) => {
-  const element = activeInputRef.value
-
-  if (!element) {
-    // 如果没有聚焦的输入框，复制到剪贴板
-    navigator.clipboard.writeText(variable).then(() => {
-      message.success('变量已复制到剪贴板')
-    })
-    return
-  }
-
-  const start = element.selectionStart || 0
-  const end = element.selectionEnd || 0
-  const text = element.value
-  const before = text.substring(0, start)
-  const after = text.substring(end)
-
-  // 更新对应的 localConfig 字段
-  const newValue = before + variable + after
-
-  if (element === contentRef.value) {
-    localConfig.value.content = newValue
-  } else if (element === titleRef.value) {
-    localConfig.value.title = newValue
-  } else if (element === descRef.value) {
-    localConfig.value.description = newValue
-  } else if (element === altRef.value) {
-    localConfig.value.alt_text = newValue
-  } else if (element === thumbRef.value) {
-    localConfig.value.thumbnail = newValue
-  } else if (element === metaRef.value) {
-    localConfig.value.metadata = newValue
-  }
-
-  // 设置光标位置
-  setTimeout(() => {
-    element.focus()
-    element.selectionStart = element.selectionEnd = start + variable.length
-  }, 0)
 }
 
 // 标记是否正在从外部更新

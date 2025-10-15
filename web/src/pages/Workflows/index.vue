@@ -1,6 +1,6 @@
 <template>
   <div>
-    <!-- 页面标题 -->
+    
     <div class="flex items-center justify-between mb-6">
       <div>
         <h1 class="text-2xl font-bold text-text-primary mb-1">工作流管理</h1>
@@ -12,7 +12,7 @@
       </BaseButton>
     </div>
 
-    <!-- 工作流列表 -->
+    
     <div
       v-if="!loading && workflows.length > 0"
       class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4"
@@ -30,7 +30,7 @@
       />
     </div>
 
-    <!-- 空状态 -->
+    
     <div v-else-if="!loading && workflows.length === 0" class="text-center py-20">
       <div class="text-text-placeholder mb-4">
         <Workflow class="w-16 h-16 mx-auto mb-4" />
@@ -39,12 +39,12 @@
       </div>
     </div>
 
-    <!-- 加载状态 -->
+    
     <div v-else class="flex justify-center items-center py-20">
       <div class="text-text-tertiary">加载中...</div>
     </div>
 
-    <!-- 执行参数对话框 -->
+    
     <ExecuteWithParamsDialog
       :visible="executeDialogVisible"
       :workflow="selectedWorkflow"

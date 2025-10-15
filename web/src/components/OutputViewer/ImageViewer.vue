@@ -1,6 +1,6 @@
 <template>
   <div class="image-viewer">
-    <!-- 缩略图 -->
+    
     <div class="relative inline-block">
       <img
         ref="thumbnailRef"
@@ -30,17 +30,17 @@
       {{ description }}
     </div>
 
-    <!-- 预览弹窗 -->
+    
     <Teleport to="body">
       <Transition name="fade-bg">
         <div v-if="showPreview" class="fixed inset-0 z-50 bg-black/90 backdrop-blur-sm">
-          <!-- 工具栏 -->
+          
           <div
             class="absolute top-0 left-0 right-0 h-16 flex items-center justify-between px-6 bg-black/50 z-20"
             @click.stop
           >
             <div class="flex items-center gap-4">
-              <!-- 缩放控制 -->
+              
               <div class="flex items-center gap-2 bg-white/10 rounded-lg px-3 py-2">
                 <button
                   class="p-1 hover:bg-white/20 rounded transition-colors"
@@ -85,7 +85,7 @@
                 </button>
               </div>
 
-              <!-- 旋转 -->
+              
               <button
                 class="p-2 bg-white/10 hover:bg-white/20 rounded-lg transition-colors"
                 @click.stop="rotateLeft"
@@ -125,7 +125,7 @@
                 </svg>
               </button>
 
-              <!-- 重置 -->
+              
               <button
                 class="p-2 bg-white/10 hover:bg-white/20 rounded-lg transition-colors"
                 @click.stop="reset"
@@ -148,7 +148,7 @@
             </div>
 
             <div class="flex items-center gap-2">
-              <!-- 新窗口打开 -->
+              
               <button
                 class="px-4 py-2 bg-white/10 hover:bg-white/20 rounded-lg transition-colors text-white text-sm"
                 @click.stop="openInNewTab"
@@ -157,7 +157,7 @@
                 新窗口打开
               </button>
 
-              <!-- 关闭 -->
+              
               <button
                 class="p-2 hover:bg-white/20 rounded-lg transition-colors"
                 @click.stop="closePreview"
@@ -180,7 +180,7 @@
             </div>
           </div>
 
-          <!-- 图片容器 -->
+          
           <div
             ref="containerRef"
             class="absolute inset-0 overflow-hidden z-10"
@@ -207,7 +207,7 @@
             </Transition>
           </div>
 
-          <!-- 提示信息 -->
+          
           <div
             class="absolute bottom-6 left-1/2 -translate-x-1/2 bg-black/50 text-white text-xs px-4 py-2 rounded-lg pointer-events-none z-20"
           >

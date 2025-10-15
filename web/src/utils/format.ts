@@ -90,9 +90,9 @@ export function maskUserId(userId: string, showStart = 4, showEnd = 4): string {
 
   const len = userId.length
 
-  // 如果ID太短，只遮挡中间部分
+
   if (len <= showStart + showEnd) {
-    if (len <= 3) return userId // 太短则不遮挡
+    if (len <= 3) return userId
     const start = Math.floor(len / 3)
     const end = len - Math.floor(len / 3)
     return userId.slice(0, start) + '***' + userId.slice(end)
@@ -116,7 +116,7 @@ export function formatTime(
   if (typeof time === 'string') {
     timestamp = new Date(time).getTime()
   } else {
-    // 如果是秒级时间戳，转换为毫秒
+
     timestamp = time < 10000000000 ? time * 1000 : time
   }
 

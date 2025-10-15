@@ -16,29 +16,29 @@ import (
 
 var userService *UserService
 
-// UserService 用户服务
+
 type UserService struct {
-	// 存储服务需要的依赖或状态
+
 }
 
-// InitUserService 初始化用户服务
+
 func InitUserService() {
 	userService = &UserService{}
 }
 
-// GetUserService 获取用户服务实例
+
 func GetUserService() *UserService {
 	return userService
 }
 
-// Login 用户登录
+
 func Login(account, password string) (map[string]interface{}, string, time.Time, error) {
 	db := database.GetDB()
 	if db == nil {
 		return nil, "", time.Time{}, errors.New(errors.CodeDBConnectionFailed, "数据库连接失败")
 	}
 
-	// 使用原始SQL查询来避免UUID扫描问题
+
 	var userRow struct {
 		ID        string `db:"id"`
 		Username  string `db:"username"`
@@ -61,32 +61,32 @@ func Login(account, password string) (map[string]interface{}, string, time.Time,
 		return nil, "", time.Time{}, errors.New(errors.CodeUserNotFound, "用户不存在")
 	}
 
-	// 验证密码
+
 	if !utils.ComparePasswords(userRow.Password, password) {
 		return nil, "", time.Time{}, errors.New(errors.CodeWrongPassword, "密码错误")
 	}
 
-	// 检查用户状态
+
 	if userRow.Status != common.UserStatusNormal {
 		return nil, "", time.Time{}, errors.New(errors.CodeUserDisabled, "账号已被禁用")
 	}
 
-	// 解析UUID
+
 	userID, err := common.ParseUUID(userRow.ID)
 	if err != nil {
 		return nil, "", time.Time{}, errors.New(errors.CodeInternal, "用户ID格式错误")
 	}
 
-	// 生成 JWT token
+
 	token, err := common.GenerateToken(userID, userRow.Username, userRow.Role)
 	if err != nil {
 		return nil, "", time.Time{}, errors.New(errors.CodeInternal, "生成token失败")
 	}
 
-	// 计算过期时间
-	expiresAt := time.Now().Add(time.Duration(24) * time.Hour) // 默认24小时
 
-	// 构造用户信息
+	expiresAt := time.Now().Add(time.Duration(24) * time.Hour)
+
+
 	userInfo := map[string]interface{}{
 		"id":       userRow.ID,
 		"username": userRow.Username,
@@ -100,7 +100,7 @@ func Login(account, password string) (map[string]interface{}, string, time.Time,
 	return userInfo, token, expiresAt, nil
 }
 
-// FindUsers 获取用户列表
+
 func FindUsers() ([]models.User, error) {
 	db := database.GetDB()
 	var users []models.User
@@ -108,7 +108,7 @@ func FindUsers() ([]models.User, error) {
 	return users, result.Error
 }
 
-// FindUserByID 根据ID查找用户
+
 func FindUserByID(id string) (*models.User, error) {
 	db := database.GetDB()
 	var user models.User
@@ -119,7 +119,7 @@ func FindUserByID(id string) (*models.User, error) {
 	return &user, nil
 }
 
-// FindUserByEmail 根据邮箱查找用户
+
 func FindUserByEmail(email string) (*models.User, error) {
 	db := database.GetDB()
 	var user models.User
@@ -130,15 +130,15 @@ func FindUserByEmail(email string) (*models.User, error) {
 	return &user, nil
 }
 
-// generateVerificationCode 生成验证码
+
 func generateVerificationCode(email string, codeType string) string {
-	// 设置随机数种子
+
 	rand.Seed(time.Now().UnixNano())
 
-	// 生成6位随机数
+
 	code := fmt.Sprintf("%06d", rand.Intn(1000000))
 
-	// 使用email和类型作为key，存储到缓存中，5分钟过期
+
 	key := fmt.Sprintf("%s:%s:code", email, codeType)
 	err := cache.GetCache().Set(key, code, 5*time.Minute)
 	if err != nil {
@@ -149,21 +149,21 @@ func generateVerificationCode(email string, codeType string) string {
 	return code
 }
 
-// SendRegistrationCode 发送注册验证码
+
 func SendRegistrationCode(email string) error {
-	// 检查邮箱是否已被注册
+
 	_, err := FindUserByEmail(email)
 	if err == nil {
 		return errors.New(errors.CodeEmailExists, "该邮箱已被注册")
 	}
 
-	// 生成注册验证码
+
 	code := generateVerificationCode(email, common.CodeTypeRegister)
 	if code == "" {
 		return errors.New(errors.CodeInternal, "生成验证码失败")
 	}
 
-	// 发送验证码邮件
+
 	if err := sendVerificationEmail(email, code, common.CodeTypeRegister); err != nil {
 		return fmt.Errorf("发送验证码失败: %v", err)
 	}
@@ -171,21 +171,21 @@ func SendRegistrationCode(email string) error {
 	return nil
 }
 
-// SendResetPasswordCode 发送重置密码验证码
+
 func SendResetPasswordCode(email string) error {
-	// 检查邮箱是否存在
+
 	_, err := FindUserByEmail(email)
 	if err != nil {
 		return errors.New(errors.CodeUserNotFound, "该邮箱尚未注册")
 	}
 
-	// 生成重置密码验证码
+
 	code := generateVerificationCode(email, common.CodeTypeResetPassword)
 	if code == "" {
 		return errors.New(errors.CodeInternal, "生成验证码失败")
 	}
 
-	// 发送验证码邮件
+
 	if err := sendVerificationEmail(email, code, common.CodeTypeResetPassword); err != nil {
 		return fmt.Errorf("发送验证码失败: %v", err)
 	}
@@ -193,21 +193,21 @@ func SendResetPasswordCode(email string) error {
 	return nil
 }
 
-// SendChangeEmailCode 发送修改邮箱验证码
+
 func SendChangeEmailCode(userID, newEmail string) error {
-	// 检查新邮箱是否已被其他用户使用
+
 	existingUser, err := FindUserByEmail(newEmail)
 	if err == nil && existingUser.ID.String() != userID {
 		return errors.New(errors.CodeEmailExists, "该邮箱已被其他用户使用")
 	}
 
-	// 生成修改邮箱验证码
+
 	code := generateVerificationCode(newEmail, common.CodeTypeChangeEmail)
 	if code == "" {
 		return errors.New(errors.CodeInternal, "生成验证码失败")
 	}
 
-	// 发送验证码邮件
+
 	if err := sendVerificationEmail(newEmail, code, common.CodeTypeChangeEmail); err != nil {
 		return fmt.Errorf("发送验证码失败: %v", err)
 	}
@@ -215,7 +215,7 @@ func SendChangeEmailCode(userID, newEmail string) error {
 	return nil
 }
 
-// ValidateCode 验证验证码
+
 func ValidateCode(email, code, codeType string) bool {
 	key := fmt.Sprintf("%s:%s:code", email, codeType)
 	cachedCode, err := cache.GetCache().Get(key)
@@ -224,9 +224,9 @@ func ValidateCode(email, code, codeType string) bool {
 		return false
 	}
 
-	// 验证码匹配
+
 	if code == cachedCode {
-		// 验证成功后删除验证码
+
 		_ = cache.GetCache().Del(key)
 		return true
 	}
@@ -234,35 +234,35 @@ func ValidateCode(email, code, codeType string) bool {
 	return false
 }
 
-// RegisterUser 注册用户
+
 func RegisterUser(username, email, password, code string) error {
 	db := database.GetDB()
 
-	// 验证验证码
+
 	if !ValidateCode(email, code, common.CodeTypeRegister) {
 		return errors.New(errors.CodeInvalidVerifyCode, "验证码无效或已过期")
 	}
 
-	// 检查用户名是否已存在
+
 	var count int64
 	db.Model(&models.User{}).Where("username = ?", username).Count(&count)
 	if count > 0 {
 		return errors.New(errors.CodeUserExists, "用户名已存在")
 	}
 
-	// 检查邮箱是否已存在
+
 	db.Model(&models.User{}).Where("email = ?", email).Count(&count)
 	if count > 0 {
 		return errors.New(errors.CodeEmailExists, "邮箱已被注册")
 	}
 
-	// 创建用户
+
 	hashedPassword, err := utils.HashPassword(password)
 	if err != nil {
 		return errors.New(errors.CodeInternal, "密码加密失败")
 	}
 
-	// 检查是否是第一个用户（自动设为超级管理员）
+
 	var totalUserCount int64
 	db.Model(&models.User{}).Count(&totalUserCount)
 
@@ -287,9 +287,9 @@ func RegisterUser(username, email, password, code string) error {
 	return nil
 }
 
-// sendVerificationEmail 发送验证码邮件
+
 func sendVerificationEmail(emailAddr string, code string, codeType string) error {
-	// 检查邮件服务是否可用
+
 	if !email.IsMailEnabled() {
 		return errors.New(errors.CodeEmailServiceError, "邮件服务不可用，请联系管理员")
 	}
@@ -303,7 +303,7 @@ func sendVerificationEmail(emailAddr string, code string, codeType string) error
 		subject = "重置密码验证码"
 	}
 
-	// 发送验证码邮件
+
 	err := email.SendMail(emailAddr, subject, fmt.Sprintf("您的验证码是: %s，5分钟内有效。", code))
 	if err != nil {
 		return err
@@ -312,16 +312,16 @@ func sendVerificationEmail(emailAddr string, code string, codeType string) error
 	return nil
 }
 
-// ResetPassword 重置密码
+
 func ResetPassword(email, code, newPassword string) error {
 	db := database.GetDB()
 
-	// 验证验证码
+
 	if !ValidateCode(email, code, common.CodeTypeResetPassword) {
 		return errors.New(errors.CodeInvalidVerifyCode, "验证码无效或已过期")
 	}
 
-	// 更新密码
+
 	hashedPassword, err := utils.HashPassword(newPassword)
 	if err != nil {
 		return errors.New(errors.CodeInternal, "密码加密失败")
@@ -339,14 +339,14 @@ func ResetPassword(email, code, newPassword string) error {
 	return nil
 }
 
-// GetUserInfo 获取用户信息
+
 func GetUserInfo(userID string) (map[string]interface{}, error) {
 	db := database.GetDB()
 	if db == nil {
 		return nil, errors.New(errors.CodeDBConnectionFailed, "数据库连接失败")
 	}
 
-	// 使用原始SQL查询来避免UUID扫描问题
+
 	var userRow struct {
 		ID        string `db:"id"`
 		Username  string `db:"username"`
@@ -368,7 +368,7 @@ func GetUserInfo(userID string) (map[string]interface{}, error) {
 		return nil, errors.New(errors.CodeUserNotFound, "用户不存在")
 	}
 
-	// 构造用户信息
+
 	userInfo := map[string]interface{}{
 		"id":         userRow.ID,
 		"username":   userRow.Username,
@@ -384,17 +384,17 @@ func GetUserInfo(userID string) (map[string]interface{}, error) {
 	return userInfo, nil
 }
 
-// UpdateProfile 更新用户资料
+
 func UpdateProfile(userID, username, email, avatar, code string) (map[string]interface{}, error) {
 	db := database.GetDB()
 	if db == nil {
 		return nil, errors.New(errors.CodeDBConnectionFailed, "数据库连接失败")
 	}
 
-	// 构建更新数据
+
 	updateData := make(map[string]interface{})
 	if username != "" {
-		// 检查用户名是否已被其他用户使用
+
 		var count int64
 		db.Model(&models.User{}).Where("username = ? AND id != ?", username, userID).Count(&count)
 		if count > 0 {
@@ -403,15 +403,15 @@ func UpdateProfile(userID, username, email, avatar, code string) (map[string]int
 		updateData["username"] = username
 	}
 	if email != "" {
-		// 如果修改邮箱，需要验证验证码
+
 		if code != "" {
-			// 验证验证码
+
 			if !ValidateCode(email, code, common.CodeTypeChangeEmail) {
 				return nil, errors.New(errors.CodeInvalidVerifyCode, "验证码无效或已过期")
 			}
 		}
 
-		// 检查邮箱是否已被其他用户使用
+
 		var count int64
 		db.Model(&models.User{}).Where("email = ? AND id != ?", email, userID).Count(&count)
 		if count > 0 {
@@ -427,7 +427,7 @@ func UpdateProfile(userID, username, email, avatar, code string) (map[string]int
 		return nil, errors.New(errors.CodeInvalidParameter, "没有需要更新的数据")
 	}
 
-	// 更新用户信息
+
 	result := db.Model(&models.User{}).Where("id = ?", userID).Updates(updateData)
 	if result.Error != nil {
 		return nil, errors.New(errors.CodeInternal, "更新用户信息失败")
@@ -437,18 +437,18 @@ func UpdateProfile(userID, username, email, avatar, code string) (map[string]int
 		return nil, errors.New(errors.CodeUserNotFound, "用户不存在")
 	}
 
-	// 返回更新后的用户信息
+
 	return GetUserInfo(userID)
 }
 
-// ChangePassword 修改密码
+
 func ChangePassword(userID, oldPassword, newPassword string) error {
 	db := database.GetDB()
 	if db == nil {
 		return errors.New(errors.CodeDBConnectionFailed, "数据库连接失败")
 	}
 
-	// 获取用户当前密码
+
 	var userRow struct {
 		Password string `db:"password"`
 	}
@@ -462,18 +462,18 @@ func ChangePassword(userID, oldPassword, newPassword string) error {
 		return errors.New(errors.CodeUserNotFound, "用户不存在")
 	}
 
-	// 验证原密码
+
 	if !utils.ComparePasswords(userRow.Password, oldPassword) {
 		return errors.New(errors.CodeWrongPassword, "原密码错误")
 	}
 
-	// 加密新密码
+
 	hashedPassword, err := utils.HashPassword(newPassword)
 	if err != nil {
 		return errors.New(errors.CodeInternal, "密码加密失败")
 	}
 
-	// 更新密码
+
 	result := db.Model(&models.User{}).Where("id = ?", userID).Update("password", hashedPassword)
 	if result.Error != nil {
 		return errors.New(errors.CodeInternal, "更新密码失败")

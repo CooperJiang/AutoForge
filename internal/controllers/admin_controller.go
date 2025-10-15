@@ -9,30 +9,30 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// AdminController 管理员控制器
+
 type AdminController struct {
 	adminService *services.AdminService
 }
 
-// NewAdminController 创建管理员控制器实例
+
 func NewAdminController() *AdminController {
 	return &AdminController{
 		adminService: services.NewAdminService(),
 	}
 }
 
-// LoginRequest 登录请求
+
 type LoginRequest struct {
 	Password string `json:"password" binding:"required"`
 }
 
-// LoginResponse 登录响应
+
 type LoginResponse struct {
 	Token     string `json:"token"`
 	ExpiresIn int    `json:"expires_in"`
 }
 
-// Login 管理员登录
+
 func (c *AdminController) Login(ctx *gin.Context) {
 	var req LoginRequest
 	if err := ctx.ShouldBindJSON(&req); err != nil {
@@ -52,27 +52,27 @@ func (c *AdminController) Login(ctx *gin.Context) {
 	}, "登录成功")
 }
 
-// Logout 管理员登出
+
 func (c *AdminController) Logout(ctx *gin.Context) {
 	token := ctx.GetHeader("Authorization")
 	if token != "" && len(token) > 7 {
-		token = token[7:] // 移除 "Bearer " 前缀
+		token = token[7:]
 		c.adminService.Logout(token)
 	}
 
 	common.SuccessWithMessage(ctx, "登出成功")
 }
 
-// TaskQueryParams 任务查询参数
+
 type TaskQueryParams struct {
 	Page     int    `form:"page" binding:"omitempty,min=1"`
 	PageSize int    `form:"page_size" binding:"omitempty,min=1,max=100"`
 	UserID   string `form:"user_id"`
-	Status   string `form:"status"` // all, enabled, disabled
+	Status   string `form:"status"`
 	Keyword  string `form:"keyword"`
 }
 
-// GetTasks 获取所有任务
+
 func (c *AdminController) GetTasks(ctx *gin.Context) {
 	var params TaskQueryParams
 	if err := ctx.ShouldBindQuery(&params); err != nil {
@@ -80,7 +80,7 @@ func (c *AdminController) GetTasks(ctx *gin.Context) {
 		return
 	}
 
-	// 设置默认值
+
 	if params.Page == 0 {
 		params.Page = 1
 	}
@@ -107,12 +107,12 @@ func (c *AdminController) GetTasks(ctx *gin.Context) {
 	}, "获取成功")
 }
 
-// UpdateTaskStatusRequest 更新任务状态请求
+
 type UpdateTaskStatusRequest struct {
 	Enabled bool `json:"enabled"`
 }
 
-// UpdateTaskStatus 更新任务状态
+
 func (c *AdminController) UpdateTaskStatus(ctx *gin.Context) {
 	taskID := ctx.Param("id")
 	if taskID == "" {
@@ -134,7 +134,7 @@ func (c *AdminController) UpdateTaskStatus(ctx *gin.Context) {
 	common.SuccessWithMessage(ctx, "更新成功")
 }
 
-// DeleteTask 删除任务
+
 func (c *AdminController) DeleteTask(ctx *gin.Context) {
 	taskID := ctx.Param("id")
 	if taskID == "" {
@@ -150,7 +150,7 @@ func (c *AdminController) DeleteTask(ctx *gin.Context) {
 	common.SuccessWithMessage(ctx, "删除成功")
 }
 
-// ExecuteTask 立即执行任务
+
 func (c *AdminController) ExecuteTask(ctx *gin.Context) {
 	taskID := ctx.Param("id")
 	if taskID == "" {
@@ -167,7 +167,7 @@ func (c *AdminController) ExecuteTask(ctx *gin.Context) {
 	common.SuccessWithMessage(ctx, "任务已开始执行")
 }
 
-// GetStats 获取统计数据
+
 func (c *AdminController) GetStats(ctx *gin.Context) {
 	stats, err := c.adminService.GetStats()
 	if err != nil {
@@ -178,16 +178,16 @@ func (c *AdminController) GetStats(ctx *gin.Context) {
 	common.Success(ctx, stats, "获取成功")
 }
 
-// ExecutionQueryParams 执行记录查询参数
+
 type ExecutionQueryParams struct {
 	Page     int    `form:"page" binding:"omitempty,min=1"`
 	PageSize int    `form:"page_size" binding:"omitempty,min=1,max=100"`
 	UserID   string `form:"user_id"`
 	TaskID   string `form:"task_id"`
-	Status   string `form:"status"` // success, failed, all
+	Status   string `form:"status"`
 }
 
-// GetExecutions 获取所有执行记录
+
 func (c *AdminController) GetExecutions(ctx *gin.Context) {
 	var params ExecutionQueryParams
 	if err := ctx.ShouldBindQuery(&params); err != nil {
@@ -195,7 +195,7 @@ func (c *AdminController) GetExecutions(ctx *gin.Context) {
 		return
 	}
 
-	// 设置默认值
+
 	if params.Page == 0 {
 		params.Page = 1
 	}
@@ -222,7 +222,7 @@ func (c *AdminController) GetExecutions(ctx *gin.Context) {
 	}, "获取成功")
 }
 
-// DeleteExecution 删除执行记录
+
 func (c *AdminController) DeleteExecution(ctx *gin.Context) {
 	executionID := ctx.Param("id")
 	if executionID == "" {
@@ -238,7 +238,7 @@ func (c *AdminController) DeleteExecution(ctx *gin.Context) {
 	common.SuccessWithMessage(ctx, "删除成功")
 }
 
-// GetUsers 获取用户列表
+
 func (c *AdminController) GetUsers(ctx *gin.Context) {
 	page := 1
 	pageSize := 20
@@ -273,12 +273,12 @@ func (c *AdminController) GetUsers(ctx *gin.Context) {
 	}, "获取成功")
 }
 
-// UpdateUserStatusRequest 更新用户状态请求
+
 type UpdateUserStatusRequest struct {
 	Status int `json:"status" binding:"required"`
 }
 
-// UpdateUserStatus 更新用户状态
+
 func (c *AdminController) UpdateUserStatus(ctx *gin.Context) {
 	userID := ctx.Param("id")
 	if userID == "" {

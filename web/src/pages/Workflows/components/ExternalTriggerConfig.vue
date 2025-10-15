@@ -1,12 +1,12 @@
 <template>
   <div class="space-y-4">
-    <!-- 节点说明 -->
-    <div class="bg-blue-50 border border-blue-200 rounded-lg p-3">
+    
+    <div class="bg-blue-500/10 border border-blue-500/20 rounded-lg p-3">
       <div class="flex items-start gap-2">
-        <Globe class="w-4 h-4 text-blue-600 mt-0.5 flex-shrink-0" />
-        <div class="text-xs text-blue-800">
+        <Globe class="w-4 h-4 text-blue-600 dark:text-blue-400 mt-0.5 flex-shrink-0" />
+        <div class="text-xs text-blue-800 dark:text-blue-300">
           <p class="font-medium mb-1">外部 API 触发节点</p>
-          <p class="text-blue-700">
+          <p class="text-blue-700 dark:text-blue-400">
             此节点定义工作流可接收的外部参数。启用工作流 API 后，外部系统可通过 API
             调用并传入这些参数。
           </p>
@@ -14,7 +14,7 @@
       </div>
     </div>
 
-    <!-- 参数列表 -->
+    
     <div>
       <div class="flex items-center justify-between mb-2">
         <label class="text-xs font-medium text-text-primary">参数定义</label>
@@ -41,7 +41,7 @@
           :key="index"
           class="border border-border-primary rounded-lg p-3 space-y-2 hover:border-primary transition-colors"
         >
-          <!-- 参数名称和操作 -->
+          
           <div class="flex items-center justify-between gap-2">
             <BaseInput
               v-model="param.key"
@@ -60,7 +60,7 @@
             </BaseButton>
           </div>
 
-          <!-- 参数类型 -->
+          
           <div>
             <label class="text-xs text-text-secondary mb-1 block">类型</label>
             <BaseSelect
@@ -71,7 +71,7 @@
             />
           </div>
 
-          <!-- 必填选项 -->
+          
           <div class="flex items-center gap-2">
             <input
               :id="`required-${index}`"
@@ -85,7 +85,7 @@
             </label>
           </div>
 
-          <!-- 默认值 -->
+          
           <div>
             <label class="text-xs text-text-secondary mb-1 block">默认值</label>
             <BaseInput
@@ -96,7 +96,7 @@
             />
           </div>
 
-          <!-- 描述 -->
+          
           <div>
             <label class="text-xs text-text-secondary mb-1 block">描述</label>
             <textarea
@@ -108,7 +108,7 @@
             />
           </div>
 
-          <!-- 示例值 -->
+          
           <div>
             <label class="text-xs text-text-secondary mb-1 block">示例值</label>
             <BaseInput
@@ -122,7 +122,7 @@
       </div>
     </div>
 
-    <!-- Webhook 配置 -->
+    
     <div>
       <label class="text-xs font-medium text-text-primary mb-2 block"
         >Webhook 回调地址（可选）</label
@@ -136,7 +136,7 @@
       <p class="text-xs text-text-tertiary mt-1">异步执行完成后，会将结果 POST 到此 URL</p>
     </div>
 
-    <!-- 变量引用提示 -->
+    
     <div class="bg-bg-tertiary rounded-lg p-3">
       <div class="flex items-start gap-2">
         <Info class="w-4 h-4 text-primary mt-0.5 flex-shrink-0" />

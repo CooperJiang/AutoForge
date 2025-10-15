@@ -3,7 +3,7 @@
     class="min-h-screen flex items-center justify-center bg-gradient-to-br from-bg-secondary via-bg-secondary to-bg-secondary"
   >
     <div class="w-full max-w-md px-6">
-      <!-- Logo 和标题 -->
+      
       <div class="text-center mb-8">
         <div class="inline-flex items-center justify-center w-20 h-20 mb-4">
           <img src="/logo.png" alt="Logo" class="w-full h-full object-contain" />
@@ -12,7 +12,7 @@
         <p class="text-text-secondary">请输入管理员密码以继续</p>
       </div>
 
-      <!-- 登录卡片 -->
+      
       <div class="bg-bg-elevated rounded-2xl shadow-xl border-2 border-border-primary p-8">
         <form @submit.prevent="handleLogin">
           <div class="mb-6">
@@ -37,13 +37,13 @@
           </button>
         </form>
 
-        <!-- 提示信息 -->
+        
         <div class="mt-6 text-center text-sm text-text-tertiary">
           <p>默认密码请查看配置文件</p>
         </div>
       </div>
 
-      <!-- 返回首页 -->
+      
       <div class="text-center mt-6">
         <router-link
           to="/"

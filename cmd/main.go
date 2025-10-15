@@ -23,6 +23,7 @@ import (
 	_ "auto-forge/pkg/utools/email"
 	_ "auto-forge/pkg/utools/feishu"
 	_ "auto-forge/pkg/utools/formatter"
+	_ "auto-forge/pkg/utools/context"
 	_ "auto-forge/pkg/utools/health"
 	_ "auto-forge/pkg/utools/http"
 	_ "auto-forge/pkg/utools/jsontransform"

@@ -1,15 +1,15 @@
 import { ref, computed, onUnmounted, watch } from 'vue'
 
 export interface CountdownResult {
-  // 格式化的倒计时文本（如：2天3小时5分10秒后）
+
   countdown: string
-  // 是否已过期
+
   isExpired: boolean
-  // 剩余毫秒数
+
   remainingMs: number
-  // 剩余秒数
+
   remainingSeconds: number
-  // 时间组件
+
   days: number
   hours: number
   minutes: number
@@ -17,15 +17,15 @@ export interface CountdownResult {
 }
 
 export interface UseCountdownOptions {
-  // 是否自动启动
+
   autoStart?: boolean
-  // 倒计时结束回调（到达目标时间时触发）
+
   onFinish?: () => void
-  // 倒计时更新回调（每秒触发）
+
   onTick?: (result: CountdownResult) => void
-  // 提前触发时间（毫秒），默认 1000ms（提前1秒触发 onFinish）
+
   finishOffset?: number
-  // 是否只在秒数变化时更新（避免频繁重渲染）
+
   onlyUpdateOnSecondChange?: boolean
 }
 
@@ -56,7 +56,7 @@ export function useCountdown(
 
   let timer: NodeJS.Timeout | null = null
   let hasTriggeredFinish = false
-  let lastSecond = -1 // 记录上一次的秒数，避免不必要的更新
+  let lastSecond = -1
 
   const getTargetTimestamp = () => {
     return typeof targetTimestamp === 'function' ? targetTimestamp() : targetTimestamp
@@ -66,7 +66,7 @@ export function useCountdown(
     const target = getTargetTimestamp()
 
     if (!target) {
-      // 只在值真正改变时更新
+
       if (countdown.value !== '') {
         countdown.value = ''
         isExpired.value = false
@@ -85,7 +85,7 @@ export function useCountdown(
     const diff = targetMs - now
     const diffSeconds = Math.floor(diff / 1000)
 
-    // 如果只在秒数变化时更新，且秒数未变化，则跳过
+
     if (onlyUpdateOnSecondChange && diffSeconds === lastSecond) {
       return
     }
@@ -94,7 +94,7 @@ export function useCountdown(
 
     remainingMs.value = diff
 
-    // 已过期
+
     if (diff <= 0) {
       if (countdown.value !== '已过期') {
         countdown.value = '已过期'
@@ -105,7 +105,7 @@ export function useCountdown(
         seconds.value = 0
       }
 
-      // 触发完成回调（只触发一次）
+
       if (!hasTriggeredFinish && onFinish) {
         hasTriggeredFinish = true
         onFinish()
@@ -114,10 +114,10 @@ export function useCountdown(
       return
     }
 
-    // 即将到达目标时间（提前触发）
+
     if (diff <= finishOffset && !hasTriggeredFinish && onFinish) {
       hasTriggeredFinish = true
-      // 延迟到准确时间再触发
+
       setTimeout(() => {
         onFinish()
       }, diff)
@@ -128,7 +128,7 @@ export function useCountdown(
     minutes.value = Math.floor((diffSeconds % 3600) / 60)
     seconds.value = diffSeconds % 60
 
-    // 构建倒计时字符串
+
     const parts = []
     if (days.value > 0) parts.push(`${days.value}天`)
     if (hours.value > 0) parts.push(`${hours.value}小时`)
@@ -137,7 +137,7 @@ export function useCountdown(
 
     const newCountdown = parts.join('') + '后'
 
-    // 只在文本真正改变时更新
+
     if (countdown.value !== newCountdown) {
       countdown.value = newCountdown
     }
@@ -146,7 +146,7 @@ export function useCountdown(
       isExpired.value = false
     }
 
-    // 触发 tick 回调
+
     if (onTick) {
       onTick({
         countdown: countdown.value,
@@ -187,10 +187,10 @@ export function useCountdown(
     start()
   }
 
-  // 计算属性：剩余秒数
+
   const remainingSeconds = computed(() => Math.floor(remainingMs.value / 1000))
 
-  // 监听目标时间变化，重新计算
+
   if (typeof targetTimestamp !== 'function') {
     watch(
       () => targetTimestamp,
@@ -204,12 +204,12 @@ export function useCountdown(
     )
   }
 
-  // 自动启动
+
   if (autoStart) {
     start()
   }
 
-  // 清理
+
   onUnmounted(() => {
     stop()
   })

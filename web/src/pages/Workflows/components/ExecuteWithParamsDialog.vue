@@ -6,7 +6,7 @@
     @update:model-value="(value) => !value && $emit('close')"
   >
     <div class="space-y-4">
-      <!-- 工作流信息 -->
+      
       <div class="bg-bg-tertiary rounded-lg p-3">
         <div class="text-sm font-medium text-text-primary mb-1">
           {{ workflow?.name }}
@@ -16,7 +16,7 @@
         </div>
       </div>
 
-      <!-- 参数说明 -->
+      
       <div v-if="hasParams" class="text-sm text-text-secondary">
         <div class="flex items-center gap-2 mb-2">
           <Info class="w-4 h-4 text-primary" />
@@ -24,7 +24,7 @@
         </div>
       </div>
 
-      <!-- 参数列表 -->
+      
       <div v-if="hasParams" class="space-y-3">
         <div v-for="param in externalParams" :key="param.key" class="space-y-1.5">
           <label class="block text-sm font-medium text-text-primary">
@@ -35,7 +35,7 @@
             {{ param.description }}
           </div>
 
-          <!-- 根据类型渲染不同输入框 -->
+          
           <BaseInput
             v-if="param.type === 'string'"
             v-model="paramValues[param.key]"
@@ -59,14 +59,14 @@
         </div>
       </div>
 
-      <!-- 无参数提示 -->
+      
       <div v-else class="text-center py-8 text-text-tertiary">
         <Play class="w-12 h-12 mx-auto mb-2 opacity-50" />
         <p>该工作流无需参数，可直接执行</p>
       </div>
     </div>
 
-    <!-- 会话ID（可选，用于对话记忆） -->
+    
     <div class="space-y-1.5">
       <label class="block text-sm font-medium text-text-primary">会话ID（可选）</label>
       <BaseInput v-model="sessionId" placeholder="例如：user-123，或留空使用默认" class="w-full" />

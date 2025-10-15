@@ -5,7 +5,7 @@
       :style="{ paddingLeft: `${level * 16 + 8}px` }"
       @click="handleClick"
     >
-      <!-- 展开/收起图标 -->
+      
       <ChevronRight
         v-if="isExpandable"
         class="w-3.5 h-3.5 text-text-secondary transition-transform flex-shrink-0"
@@ -13,20 +13,20 @@
       />
       <div v-else class="w-3.5" />
 
-      <!-- 字段图标 -->
+      
       <component :is="getIcon()" class="w-3.5 h-3.5 flex-shrink-0" :class="getIconColor()" />
 
-      <!-- 字段名 -->
+      
       <span class="font-mono text-xs font-medium text-text-primary flex-shrink-0">
         {{ name }}
       </span>
 
-      <!-- 描述 -->
+      
       <span class="text-xs text-text-tertiary truncate flex-1">
         {{ getDescription() }}
       </span>
 
-      <!-- 复制按钮 -->
+      
       <button
         v-if="!isExpandable"
         @click.stop="handleCopy"
@@ -37,7 +37,7 @@
       </button>
     </div>
 
-    <!-- 子节点 -->
+    
     <div v-if="isExpandable && expanded" class="mt-0.5">
       <VariableTreeNode
         v-for="(childValue, childKey) in getChildren()"

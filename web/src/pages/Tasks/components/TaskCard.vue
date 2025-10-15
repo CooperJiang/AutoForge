@@ -2,7 +2,7 @@
   <div
     class="bg-bg-elevated border-2 border-border-primary rounded-lg shadow-sm hover:shadow-md transition-shadow"
   >
-    <!-- 卡片头部 -->
+    
     <div class="p-4 border-b border-border-primary">
       <div class="flex items-start justify-between">
         <div class="flex-1 min-w-0">
@@ -26,7 +26,7 @@
       </div>
     </div>
 
-    <!-- 卡片内容 -->
+    
     <div class="px-4 py-3 bg-bg-hover">
       <div class="space-y-1.5 text-xs">
         <div class="flex items-center">
@@ -63,7 +63,7 @@
       </div>
     </div>
 
-    <!-- 执行记录区域 -->
+    
     <div class="border-t border-border-primary">
       <button
         @click="toggleExecutions"
@@ -89,7 +89,7 @@
         </span>
       </button>
 
-      <!-- 执行记录列表 -->
+      
       <Transition
         enter-active-class="transition-all duration-200 ease-out"
         enter-from-class="opacity-0 max-h-0"
@@ -189,7 +189,7 @@
     </div>
   </div>
 
-  <!-- 删除任务确认对话框 -->
+  
   <Dialog
     v-model="showDeleteDialog"
     title="确认删除"
@@ -200,7 +200,7 @@
     @confirm="handleDelete"
   />
 
-  <!-- 删除执行记录确认对话框 -->
+  
   <Dialog
     v-model="showDeleteExecutionDialog"
     title="确认删除"

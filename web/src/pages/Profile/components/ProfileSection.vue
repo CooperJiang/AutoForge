@@ -6,13 +6,13 @@
     </div>
 
     <div class="p-8">
-      <!-- 修改用户名 -->
+      
       <UsernameForm :user-name="userName" @update="$emit('update-username', $event)" />
 
-      <!-- 分隔线 -->
+      
       <div class="my-8 border-b-2 border-border-primary"></div>
 
-      <!-- 修改邮箱 -->
+      
       <EmailForm :user-email="userEmail" @update="$emit('update-email', $event)" />
     </div>
   </div>

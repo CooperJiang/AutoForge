@@ -11,6 +11,7 @@ import {
   MessageCircle,
   Sparkles,
   Image as ImageIcon,
+  Database,
 } from 'lucide-vue-next'
 
 export interface ToolUsageItem {
@@ -21,8 +22,8 @@ export interface ToolConfig {
   code: string
   title: string
   description: string
-  icon: LucideIcon | string // LucideIcon component or image path
-  iconBg: string // Tailwind background color class
+  icon: LucideIcon | string
+  iconBg: string
   usageTitle?: string
   usageDescription?: string
   usageItems: ToolUsageItem[]
@@ -207,6 +208,27 @@ export const TOOL_CONFIGS: Record<string, ToolConfig> = {
       { text: '适用场景：图片创作、设计辅助、内容配图等' },
     ],
     tags: ['OpenAI', 'DALL-E', 'Image', 'AI'],
+  },
+
+  context_manager: {
+    code: 'context_manager',
+    title: '💬 对话上下文管理器',
+    description:
+      'Manage conversation context with prepare and persist modes for multi-turn dialogues',
+    icon: Database,
+    iconBg: 'bg-gradient-to-br from-indigo-500 to-purple-600',
+    usageTitle: 'Context Manager',
+    usageDescription:
+      '管理多轮对话的上下文历史，支持准备消息（Prepare）和保存消息（Persist）两种模式。',
+    usageItems: [
+      { text: 'Prepare 模式：读取历史 + 拼接当前消息 → 输出 messages_json' },
+      { text: 'Persist 模式：保存 AI 回复到 Redis 历史记录' },
+      { text: '支持会话隔离（通过 session_key 区分不同用户）' },
+      { text: '自动裁剪到窗口大小，防止上下文过长' },
+      { text: '通用设计，可与任意 LLM（OpenAI、Gemini、Claude 等）配合使用' },
+      { text: '适用场景：智能客服、AI 助手、教育辅导、知识问答等' },
+    ],
+    tags: ['Context', 'Memory', 'Chat', 'Conversation', 'Session'],
   },
 }
 

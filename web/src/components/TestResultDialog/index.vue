@@ -6,14 +6,14 @@
         class="fixed inset-0 z-50 flex items-center justify-center p-4"
         @click.self="onClose"
       >
-        <!-- 背景遮罩 -->
+        
         <div class="absolute inset-0 bg-black bg-opacity-50 transition-opacity"></div>
 
-        <!-- 对话框内容 -->
+        
         <div
           class="relative bg-bg-elevated rounded-lg shadow-xl border-2 border-border-primary w-full max-w-2xl transform transition-all max-h-[90vh] flex flex-col"
         >
-          <!-- 标题 -->
+          
           <div
             class="px-5 py-4 border-b-2 border-border-primary flex items-center justify-between flex-shrink-0"
           >
@@ -48,10 +48,10 @@
             </button>
           </div>
 
-          <!-- 内容 -->
+          
           <div class="px-5 py-4 overflow-y-auto flex-1">
             <div class="space-y-4">
-              <!-- 基本信息 -->
+              
               <div class="grid grid-cols-2 gap-3">
                 <div class="bg-bg-hover border-2 border-border-primary rounded-lg p-3">
                   <div class="text-xs text-text-tertiary mb-1">状态码</div>
@@ -72,7 +72,7 @@
                 </div>
               </div>
 
-              <!-- 错误信息 -->
+              
               <div
                 v-if="result?.error_message"
                 class="bg-rose-50 border-2 border-rose-200 rounded-lg p-4"
@@ -86,7 +86,7 @@
                 </div>
               </div>
 
-              <!-- 响应内容 -->
+              
               <div v-if="result?.response_body">
                 <div class="flex items-center justify-between mb-2">
                   <div class="font-semibold text-sm text-text-secondary">响应内容</div>
@@ -99,7 +99,7 @@
             </div>
           </div>
 
-          <!-- 底部按钮 -->
+          
           <div class="px-5 py-4 border-t-2 border-border-primary flex justify-end flex-shrink-0">
             <BaseButton variant="primary" @click="onClose"> 关闭 </BaseButton>
           </div>

@@ -6,14 +6,14 @@
         class="fixed inset-0 z-50 flex items-center justify-center"
         @click.self="handleCancel"
       >
-        <!-- 遮罩层 -->
+        
         <div class="absolute inset-0 bg-black/50 backdrop-blur-sm"></div>
 
-        <!-- 对话框 -->
+        
         <div
           class="relative bg-bg-elevated rounded-lg shadow-xl max-w-md w-full mx-4 overflow-hidden"
         >
-          <!-- 头部 -->
+          
           <div class="px-6 py-4 border-b border-border-primary">
             <div class="flex items-center gap-3">
               <div
@@ -33,12 +33,12 @@
             </div>
           </div>
 
-          <!-- 内容 -->
+          
           <div class="px-6 py-4">
             <p class="text-text-secondary leading-relaxed">{{ message }}</p>
           </div>
 
-          <!-- 底部按钮 -->
+          
           <div
             class="px-6 py-4 bg-bg-hover border-t border-border-primary flex items-center justify-end gap-3"
           >

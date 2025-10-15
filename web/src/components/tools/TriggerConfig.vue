@@ -1,6 +1,6 @@
 <template>
   <div class="space-y-4">
-    <!-- 触发器类型选择 -->
+    
     <div>
       <label class="block text-sm font-medium text-text-secondary mb-2">
         触发器类型 <span class="text-red-500">*</span>
@@ -12,7 +12,7 @@
       />
     </div>
 
-    <!-- 定时触发配置 -->
+    
     <div v-if="localConfig.triggerType === 'schedule'">
       <div class="bg-primary-light border-l-4 border-border-focus p-3 mb-3">
         <p class="text-sm text-primary">
@@ -35,7 +35,7 @@
       />
     </div>
 
-    <!-- Webhook 触发配置 -->
+    
     <div v-if="localConfig.triggerType === 'webhook'" class="space-y-3">
       <div class="bg-info-light border-l-4 border-info rounded-lg p-3">
         <p class="text-sm text-info-text">
@@ -79,7 +79,7 @@
         </p>
       </div>
 
-      <!-- 示例说明 -->
+      
       <div class="bg-bg-hover rounded-lg p-3">
         <div class="text-xs font-semibold text-text-secondary mb-2">使用示例：</div>
         <div class="bg-slate-900 text-slate-100 rounded p-2 font-mono text-xs overflow-x-auto">
@@ -100,7 +100,7 @@
       </div>
     </div>
 
-    <!-- 手动触发配置 -->
+    
     <div v-if="localConfig.triggerType === 'manual'">
       <div class="bg-success-light border-l-4 border-green-400 p-3">
         <p class="text-sm text-success">

@@ -1,9 +1,9 @@
 <template>
   <button type="button" @click="handleToggle" :title="getTooltipText()" class="theme-toggle-btn">
-    <!-- 亮色图标 -->
+    
     <Sun v-if="appliedTheme === 'light'" class="w-5 h-5" />
 
-    <!-- 暗色图标 -->
+    
     <Moon v-else class="w-5 h-5" />
   </button>
 </template>

@@ -10,7 +10,7 @@
     @cancel="$emit('update:modelValue', false)"
   >
     <div v-if="toolCode === 'http_request'" class="space-y-4">
-      <!-- Curl 粘贴提示 -->
+      
       <div class="bg-primary-light border border-primary rounded-lg p-3 text-xs text-primary">
         💡 小提示：按
         <kbd class="px-1.5 py-0.5 bg-bg-elevated border border-primary rounded">{{
@@ -38,7 +38,7 @@
         />
       </div>
 
-      <!-- Headers -->
+      
       <div>
         <label class="block text-sm font-medium text-text-secondary mb-2"> 请求头（可选） </label>
         <div class="space-y-2">
@@ -61,7 +61,7 @@
         </div>
       </div>
 
-      <!-- Params -->
+      
       <div>
         <label class="block text-sm font-medium text-text-secondary mb-2"> 请求参数（可选） </label>
         <div class="space-y-2">
@@ -84,7 +84,7 @@
         </div>
       </div>
 
-      <!-- Body -->
+      
       <div>
         <button
           type="button"
@@ -108,7 +108,7 @@
       </div>
     </div>
 
-    <!-- 邮件发送工具配置 -->
+    
     <div v-else-if="toolCode === 'email_sender'" class="space-y-4">
       <div class="bg-primary-light border-l-4 border-primary p-3 mb-4">
         <p class="text-sm text-primary">
@@ -175,7 +175,7 @@
       </div>
     </div>
 
-    <!-- 健康检查工具配置 -->
+    
     <div v-else-if="toolCode === 'health_checker'" class="space-y-4">
       <div class="bg-primary-light border-l-4 border-primary p-3 mb-4">
         <p class="text-sm text-primary">
@@ -206,7 +206,7 @@
         <BaseSelect v-model="healthConfig.method" :options="healthMethodOptions" />
       </div>
 
-      <!-- Headers -->
+      
       <div>
         <div class="flex items-center justify-between mb-2">
           <label class="block text-sm font-medium text-text-secondary"> 请求头 (Headers) </label>
@@ -229,7 +229,7 @@
         </div>
       </div>
 
-      <!-- Body -->
+      
       <div>
         <label class="block text-sm font-medium text-text-secondary mb-2"> 请求体 (Body) </label>
         <textarea
@@ -321,7 +321,7 @@
       </div>
     </div>
 
-    <!-- 飞书机器人工具配置 -->
+    
     <div v-else-if="toolCode === 'feishu_bot'" class="space-y-4">
       <FeishuBotConfig :config="feishuConfig" @update:config="feishuConfig = $event" />
     </div>

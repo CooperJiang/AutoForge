@@ -12,23 +12,43 @@ import (
 	"time"
 )
 
-// HealthCheckerTool 健康检查工具
+
 type HealthCheckerTool struct {
 	*utools.BaseTool
 }
 
-// NewHealthCheckerTool 创建健康检查工具实例
+
 func NewHealthCheckerTool() *HealthCheckerTool {
-	metadata := &utools.ToolMetadata{
-		Code:        "health_checker",
-		Name:        "网站健康检查",
-		Description: "检查网站/API的可用性、响应时间、状态码和内容匹配",
-		Category:    "monitoring",
-		Version:     "1.0.0",
-		Author:      "AutoForge",
-		AICallable:  true,
-		Tags:        []string{"health", "monitoring", "check", "uptime", "ssl"},
-	}
+    metadata := &utools.ToolMetadata{
+        Code:        "health_checker",
+        Name:        "网站健康检查",
+        Description: "检查网站/API的可用性、响应时间、状态码和内容匹配",
+        Category:    "monitoring",
+        Version:     "1.0.0",
+        Author:      "AutoForge",
+        AICallable:  true,
+        Tags:        []string{"health", "monitoring", "check", "uptime", "ssl"},
+        OutputFieldsSchema: map[string]utools.OutputFieldDef{
+            "url":           {Type: "string", Label: "检查 URL"},
+            "status_code":   {Type: "number", Label: "HTTP 状态码"},
+            "response_time": {Type: "number", Label: "响应时间(ms)"},
+            "headers":       {Type: "object", Label: "响应头"},
+            "response_body": {Type: "string", Label: "响应体"},
+            "ssl": {
+                Type:  "object",
+                Label: "SSL 证书信息",
+                Children: map[string]utools.OutputFieldDef{
+                    "subject":       {Type: "string", Label: "主题"},
+                    "issuer":        {Type: "string", Label: "签发者"},
+                    "not_before":    {Type: "string", Label: "生效时间"},
+                    "not_after":     {Type: "string", Label: "过期时间"},
+                    "days_to_expiry": {Type: "number", Label: "剩余天数"},
+                },
+            },
+            "issues":   {Type: "array", Label: "问题列表"},
+            "warnings": {Type: "array", Label: "警告列表"},
+        },
+    }
 
 	schema := &utools.ConfigSchema{
 		Type: "object",
@@ -114,11 +134,11 @@ func NewHealthCheckerTool() *HealthCheckerTool {
 	}
 }
 
-// Execute 执行健康检查
+
 func (t *HealthCheckerTool) Execute(ctx *utools.ExecutionContext, config map[string]interface{}) (*utools.ExecutionResult, error) {
 	startTime := time.Now()
 
-	// 解析配置
+
 	url, _ := config["url"].(string)
 	method, _ := config["method"].(string)
 	if method == "" {
@@ -164,7 +184,7 @@ func (t *HealthCheckerTool) Execute(ctx *utools.ExecutionContext, config map[str
 		verifySSL = verifySSLVal
 	}
 
-	// 创建 HTTP 客户端
+
 	client := &http.Client{
 		Timeout: time.Duration(timeout) * time.Second,
 		Transport: &http.Transport{
@@ -180,13 +200,13 @@ func (t *HealthCheckerTool) Execute(ctx *utools.ExecutionContext, config map[str
 		},
 	}
 
-	// 创建请求体
+
 	var bodyReader io.Reader
 	if bodyStr != "" {
 		bodyReader = strings.NewReader(bodyStr)
 	}
 
-	// 创建请求
+
 	req, err := http.NewRequestWithContext(ctx.Context, method, url, bodyReader)
 	if err != nil {
 		return &utools.ExecutionResult{
@@ -197,7 +217,7 @@ func (t *HealthCheckerTool) Execute(ctx *utools.ExecutionContext, config map[str
 		}, err
 	}
 
-	// 解析并添加自定义请求头
+
 	if headersStr != "" {
 		var headersMap map[string]interface{}
 		if err := json.Unmarshal([]byte(headersStr), &headersMap); err == nil {
@@ -209,9 +229,9 @@ func (t *HealthCheckerTool) Execute(ctx *utools.ExecutionContext, config map[str
 		}
 	}
 
-	// 如果有 body，自动设置 Content-Type
+
 	if bodyStr != "" && req.Header.Get("Content-Type") == "" {
-		// 尝试判断是否为 JSON
+
 		var jsonTest interface{}
 		if json.Unmarshal([]byte(bodyStr), &jsonTest) == nil {
 			req.Header.Set("Content-Type", "application/json")
@@ -220,7 +240,7 @@ func (t *HealthCheckerTool) Execute(ctx *utools.ExecutionContext, config map[str
 		}
 	}
 
-	// 发送请求
+
 	reqStartTime := time.Now()
 	resp, err := client.Do(req)
 	responseTime := time.Since(reqStartTime).Milliseconds()
@@ -240,7 +260,7 @@ func (t *HealthCheckerTool) Execute(ctx *utools.ExecutionContext, config map[str
 	}
 	defer resp.Body.Close()
 
-	// 读取响应体
+
 	bodyBytes, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return &utools.ExecutionResult{
@@ -258,14 +278,14 @@ func (t *HealthCheckerTool) Execute(ctx *utools.ExecutionContext, config map[str
 
 	responseBody := string(bodyBytes)
 
-	// 检查结果
+
 	var issues []string
 	var warnings []string
 
-	// 1. 检查状态码
+
 	statusOK := false
 	if expectedStatus == 0 {
-		// 期望任意 2xx 状态码
+
 		statusOK = resp.StatusCode >= 200 && resp.StatusCode < 300
 	} else {
 		statusOK = resp.StatusCode == expectedStatus
@@ -275,7 +295,7 @@ func (t *HealthCheckerTool) Execute(ctx *utools.ExecutionContext, config map[str
 		issues = append(issues, fmt.Sprintf("状态码不符合预期: 期望 %d, 实际 %d", expectedStatus, resp.StatusCode))
 	}
 
-	// 2. 检查内容匹配
+
 	if expectedContent != "" {
 		if useRegex {
 			matched, err := regexp.MatchString(expectedContent, responseBody)
@@ -291,9 +311,9 @@ func (t *HealthCheckerTool) Execute(ctx *utools.ExecutionContext, config map[str
 		}
 	}
 
-	// 3. 检查 SSL 证书
+
 	var sslInfo map[string]interface{}
-	if checkSSL && strings.HasPrefix(url, "https://") && resp.TLS != nil && len(resp.TLS.PeerCertificates) > 0 {
+	if checkSSL && strings.HasPrefix(url, "https:
 		cert := resp.TLS.PeerCertificates[0]
 		daysUntilExpiry := int(time.Until(cert.NotAfter).Hours() / 24)
 
@@ -312,14 +332,14 @@ func (t *HealthCheckerTool) Execute(ctx *utools.ExecutionContext, config map[str
 		}
 	}
 
-	// 构建输出
+
 	output := map[string]interface{}{
 		"url":           url,
 		"status_code":   resp.StatusCode,
 		"response_time": responseTime,
 		"body_size":     len(bodyBytes),
 		"headers":       resp.Header,
-		"response_body": responseBody, // 原始返回内容
+		"response_body": responseBody,
 	}
 
 	if sslInfo != nil {
@@ -330,17 +350,17 @@ func (t *HealthCheckerTool) Execute(ctx *utools.ExecutionContext, config map[str
 		output["warnings"] = warnings
 	}
 
-	// 构建状态报告
+
 	var statusReport []string
 
-	// 网站状态
+
 	if len(issues) == 0 {
 		statusReport = append(statusReport, fmt.Sprintf("✓ 网站正常 (响应时间: %dms)", responseTime))
 	} else {
 		statusReport = append(statusReport, fmt.Sprintf("✗ 网站异常: %s", strings.Join(issues, "; ")))
 	}
 
-	// SSL 证书状态
+
 	if sslInfo != nil {
 		daysLeft := sslInfo["days_to_expiry"].(int)
 		if daysLeft < 0 {
@@ -352,7 +372,7 @@ func (t *HealthCheckerTool) Execute(ctx *utools.ExecutionContext, config map[str
 		}
 	}
 
-	// 判断整体结果
+
 	success := len(issues) == 0
 	message := strings.Join(statusReport, "\n")
 
@@ -373,7 +393,7 @@ func (t *HealthCheckerTool) Execute(ctx *utools.ExecutionContext, config map[str
 	}, nil
 }
 
-// init 自动注册工具
+
 func init() {
 	tool := NewHealthCheckerTool()
 	if err := utools.Register(tool); err != nil {

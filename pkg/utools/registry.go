@@ -5,9 +5,9 @@ import (
 	"sync"
 )
 
-// Registry 工具注册表 - 全局单例
+
 type Registry struct {
-	tools map[string]Tool // code -> tool
+	tools map[string]Tool
 	mu    sync.RWMutex
 }
 
@@ -16,7 +16,7 @@ var (
 	once           sync.Once
 )
 
-// GetRegistry 获取全局工具注册表
+
 func GetRegistry() *Registry {
 	once.Do(func() {
 		globalRegistry = &Registry{
@@ -26,7 +26,7 @@ func GetRegistry() *Registry {
 	return globalRegistry
 }
 
-// Register 注册工具
+
 func (r *Registry) Register(tool Tool) error {
 	if tool == nil {
 		return fmt.Errorf("tool cannot be nil")
@@ -44,7 +44,7 @@ func (r *Registry) Register(tool Tool) error {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 
-	// 检查是否已注册
+
 	if _, exists := r.tools[metadata.Code]; exists {
 		return fmt.Errorf("tool '%s' already registered", metadata.Code)
 	}
@@ -53,7 +53,7 @@ func (r *Registry) Register(tool Tool) error {
 	return nil
 }
 
-// Get 根据 code 获取工具
+
 func (r *Registry) Get(code string) (Tool, error) {
 	r.mu.RLock()
 	defer r.mu.RUnlock()
@@ -66,7 +66,7 @@ func (r *Registry) Get(code string) (Tool, error) {
 	return tool, nil
 }
 
-// List 列出所有已注册的工具
+
 func (r *Registry) List() []*ToolMetadata {
 	r.mu.RLock()
 	defer r.mu.RUnlock()
@@ -79,7 +79,7 @@ func (r *Registry) List() []*ToolMetadata {
 	return result
 }
 
-// ListByCategory 列出指定分类的工具
+
 func (r *Registry) ListByCategory(category string) []*ToolMetadata {
 	r.mu.RLock()
 	defer r.mu.RUnlock()
@@ -95,7 +95,7 @@ func (r *Registry) ListByCategory(category string) []*ToolMetadata {
 	return result
 }
 
-// ListAICallable 列出所有可被 AI 调用的工具
+
 func (r *Registry) ListAICallable() []*ToolMetadata {
 	r.mu.RLock()
 	defer r.mu.RUnlock()
@@ -111,7 +111,7 @@ func (r *Registry) ListAICallable() []*ToolMetadata {
 	return result
 }
 
-// Unregister 取消注册工具
+
 func (r *Registry) Unregister(code string) error {
 	r.mu.Lock()
 	defer r.mu.Unlock()
@@ -124,24 +124,24 @@ func (r *Registry) Unregister(code string) error {
 	return nil
 }
 
-// Count 获取已注册工具数量
+
 func (r *Registry) Count() int {
 	r.mu.RLock()
 	defer r.mu.RUnlock()
 	return len(r.tools)
 }
 
-// Register 全局注册函数（简便方法）
+
 func Register(tool Tool) error {
 	return GetRegistry().Register(tool)
 }
 
-// Get 全局获取函数（简便方法）
+
 func Get(code string) (Tool, error) {
 	return GetRegistry().Get(code)
 }
 
-// List 全局列表函数（简便方法）
+
 func List() []*ToolMetadata {
 	return GetRegistry().List()
 }

@@ -3,7 +3,7 @@
     class="delay-node bg-bg-elevated rounded-lg shadow-lg border-2 border-purple-400 min-w-[180px] hover:shadow-xl transition-shadow group relative"
     :class="{ 'ring-2 ring-purple-500': data.selected }"
   >
-    <!-- 删除按钮 (hover 显示) -->
+    
     <button
       class="absolute -top-2 -right-2 w-6 h-6 bg-red-500 hover:bg-red-600 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center z-10 shadow-lg"
       @click.stop="handleDelete"
@@ -12,16 +12,16 @@
       <X class="w-4 h-4" />
     </button>
 
-    <!-- 顶部输入点 -->
+    
     <Handle
       type="target"
       :position="Position.Top"
       class="w-3 h-3 !bg-purple-500 !border-2 !border-bg-elevated"
     />
 
-    <!-- 节点内容 -->
+    
     <div class="px-4 py-3">
-      <!-- 图标和标题 -->
+      
       <div class="flex items-center gap-2 mb-2">
         <div
           class="flex-shrink-0 w-8 h-8 rounded-lg bg-gradient-to-br from-accent to-accent-hover flex items-center justify-center text-white shadow-sm"
@@ -38,7 +38,7 @@
         </div>
       </div>
 
-      <!-- 配置状态 -->
+      
       <div class="flex items-center gap-1 text-xs">
         <div v-if="hasConfig" class="flex items-center gap-1 text-emerald-600">
           <CheckCircle2 class="w-3 h-3" />
@@ -51,7 +51,7 @@
       </div>
     </div>
 
-    <!-- 底部输出点 -->
+    
     <Handle
       type="source"
       :position="Position.Bottom"

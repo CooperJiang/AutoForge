@@ -8,15 +8,15 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// PreviewController 预览控制器
+
 type PreviewController struct{}
 
-// NewPreviewController 创建预览控制器
+
 func NewPreviewController() *PreviewController {
 	return &PreviewController{}
 }
 
-// GetHtmlPreview 获取 HTML 预览
+
 func (c *PreviewController) GetHtmlPreview(ctx *gin.Context) {
 	id := ctx.Param("id")
 	if id == "" {
@@ -26,7 +26,7 @@ func (c *PreviewController) GetHtmlPreview(ctx *gin.Context) {
 		return
 	}
 
-	// 读取 HTML 文件
+
 	filePath := filepath.Join("./data/html-preview", id+".html")
 	content, err := os.ReadFile(filePath)
 	if err != nil {

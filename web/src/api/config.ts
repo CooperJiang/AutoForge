@@ -1,6 +1,6 @@
 import request from '@/utils/request'
 
-// 公开配置响应
+
 export interface PublicConfigResponse {
   oauth2: {
     linuxdo: {
@@ -12,7 +12,7 @@ export interface PublicConfigResponse {
   }
 }
 
-// 获取公开配置
+
 export const getPublicConfig = () => {
   return request.get<PublicConfigResponse>('/api/v1/config')
 }

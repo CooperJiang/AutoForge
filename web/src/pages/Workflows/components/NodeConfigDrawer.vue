@@ -1,7 +1,7 @@
 <template>
   <Drawer v-model="isOpen" title="节点配置" size="xl" @close="handleClose">
     <div v-if="node" class="space-y-4">
-      <!-- 节点基本信息 -->
+      
       <div class="bg-bg-hover rounded-lg p-4">
         <h3 class="text-sm font-semibold text-text-primary mb-3">基本信息</h3>
         <div class="space-y-3">
@@ -12,13 +12,38 @@
         </div>
       </div>
 
-      <!-- 工具配置 - 使用Tasks的配置组件 -->
+      
       <div v-if="node.type === 'tool' && node.toolCode" class="border-t border-border-primary pt-4">
         <h3 class="text-sm font-semibold text-text-primary mb-3">工具配置</h3>
 
-        <!-- HTTP请求 -->
+        
+        <div class="bg-bg-hover rounded-lg p-3 border border-border-primary mb-4">
+          <div class="flex items-center justify-between mb-2">
+            <h4 class="text-sm font-medium text-text-primary">变量助手</h4>
+            <button
+              type="button"
+              @click="showVariableHelper = !showVariableHelper"
+              class="text-xs text-primary hover:underline"
+            >
+              {{ showVariableHelper ? '隐藏' : '显示' }}
+            </button>
+          </div>
+
+          <VariableHelper
+            v-if="showVariableHelper"
+            :show="true"
+            :previous-nodes="props.previousNodes"
+            :env-vars="props.envVars"
+          />
+
+          <p v-if="!showVariableHelper" class="text-xs text-text-tertiary">
+            点击"显示"按钮查看可用的变量，点击变量即可复制到剪贴板
+          </p>
+        </div>
+
+        
         <div v-if="node.toolCode === 'http_request'" class="space-y-4">
-          <!-- Curl 粘贴提示 -->
+          
           <div class="bg-primary-light border border-primary rounded-lg p-3 text-xs text-primary">
             💡 小提示：按
             <kbd class="px-1.5 py-0.5 bg-bg-elevated border border-primary rounded">{{
@@ -49,7 +74,7 @@
             />
           </div>
 
-          <!-- Headers -->
+          
           <div>
             <label class="block text-sm font-medium text-text-secondary mb-2">
               请求头（可选）
@@ -74,7 +99,7 @@
             </div>
           </div>
 
-          <!-- Params -->
+          
           <div>
             <label class="block text-sm font-medium text-text-secondary mb-2">
               请求参数（可选）
@@ -99,7 +124,7 @@
             </div>
           </div>
 
-          <!-- Body -->
+          
           <div>
             <button
               type="button"
@@ -123,7 +148,7 @@
           </div>
         </div>
 
-        <!-- 邮件发送 -->
+        
         <EmailToolConfig
           v-else-if="node.toolCode === 'email_sender'"
           v-model:config="localNode.config"
@@ -131,13 +156,13 @@
           :env-vars="props.envVars"
         />
 
-        <!-- 健康检查 -->
+        
         <HealthCheckerConfig
           v-else-if="node.toolCode === 'health_checker'"
           v-model:config="localNode.config"
         />
 
-        <!-- 飞书机器人 -->
+        
         <FeishuBotConfig
           v-else-if="node.toolCode === 'feishu_bot'"
           v-model:config="localNode.config"
@@ -145,7 +170,7 @@
           :env-vars="props.envVars"
         />
 
-        <!-- OpenAI Chat -->
+        
         <OpenAIConfig
           v-else-if="node.toolCode === 'openai_chatgpt'"
           v-model:config="localNode.config"
@@ -153,7 +178,7 @@
           :env-vars="props.envVars"
         />
 
-        <!-- OpenAI Image -->
+        
         <OpenAIImageConfig
           v-else-if="node.toolCode === 'openai_image'"
           v-model:config="localNode.config"
@@ -168,7 +193,7 @@
           :env-vars="props.envVars"
         />
 
-        <!-- 输出格式化 -->
+        
         <OutputFormatterConfig
           v-else-if="node.toolCode === 'output_formatter'"
           v-model:config="localNode.config"
@@ -176,7 +201,7 @@
           :env-vars="props.envVars"
         />
 
-        <!-- HTML 渲染 -->
+        
         <HtmlRenderConfig
           v-else-if="node.toolCode === 'html_render'"
           v-model:config="localNode.config"
@@ -184,44 +209,138 @@
           :env-vars="props.envVars"
         />
 
-        <!-- Redis 存储器 -->
+        
         <RedisContextConfig
           v-else-if="node.toolCode === 'redis_context'"
           v-model:config="localNode.config"
         />
+
+        
+        <ContextManagerConfig
+          v-else-if="node.toolCode === 'context_manager'"
+          v-model:config="localNode.config"
+          :previous-nodes="props.previousNodes"
+          :env-vars="props.envVars"
+        />
       </div>
 
-      <!-- 外部 API 触发器配置 -->
+      
       <div v-if="node.type === 'external_trigger'" class="border-t border-border-primary pt-4">
         <h3 class="text-sm font-semibold text-text-primary mb-3">外部 API 触发配置</h3>
         <ExternalTriggerConfig v-model:config="localNode.config" @update="handleConfigUpdate" />
       </div>
 
-      <!-- 触发器配置 -->
+      
       <div v-if="node.type === 'trigger'" class="border-t border-border-primary pt-4">
         <h3 class="text-sm font-semibold text-text-primary mb-3">触发配置</h3>
         <TriggerConfig v-model:config="localNode.config" />
       </div>
 
-      <!-- 条件配置 -->
+      
       <div v-if="node.type === 'condition'" class="border-t border-border-primary pt-4">
         <h3 class="text-sm font-semibold text-text-primary mb-3">条件配置</h3>
+
+        
+        <div class="bg-bg-hover rounded-lg p-3 border border-border-primary mb-4">
+          <div class="flex items-center justify-between mb-2">
+            <h4 class="text-sm font-medium text-text-primary">变量助手</h4>
+            <button
+              type="button"
+              @click="showVariableHelper = !showVariableHelper"
+              class="text-xs text-primary hover:underline"
+            >
+              {{ showVariableHelper ? '隐藏' : '显示' }}
+            </button>
+          </div>
+
+          <VariableHelper
+            v-if="showVariableHelper"
+            :show="true"
+            :previous-nodes="props.previousNodes"
+            :env-vars="props.envVars"
+          />
+
+          <p v-if="!showVariableHelper" class="text-xs text-text-tertiary">
+            点击"显示"按钮查看可用的变量，点击变量即可复制到剪贴板
+          </p>
+        </div>
+
         <ConditionConfig v-model:config="localNode.config" :previous-nodes="props.previousNodes" />
       </div>
 
-      <!-- 延迟配置 -->
+      
       <div v-if="node.type === 'delay'" class="border-t border-border-primary pt-4">
         <h3 class="text-sm font-semibold text-text-primary mb-3">延迟配置</h3>
-        <DelayConfig v-model:config="localNode.config" />
+
+        
+        <div class="bg-bg-hover rounded-lg p-3 border border-border-primary mb-4">
+          <div class="flex items-center justify-between mb-2">
+            <h4 class="text-sm font-medium text-text-primary">变量助手</h4>
+            <button
+              type="button"
+              @click="showVariableHelper = !showVariableHelper"
+              class="text-xs text-primary hover:underline"
+            >
+              {{ showVariableHelper ? '隐藏' : '显示' }}
+            </button>
+          </div>
+
+          <VariableHelper
+            v-if="showVariableHelper"
+            :show="true"
+            :previous-nodes="props.previousNodes"
+            :env-vars="props.envVars"
+          />
+
+          <p v-if="!showVariableHelper" class="text-xs text-text-tertiary">
+            点击"显示"按钮查看可用的变量，点击变量即可复制到剪贴板
+          </p>
+        </div>
+
+        <DelayConfig
+          v-model:config="localNode.config"
+          :previous-nodes="props.previousNodes"
+          :env-vars="props.envVars"
+        />
       </div>
 
-      <!-- 开关配置 -->
+      
       <div v-if="node.type === 'switch'" class="border-t border-border-primary pt-4">
         <h3 class="text-sm font-semibold text-text-primary mb-3">开关配置</h3>
-        <SwitchConfig v-model:config="localNode.config" />
+
+        
+        <div class="bg-bg-hover rounded-lg p-3 border border-border-primary mb-4">
+          <div class="flex items-center justify-between mb-2">
+            <h4 class="text-sm font-medium text-text-primary">变量助手</h4>
+            <button
+              type="button"
+              @click="showVariableHelper = !showVariableHelper"
+              class="text-xs text-primary hover:underline"
+            >
+              {{ showVariableHelper ? '隐藏' : '显示' }}
+            </button>
+          </div>
+
+          <VariableHelper
+            v-if="showVariableHelper"
+            :show="true"
+            :previous-nodes="props.previousNodes"
+            :env-vars="props.envVars"
+          />
+
+          <p v-if="!showVariableHelper" class="text-xs text-text-tertiary">
+            点击"显示"按钮查看可用的变量，点击变量即可复制到剪贴板
+          </p>
+        </div>
+
+        <SwitchConfig
+          v-model:config="localNode.config"
+          :previous-nodes="props.previousNodes"
+          :env-vars="props.envVars"
+        />
       </div>
 
-      <!-- 错误重试配置 -->
+      
       <div v-if="node.type === 'tool'" class="border-t border-border-primary pt-4">
         <h3 class="text-sm font-semibold text-text-primary mb-3">错误重试</h3>
         <RetryConfig
@@ -230,7 +349,7 @@
         />
       </div>
 
-      <!-- 测试运行结果 -->
+      
       <div v-if="testResult" class="border-t border-border-primary pt-4">
         <div class="bg-bg-hover rounded-lg p-4">
           <div class="flex items-center justify-between mb-3">
@@ -269,7 +388,7 @@
         </div>
       </div>
 
-      <!-- 操作按钮 -->
+      
       <div class="flex items-center justify-between pt-4 border-t border-border-primary">
         <BaseButton size="sm" variant="danger" @click="handleDelete">
           <Trash2 class="w-4 h-4 mr-1" />
@@ -293,7 +412,7 @@
     </div>
   </Drawer>
 
-  <!-- 删除确认对话框 -->
+  
   <Dialog
     v-model="showDeleteConfirm"
     title="删除节点"
@@ -329,12 +448,14 @@ import JsonTransformConfig from '@/components/tools/JsonTransformConfig.vue'
 import OutputFormatterConfig from '@/components/tools/OutputFormatterConfig.vue'
 import HtmlRenderConfig from '@/components/tools/HtmlRenderConfig.vue'
 import RedisContextConfig from '@/components/tools/RedisContextConfig.vue'
+import ContextManagerConfig from '@/components/tools/ContextManagerConfig.vue'
 import TriggerConfig from '@/components/tools/TriggerConfig.vue'
 import ConditionConfig from '@/components/tools/ConditionConfig.vue'
 import DelayConfig from '@/components/tools/DelayConfig.vue'
 import SwitchConfig from '@/components/tools/SwitchConfig.vue'
 import ExternalTriggerConfig from './ExternalTriggerConfig.vue'
 import RetryConfig from '@/components/RetryConfig'
+import VariableHelper from '@/components/VariableHelper'
 import type { WorkflowNode, WorkflowEnvVar, NodeRetryConfig } from '@/types/workflow'
 import { message } from '@/utils/message'
 import { parseCurl } from '@/utils/curlParser'
@@ -362,6 +483,7 @@ const isMac = ref(/Mac/.test(navigator.userAgent))
 const bodyExpanded = ref(false)
 const testRunning = ref(false)
 const testResult = ref<{ success: boolean; output?: any; error?: string } | null>(null)
+const showVariableHelper = ref(false)
 
 const localNode = ref<WorkflowNode>({
   id: '',

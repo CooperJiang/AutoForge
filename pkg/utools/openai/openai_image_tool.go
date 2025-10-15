@@ -11,23 +11,47 @@ import (
 	"time"
 )
 
-// OpenAIImageTool OpenAI 图片生成工具
+
 type OpenAIImageTool struct {
 	*utools.BaseTool
 }
 
-// NewOpenAIImageTool 创建 OpenAI 图片生成工具实例
+
 func NewOpenAIImageTool() *OpenAIImageTool {
-	metadata := &utools.ToolMetadata{
-		Code:        "openai_image",
-		Name:        "OpenAI Image",
-		Description: "使用 OpenAI DALL-E Gpt-image-1 等模型生成图片",
-		Category:    "ai",
-		Version:     "1.0.0",
-		Author:      "AutoForge",
-		AICallable:  true,
-		Tags:        []string{"openai", "dalle", "image", "ai", "picture"},
-	}
+    metadata := &utools.ToolMetadata{
+        Code:        "openai_image",
+        Name:        "OpenAI Image",
+        Description: "使用 OpenAI DALL-E Gpt-image-1 等模型生成图片",
+        Category:    "ai",
+        Version:     "1.0.0",
+        Author:      "AutoForge",
+        AICallable:  true,
+        Tags:        []string{"openai", "dalle", "image", "ai", "picture"},
+        OutputFieldsSchema: map[string]utools.OutputFieldDef{
+            "response": {
+                Type:  "object",
+                Label: "OpenAI 原始响应",
+                Children: map[string]utools.OutputFieldDef{
+                    "created": {Type: "number", Label: "创建时间戳"},
+                    "data": {
+                        Type:  "array",
+                        Label: "图片数组",
+                        Children: map[string]utools.OutputFieldDef{
+                            "0": {
+                                Type:  "object",
+                                Label: "第一张图片",
+                                Children: map[string]utools.OutputFieldDef{
+                                    "url":            {Type: "string", Label: "图片 URL（当 response_format=url）"},
+                                    "b64_json":       {Type: "string", Label: "Base64 内容（当 response_format=b64_json）"},
+                                    "revised_prompt": {Type: "string", Label: "修订后的提示词（可选）"},
+                                },
+                            },
+                        },
+                    },
+                },
+            },
+        },
+    }
 
 	schema := &utools.ConfigSchema{
 		Type: "object",
@@ -35,7 +59,7 @@ func NewOpenAIImageTool() *OpenAIImageTool {
 			"model": {
 				Type:        "string",
 				Title:       "模型",
-				Description: "图片生成模型，例如：dall-e-2、dall-e-3、gpt-image-1 等",
+				Description: "图片生成模型，例如：dall-e-2、dall-e-3、gpt-image-1 等，支持变量",
 				Default:     "dall-e-3",
 			},
 			"prompt": {
@@ -44,36 +68,33 @@ func NewOpenAIImageTool() *OpenAIImageTool {
 				Description: "描述你想要生成的图片内容，支持变量",
 			},
 			"n": {
-				Type:        "number",
+				Type:        "string",
 				Title:       "生成数量",
-				Description: "生成图片的数量（dall-e-3 只支持 1 张）",
-				Default:     1,
+				Description: "生成图片的数量（dall-e-3 只支持 1 张），支持变量",
+				Default:     "1",
 			},
 			"size": {
 				Type:        "string",
 				Title:       "图片尺寸",
-				Description: "dall-e-2: 256x256, 512x512, 1024x1024; dall-e-3: 1024x1024, 1792x1024, 1024x1792",
+				Description: "dall-e-2: 256x256, 512x512, 1024x1024; dall-e-3: 1024x1024, 1792x1024, 1024x1792，支持变量",
 				Default:     "1024x1024",
-				Enum:        []interface{}{"256x256", "512x512", "1024x1024", "1792x1024", "1024x1792"},
 			},
 			"quality": {
 				Type:        "string",
 				Title:       "图片质量",
-				Description: "standard（标准）或 hd（高清），仅部分模型支持，留空使用默认值",
-				Enum:        []interface{}{"", "standard", "hd"},
+				Description: "standard（标准）或 hd（高清），仅部分模型支持，留空使用默认值，支持变量",
 			},
 			"response_format": {
 				Type:        "string",
 				Title:       "返回格式",
-				Description: "url（图片链接）或 b64_json（base64 编码）",
+				Description: "url（图片链接）或 b64_json（base64 编码），支持变量",
 				Default:     "url",
-				Enum:        []interface{}{"url", "b64_json"},
 			},
 			"timeout": {
-				Type:        "number",
+				Type:        "string",
 				Title:       "超时时间",
-				Description: "API 请求超时时间（秒），默认 300 秒",
-				Default:     300,
+				Description: "API 请求超时时间（秒），默认 300 秒，支持变量",
+				Default:     "300",
 			},
 		},
 		Required: []string{"model", "prompt"},
@@ -84,11 +105,11 @@ func NewOpenAIImageTool() *OpenAIImageTool {
 	}
 }
 
-// Execute 执行图片生成
+
 func (t *OpenAIImageTool) Execute(ctx *utools.ExecutionContext, toolConfig map[string]interface{}) (*utools.ExecutionResult, error) {
 	startTime := time.Now()
 
-	// 从配置文件读取 API 凭证
+
 	cfg := config.GetConfig()
 	apiKey := cfg.OpenAI.APIKey
 	if apiKey == "" {
@@ -102,10 +123,10 @@ func (t *OpenAIImageTool) Execute(ctx *utools.ExecutionContext, toolConfig map[s
 
 	apiBase := cfg.OpenAI.APIBase
 	if apiBase == "" {
-		apiBase = "https://api.openai.com/v1"
+		apiBase = "https:
 	}
 
-	// 从用户配置获取参数
+
 	model, _ := toolConfig["model"].(string)
 	if model == "" {
 		model = "dall-e-3"
@@ -121,10 +142,16 @@ func (t *OpenAIImageTool) Execute(ctx *utools.ExecutionContext, toolConfig map[s
 		}, fmt.Errorf("prompt is required")
 	}
 
-	// 获取其他参数
+
 	n := 1
 	if nVal, ok := toolConfig["n"].(float64); ok && nVal > 0 {
 		n = int(nVal)
+	} else if nStr, ok := toolConfig["n"].(string); ok && nStr != "" {
+
+		var nParsed int
+		if _, err := fmt.Sscanf(nStr, "%d", &nParsed); err == nil && nParsed > 0 {
+			n = nParsed
+		}
 	}
 
 	size, _ := toolConfig["size"].(string)
@@ -133,20 +160,26 @@ func (t *OpenAIImageTool) Execute(ctx *utools.ExecutionContext, toolConfig map[s
 	}
 
 	quality, _ := toolConfig["quality"].(string)
-	// quality 可以为空，使用模型默认值
+
 
 	responseFormat, _ := toolConfig["response_format"].(string)
 	if responseFormat == "" {
 		responseFormat = "url"
 	}
 
-	// 超时时间，默认 300 秒
+
 	timeout := 300
 	if t, ok := toolConfig["timeout"].(float64); ok && t > 0 {
 		timeout = int(t)
+	} else if tStr, ok := toolConfig["timeout"].(string); ok && tStr != "" {
+
+		var tParsed int
+		if _, err := fmt.Sscanf(tStr, "%d", &tParsed); err == nil && tParsed > 0 {
+			timeout = tParsed
+		}
 	}
 
-	// 构建请求体
+
 	requestBody := map[string]interface{}{
 		"model":           model,
 		"prompt":          prompt,
@@ -155,7 +188,7 @@ func (t *OpenAIImageTool) Execute(ctx *utools.ExecutionContext, toolConfig map[s
 		"response_format": responseFormat,
 	}
 
-	// quality 参数（可选）
+
 	if quality != "" {
 		requestBody["quality"] = quality
 	}
@@ -170,7 +203,7 @@ func (t *OpenAIImageTool) Execute(ctx *utools.ExecutionContext, toolConfig map[s
 		}, err
 	}
 
-	// 发送请求
+
 	url := fmt.Sprintf("%s/images/generations", apiBase)
 	req, err := http.NewRequest("POST", url, bytes.NewBuffer(jsonData))
 	if err != nil {
@@ -210,7 +243,7 @@ func (t *OpenAIImageTool) Execute(ctx *utools.ExecutionContext, toolConfig map[s
 		}, err
 	}
 
-	// 解析响应
+
 	var result map[string]interface{}
 	if err := json.Unmarshal(body, &result); err != nil {
 		return &utools.ExecutionResult{
@@ -222,7 +255,7 @@ func (t *OpenAIImageTool) Execute(ctx *utools.ExecutionContext, toolConfig map[s
 		}, err
 	}
 
-	// 检查 HTTP 状态码
+
 	if resp.StatusCode != 200 {
 		errorMsg := fmt.Sprintf("HTTP %d", resp.StatusCode)
 		if errorObj, ok := result["error"].(map[string]interface{}); ok {
@@ -239,7 +272,7 @@ func (t *OpenAIImageTool) Execute(ctx *utools.ExecutionContext, toolConfig map[s
 		}, fmt.Errorf("openai api error: %s", errorMsg)
 	}
 
-	// 检查错误
+
 	if errorObj, ok := result["error"].(map[string]interface{}); ok {
 		errorMsg, _ := errorObj["message"].(string)
 		errorType, _ := errorObj["type"].(string)
@@ -252,7 +285,7 @@ func (t *OpenAIImageTool) Execute(ctx *utools.ExecutionContext, toolConfig map[s
 		}, fmt.Errorf("openai api error: %s", errorMsg)
 	}
 
-	// 提取图片数据
+
 	data, ok := result["data"].([]interface{})
 	if !ok || len(data) == 0 {
 		return &utools.ExecutionResult{
@@ -271,13 +304,13 @@ func (t *OpenAIImageTool) Execute(ctx *utools.ExecutionContext, toolConfig map[s
 		Success: true,
 		Message: fmt.Sprintf("图片生成成功，共 %d 张", len(data)),
 		Output: map[string]interface{}{
-			"response": result, // OpenAI 原始完整响应
+			"response": result,
 		},
 		DurationMs: time.Since(startTime).Milliseconds(),
 	}, nil
 }
 
-// init 自动注册工具
+
 func init() {
 	tool := NewOpenAIImageTool()
 	if err := utools.Register(tool); err != nil {

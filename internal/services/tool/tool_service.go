@@ -1,11 +1,11 @@
 package tool
 
 import (
-	"auto-forge/internal/models"
-	"auto-forge/pkg/utools"
-	"encoding/json"
-	"fmt"
-	"sync"
+    "auto-forge/internal/models"
+    "auto-forge/pkg/utools"
+    "encoding/json"
+    "fmt"
+    "sync"
 )
 
 var (
@@ -13,10 +13,10 @@ var (
 	once        sync.Once
 )
 
-// ToolService 工具服务
+
 type ToolService struct{}
 
-// GetToolService 获取工具服务单例
+
 func GetToolService() *ToolService {
 	once.Do(func() {
 		toolService = &ToolService{}
@@ -24,12 +24,12 @@ func GetToolService() *ToolService {
 	return toolService
 }
 
-// InitToolService 初始化工具服务
+
 func InitToolService() {
 	GetToolService()
 }
 
-// ListTools 获取所有工具列表（从代码注册表读取）
+
 func (s *ToolService) ListTools() ([]models.Tool, error) {
 	registry := utools.GetRegistry()
 	metadataList := registry.List()
@@ -37,7 +37,7 @@ func (s *ToolService) ListTools() ([]models.Tool, error) {
 	tools := make([]models.Tool, 0, len(metadataList))
 
 	for _, metadata := range metadataList {
-		// 获取工具的 Schema
+
 		tool, err := registry.Get(metadata.Code)
 		if err != nil {
 			continue
@@ -47,19 +47,20 @@ func (s *ToolService) ListTools() ([]models.Tool, error) {
 		schemaJSON, _ := json.Marshal(schema)
 		tagsJSON, _ := json.Marshal(metadata.Tags)
 
-		toolModel := models.Tool{
-			Code:         metadata.Code,
-			Name:         metadata.Name,
-			Description:  metadata.Description,
-			Category:     metadata.Category,
-			Version:      metadata.Version,
-			Author:       metadata.Author,
-			Icon:         "", // Icon is now configured in frontend
-			ConfigSchema: string(schemaJSON),
-			AICallable:   metadata.AICallable,
-			Enabled:      true,
-			Tags:         string(tagsJSON),
-		}
+        toolModel := models.Tool{
+            Code:         metadata.Code,
+            Name:         metadata.Name,
+            Description:  metadata.Description,
+            Category:     metadata.Category,
+            Version:      metadata.Version,
+            Author:       metadata.Author,
+            Icon:         "",
+            ConfigSchema: string(schemaJSON),
+            AICallable:   metadata.AICallable,
+            Enabled:      true,
+            Tags:         string(tagsJSON),
+            OutputFieldsSchema: metadata.OutputFieldsSchema,
+        }
 
 		tools = append(tools, toolModel)
 	}
@@ -67,7 +68,7 @@ func (s *ToolService) ListTools() ([]models.Tool, error) {
 	return tools, nil
 }
 
-// GetToolByCode 根据 code 获取工具详情（从代码注册表读取）
+
 func (s *ToolService) GetToolByCode(code string) (*models.Tool, error) {
 	registry := utools.GetRegistry()
 	tool, err := registry.Get(code)
@@ -87,7 +88,7 @@ func (s *ToolService) GetToolByCode(code string) (*models.Tool, error) {
 		Category:     metadata.Category,
 		Version:      metadata.Version,
 		Author:       metadata.Author,
-		Icon:         "", // Icon is now configured in frontend
+		Icon:         "",
 		ConfigSchema: string(schemaJSON),
 		AICallable:   metadata.AICallable,
 		Enabled:      true,
@@ -97,7 +98,27 @@ func (s *ToolService) GetToolByCode(code string) (*models.Tool, error) {
 	return toolModel, nil
 }
 
-// GetToolsByCategory 根据分类获取工具（从代码注册表读取）
+
+func (s *ToolService) DescribeOutput(code string, cfg map[string]interface{}) (map[string]utools.OutputFieldDef, error) {
+    tool, err := utools.Get(code)
+    if err != nil {
+        return nil, fmt.Errorf("工具不存在: %s", code)
+    }
+    if d, ok := tool.(utools.DynamicOutputDescriber); ok {
+        schema := d.DescribeOutput(cfg)
+        if schema != nil {
+            return schema, nil
+        }
+    }
+
+    md := tool.GetMetadata()
+    if md != nil && md.OutputFieldsSchema != nil {
+        return md.OutputFieldsSchema, nil
+    }
+    return map[string]utools.OutputFieldDef{}, nil
+}
+
+
 func (s *ToolService) GetToolsByCategory(category string) ([]models.Tool, error) {
 	allTools, err := s.ListTools()
 	if err != nil {
@@ -114,7 +135,7 @@ func (s *ToolService) GetToolsByCategory(category string) ([]models.Tool, error)
 	return tools, nil
 }
 
-// GetAICallableTools 获取所有可被 AI 调用的工具（从代码注册表读取）
+
 func (s *ToolService) GetAICallableTools() ([]models.Tool, error) {
 	allTools, err := s.ListTools()
 	if err != nil {

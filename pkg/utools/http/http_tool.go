@@ -10,23 +10,29 @@ import (
 	"time"
 )
 
-// HTTPTool HTTP 请求工具
+
 type HTTPTool struct {
 	*utools.BaseTool
 }
 
-// NewHTTPTool 创建 HTTP 工具实例
+
 func NewHTTPTool() *HTTPTool {
-	metadata := &utools.ToolMetadata{
-		Code:        "http_request",
-		Name:        "HTTP 请求",
-		Description: "发送 HTTP/HTTPS 请求，支持 GET、POST、PUT、DELETE 等方法",
-		Category:    "network",
-		Version:     "1.0.0",
-		Author:      "AutoForge",
-		AICallable:  true,
-		Tags:        []string{"http", "api", "request", "network"},
-	}
+    metadata := &utools.ToolMetadata{
+        Code:        "http_request",
+        Name:        "HTTP 请求",
+        Description: "发送 HTTP/HTTPS 请求，支持 GET、POST、PUT、DELETE 等方法",
+        Category:    "network",
+        Version:     "1.0.0",
+        Author:      "AutoForge",
+        AICallable:  true,
+        Tags:        []string{"http", "api", "request", "network"},
+        OutputFieldsSchema: map[string]utools.OutputFieldDef{
+            "status_code": {Type: "number", Label: "HTTP 状态码"},
+            "headers":     {Type: "object", Label: "响应头"},
+            "body":        {Type: "string", Label: "原始响应体"},
+            "json":        {Type: "object", Label: "解析后的 JSON（若可解析）"},
+        },
+    }
 
 	schema := &utools.ConfigSchema{
 		Type: "object",
@@ -82,27 +88,27 @@ func NewHTTPTool() *HTTPTool {
 	}
 }
 
-// Execute 执行 HTTP 请求
+
 func (t *HTTPTool) Execute(ctx *utools.ExecutionContext, config map[string]interface{}) (*utools.ExecutionResult, error) {
 	startTime := time.Now()
 
-	// 解析配置
+
 	url, _ := config["url"].(string)
 	method, _ := config["method"].(string)
 
-	// 解析超时时间
+
 	timeout := 30.0
 	if timeoutVal, ok := config["timeout"].(float64); ok {
 		timeout = timeoutVal
 	}
 
-	// 构建请求体
+
 	var bodyReader io.Reader
 	if body, ok := config["body"].(string); ok && body != "" {
 		bodyReader = bytes.NewBufferString(body)
 	}
 
-	// 创建 HTTP 请求
+
 	req, err := http.NewRequestWithContext(ctx.Context, method, url, bodyReader)
 	if err != nil {
 		return &utools.ExecutionResult{
@@ -113,7 +119,7 @@ func (t *HTTPTool) Execute(ctx *utools.ExecutionContext, config map[string]inter
 		}, err
 	}
 
-	// 添加请求头
+
 	if headers, ok := config["headers"].(map[string]interface{}); ok {
 		for key, value := range headers {
 			if strValue, ok := value.(string); ok {
@@ -122,7 +128,7 @@ func (t *HTTPTool) Execute(ctx *utools.ExecutionContext, config map[string]inter
 		}
 	}
 
-	// 添加查询参数
+
 	if params, ok := config["params"].(map[string]interface{}); ok {
 		q := req.URL.Query()
 		for key, value := range params {
@@ -131,7 +137,7 @@ func (t *HTTPTool) Execute(ctx *utools.ExecutionContext, config map[string]inter
 		req.URL.RawQuery = q.Encode()
 	}
 
-	// 创建 HTTP 客户端
+
 	client := &http.Client{
 		Timeout: time.Duration(timeout) * time.Second,
 		CheckRedirect: func(req *http.Request, via []*http.Request) error {
@@ -142,7 +148,7 @@ func (t *HTTPTool) Execute(ctx *utools.ExecutionContext, config map[string]inter
 		},
 	}
 
-	// 发送请求
+
 	resp, err := client.Do(req)
 	if err != nil {
 		return &utools.ExecutionResult{
@@ -154,7 +160,7 @@ func (t *HTTPTool) Execute(ctx *utools.ExecutionContext, config map[string]inter
 	}
 	defer resp.Body.Close()
 
-	// 读取响应体
+
 	bodyBytes, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return &utools.ExecutionResult{
@@ -168,11 +174,11 @@ func (t *HTTPTool) Execute(ctx *utools.ExecutionContext, config map[string]inter
 
 	responseBody := string(bodyBytes)
 
-	// 尝试解析 JSON 响应
+
 	var jsonResponse map[string]interface{}
 	_ = json.Unmarshal(bodyBytes, &jsonResponse)
 
-	// 判断请求是否成功
+
 	success := resp.StatusCode >= 200 && resp.StatusCode < 300
 
 	output := map[string]interface{}{
@@ -200,7 +206,7 @@ func (t *HTTPTool) Execute(ctx *utools.ExecutionContext, config map[string]inter
 	}, nil
 }
 
-// init 自动注册工具
+
 func init() {
 	tool := NewHTTPTool()
 	if err := utools.Register(tool); err != nil {

@@ -10,17 +10,17 @@ export function useAuth() {
   const loading = ref(false)
   const error = ref('')
 
-  // 使用安全存储存储用户信息和token (7天过期)
+
   const [token, setToken, removeToken] = useAuthStorage<string | null>(
     STORAGE_KEYS.AUTH_TOKEN,
     null
   )
   const [user, setUser, removeUser] = useAuthStorage<User | null>(STORAGE_KEYS.AUTH_USER, null)
 
-  // 计算属性
+
   const isAuthenticated = computed(() => !!token.value && !!user.value)
 
-  // 登录
+
   const login = async (credentials: LoginRequest) => {
     try {
       loading.value = true
@@ -28,7 +28,7 @@ export function useAuth() {
 
       const response = await authApi.login(credentials)
 
-      // 从响应中提取数据
+
       const responseData = (response as any).data || response
 
       setToken(responseData.token)
@@ -44,7 +44,7 @@ export function useAuth() {
     }
   }
 
-  // 注册
+
   const register = async (userData: RegisterRequest) => {
     try {
       loading.value = true
@@ -61,7 +61,7 @@ export function useAuth() {
     }
   }
 
-  // 发送注册验证码
+
   const sendRegistrationCode = async (email: string) => {
     try {
       loading.value = true
@@ -78,7 +78,7 @@ export function useAuth() {
     }
   }
 
-  // 发送重置密码验证码
+
   const sendResetPasswordCode = async (email: string) => {
     try {
       loading.value = true
@@ -95,7 +95,7 @@ export function useAuth() {
     }
   }
 
-  // 重置密码
+
   const resetPassword = async (data: ResetPasswordRequest) => {
     try {
       loading.value = true
@@ -112,7 +112,7 @@ export function useAuth() {
     }
   }
 
-  // 登出
+
   const logout = (shouldRedirect: boolean = true) => {
     removeToken()
     removeUser()
@@ -121,12 +121,12 @@ export function useAuth() {
     }
   }
 
-  // 获取用户信息
+
   const getUserInfo = async () => {
     try {
       loading.value = true
       const response = await authApi.getUserInfo()
-      // 从响应中提取数据
+
       const userInfo = (response as any).data || response
       setUser(userInfo)
       return userInfo
@@ -140,14 +140,14 @@ export function useAuth() {
   }
 
   return {
-    // 状态
+
     loading,
     error,
     user,
     token,
     isAuthenticated,
 
-    // 方法
+
     login,
     register,
     sendRegistrationCode,

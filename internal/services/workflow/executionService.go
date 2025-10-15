@@ -13,23 +13,23 @@ import (
 	"gorm.io/gorm"
 )
 
-// ExecutionService 工作流执行服务
+
 type ExecutionService struct {
 	workflowService *WorkflowService
 }
 
-// NewExecutionService 创建执行服务实例
+
 func NewExecutionService() *ExecutionService {
 	return &ExecutionService{
 		workflowService: NewWorkflowService(),
 	}
 }
 
-// CreateExecution 创建执行记录
+
 func (s *ExecutionService) CreateExecution(workflowID, userID, triggerType string) (*models.WorkflowExecution, error) {
 	db := database.GetDB()
 
-	// 检查工作流是否存在
+
 	workflow, err := s.workflowService.GetWorkflowByID(workflowID, userID)
 	if err != nil {
 		return nil, err
@@ -63,7 +63,7 @@ func (s *ExecutionService) CreateExecution(workflowID, userID, triggerType strin
 	return execution, nil
 }
 
-// GetExecutionByID 根据ID获取执行记录
+
 func (s *ExecutionService) GetExecutionByID(executionID, userID string) (*models.WorkflowExecution, error) {
 	db := database.GetDB()
 
@@ -78,11 +78,11 @@ func (s *ExecutionService) GetExecutionByID(executionID, userID string) (*models
 	return &execution, nil
 }
 
-// GetExecutionList 获取执行历史列表
+
 func (s *ExecutionService) GetExecutionList(workflowID, userID string, query *request.ExecutionListQuery) (*response.ExecutionListResponse, error) {
 	db := database.GetDB()
 
-	// 默认值
+
 	if query.Page == 0 {
 		query.Page = 1
 	}
@@ -90,16 +90,16 @@ func (s *ExecutionService) GetExecutionList(workflowID, userID string, query *re
 		query.PageSize = 20
 	}
 
-	// 构建查询
+
 	queryDB := db.Model(&models.WorkflowExecution{}).
 		Where("workflow_id = ? AND user_id = ?", workflowID, userID)
 
-	// 状态过滤
+
 	if query.Status != "" {
 		queryDB = queryDB.Where("status = ?", query.Status)
 	}
 
-	// 时间范围过滤
+
 	if query.StartTime != nil {
 		queryDB = queryDB.Where("start_time >= ?", *query.StartTime)
 	}
@@ -107,13 +107,13 @@ func (s *ExecutionService) GetExecutionList(workflowID, userID string, query *re
 		queryDB = queryDB.Where("start_time <= ?", *query.EndTime)
 	}
 
-	// 计算总数
+
 	var total int64
 	if err := queryDB.Count(&total).Error; err != nil {
 		return nil, err
 	}
 
-	// 分页查询 - 不加载 node_logs 字段以避免大数据导致排序问题
+
 	var executions []models.WorkflowExecution
 	offset := (query.Page - 1) * query.PageSize
 	if err := queryDB.Select("id, created_at, updated_at, deleted_at, workflow_id, user_id, status, trigger_type, start_time, end_time, duration_ms, total_nodes, success_nodes, failed_nodes, skipped_nodes, error").
@@ -124,7 +124,7 @@ func (s *ExecutionService) GetExecutionList(workflowID, userID string, query *re
 		return nil, err
 	}
 
-	// 转换为响应格式
+
 	items := make([]response.WorkflowExecutionResponse, len(executions))
 	for i, exec := range executions {
 		items[i] = s.toExecutionResponse(&exec)
@@ -138,7 +138,7 @@ func (s *ExecutionService) GetExecutionList(workflowID, userID string, query *re
 	}, nil
 }
 
-// UpdateExecutionStatus 更新执行状态
+
 func (s *ExecutionService) UpdateExecutionStatus(executionID, status string, errorMsg string) error {
 	db := database.GetDB()
 
@@ -150,7 +150,7 @@ func (s *ExecutionService) UpdateExecutionStatus(executionID, status string, err
 		endTime := time.Now().Unix()
 		updates["end_time"] = endTime
 
-		// 计算执行时长
+
 		var execution models.WorkflowExecution
 		if err := db.First(&execution, "id = ?", executionID).Error; err == nil {
 			if execution.StartTime != nil {
@@ -174,7 +174,7 @@ func (s *ExecutionService) UpdateExecutionStatus(executionID, status string, err
 	return nil
 }
 
-// AddNodeLog 添加或更新节点执行日志
+
 func (s *ExecutionService) AddNodeLog(executionID string, nodeLog models.NodeExecutionLog) error {
 	db := database.GetDB()
 
@@ -183,7 +183,7 @@ func (s *ExecutionService) AddNodeLog(executionID string, nodeLog models.NodeExe
 		return err
 	}
 
-	// 查找是否已存在该节点的日志
+
 	nodeIndex := -1
 	for i, log := range execution.NodeLogs {
 		if log.NodeID == nodeLog.NodeID {
@@ -192,7 +192,7 @@ func (s *ExecutionService) AddNodeLog(executionID string, nodeLog models.NodeExe
 		}
 	}
 
-	// 如果存在，更新日志；否则添加新日志
+
 	var oldStatus string
 	if nodeIndex >= 0 {
 		oldStatus = execution.NodeLogs[nodeIndex].Status
@@ -201,7 +201,7 @@ func (s *ExecutionService) AddNodeLog(executionID string, nodeLog models.NodeExe
 		execution.NodeLogs = append(execution.NodeLogs, nodeLog)
 	}
 
-	// 更新统计：如果是更新日志，需要先减去旧状态的计数
+
 	if nodeIndex >= 0 && oldStatus != "" {
 		switch oldStatus {
 		case models.ExecutionStatusSuccess:
@@ -219,7 +219,7 @@ func (s *ExecutionService) AddNodeLog(executionID string, nodeLog models.NodeExe
 		}
 	}
 
-	// 添加新状态的计数
+
 	switch nodeLog.Status {
 	case models.ExecutionStatusSuccess:
 		execution.SuccessNodes++
@@ -242,7 +242,7 @@ func (s *ExecutionService) AddNodeLog(executionID string, nodeLog models.NodeExe
 	return nil
 }
 
-// UpdateWorkflowStats 更新工作流统计信息
+
 func (s *ExecutionService) UpdateWorkflowStats(workflowID string, success bool) error {
 	db := database.GetDB()
 
@@ -267,11 +267,11 @@ func (s *ExecutionService) UpdateWorkflowStats(workflowID string, success bool) 
 	return nil
 }
 
-// DeleteExecution 删除执行记录
+
 func (s *ExecutionService) DeleteExecution(executionID, userID string) error {
 	db := database.GetDB()
 
-	// 检查执行记录是否存在且属于该用户
+
 	var execution models.WorkflowExecution
 	if err := db.Where("id = ? AND user_id = ?", executionID, userID).First(&execution).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -280,7 +280,7 @@ func (s *ExecutionService) DeleteExecution(executionID, userID string) error {
 		return err
 	}
 
-	// 删除执行记录
+
 	if err := db.Delete(&execution).Error; err != nil {
 		return fmt.Errorf("删除执行记录失败: %v", err)
 	}
@@ -289,12 +289,12 @@ func (s *ExecutionService) DeleteExecution(executionID, userID string) error {
 	return nil
 }
 
-// ToExecutionResponse 转换为响应格式（公开方法）
+
 func (s *ExecutionService) ToExecutionResponse(execution *models.WorkflowExecution) response.WorkflowExecutionResponse {
 	return s.toExecutionResponse(execution)
 }
 
-// toExecutionResponse 转换为响应格式（内部方法）
+
 func (s *ExecutionService) toExecutionResponse(execution *models.WorkflowExecution) response.WorkflowExecutionResponse {
 	return response.WorkflowExecutionResponse{
 		ID:           execution.GetID(),

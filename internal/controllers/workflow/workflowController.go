@@ -12,7 +12,7 @@ import (
 
 var workflowService = workflow.NewWorkflowService()
 
-// CreateWorkflow 创建工作流
+
 func CreateWorkflow(c *gin.Context) {
 	userID := c.GetString("user_id")
 	if userID == "" {
@@ -36,7 +36,7 @@ func CreateWorkflow(c *gin.Context) {
 	errors.ResponseSuccess(c, workflowService.ToWorkflowResponse(wf), "创建工作流成功")
 }
 
-// GetWorkflowList 获取工作流列表
+
 func GetWorkflowList(c *gin.Context) {
 	userID := c.GetString("user_id")
 	if userID == "" {
@@ -60,7 +60,7 @@ func GetWorkflowList(c *gin.Context) {
 	errors.ResponseSuccess(c, result, "获取工作流列表成功")
 }
 
-// GetWorkflowByID 获取工作流详情
+
 func GetWorkflowByID(c *gin.Context) {
 	userID := c.GetString("user_id")
 	if userID == "" {
@@ -84,7 +84,7 @@ func GetWorkflowByID(c *gin.Context) {
 	errors.ResponseSuccess(c, workflowService.ToWorkflowResponse(wf), "获取工作流详情成功")
 }
 
-// UpdateWorkflow 更新工作流
+
 func UpdateWorkflow(c *gin.Context) {
 	userID := c.GetString("user_id")
 	if userID == "" {
@@ -114,7 +114,7 @@ func UpdateWorkflow(c *gin.Context) {
 	errors.ResponseSuccess(c, workflowService.ToWorkflowResponse(wf), "更新工作流成功")
 }
 
-// DeleteWorkflow 删除工作流
+
 func DeleteWorkflow(c *gin.Context) {
 	userID := c.GetString("user_id")
 	if userID == "" {
@@ -137,7 +137,7 @@ func DeleteWorkflow(c *gin.Context) {
 	errors.ResponseSuccess(c, nil, "删除成功")
 }
 
-// ToggleEnabled 切换工作流启用状态
+
 func ToggleEnabled(c *gin.Context) {
 	userID := c.GetString("user_id")
 	if userID == "" {
@@ -167,7 +167,7 @@ func ToggleEnabled(c *gin.Context) {
 	errors.ResponseSuccess(c, workflowService.ToWorkflowResponse(wf), "操作成功")
 }
 
-// GetWorkflowStats 获取工作流统计
+
 func GetWorkflowStats(c *gin.Context) {
 	userID := c.GetString("user_id")
 	if userID == "" {
@@ -191,7 +191,7 @@ func GetWorkflowStats(c *gin.Context) {
 	errors.ResponseSuccess(c, stats, "获取统计成功")
 }
 
-// ValidateWorkflow 验证工作流配置
+
 func ValidateWorkflow(c *gin.Context) {
 	var req request.ValidateWorkflowRequest
 	if err := c.ShouldBindJSON(&req); err != nil {

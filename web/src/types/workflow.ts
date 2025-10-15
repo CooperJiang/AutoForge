@@ -120,7 +120,7 @@ export interface FieldRender {
   display: boolean
 }
 
-// DTO types for API requests
+
 export interface CreateWorkflowDto {
   name: string
   description: string
@@ -148,5 +148,5 @@ export interface ExecuteWorkflowDto {
   params?: Record<string, any>
 }
 
-// Same as WorkflowExecution for now
+
 export type WorkflowExecutionDetail = WorkflowExecution

@@ -3,9 +3,9 @@ import type { BaseResponse } from '@/types'
 import { useMessage } from '@/composables/useMessage'
 import SecureStorage, { STORAGE_KEYS } from './storage'
 
-// 创建axios实例
+
 const request: AxiosInstance = axios.create({
-  // 使用环境变量配置API地址，开发环境指向localhost，生产环境使用相对路径
+
   baseURL: import.meta.env.VITE_API_BASE_URL,
   timeout: 10000,
   headers: {
@@ -13,19 +13,19 @@ const request: AxiosInstance = axios.create({
   },
 })
 
-// 获取消息实例
+
 const { error: showError } = useMessage()
 
-// 请求拦截器
+
 request.interceptors.request.use(
   (config) => {
-    // 添加认证token - 所有接口都使用同一个token
+
     const token = SecureStorage.getItem<string>(STORAGE_KEYS.AUTH_TOKEN)
     if (token) {
       config.headers.Authorization = `Bearer ${token}`
     }
 
-    // 添加请求时间戳（防止缓存）
+
     if (config.method === 'get') {
       config.params = {
         ...config.params,
@@ -41,18 +41,18 @@ request.interceptors.request.use(
   }
 )
 
-// 响应拦截器
+
 request.interceptors.response.use(
   (response: AxiosResponse<BaseResponse>) => {
     const { data } = response
 
-    // 检查业务状态码
+
     if (data.code !== 200) {
-      // 优先使用 detail（详细错误），如果没有则使用 message
+
       const errorMessage = (data as any).detail || data.message || '请求失败'
       const error: any = new Error(errorMessage)
 
-      // 将完整的响应数据附加到error对象上，方便业务代码获取
+
       error.response = response
       error.code = data.code
       error.message = errorMessage
@@ -61,28 +61,28 @@ request.interceptors.response.use(
       return Promise.reject(error)
     }
 
-    // 返回修改后的响应，将实际数据放在 data 字段中
+
     return {
       ...response,
       data: data.data,
     } as AxiosResponse
   },
   (error) => {
-    // 处理HTTP错误
+
     let message = '网络错误'
     let shouldShowError = true
 
     if (error.response) {
       const { status, data } = error.response
 
-      // 处理 HTTP 401 - token 过期
+
       if (status === 401) {
         message = '登录已过期，请重新登录'
-        shouldShowError = false // 不显示错误提示，直接跳转
-        // 清除token并跳转到登录页
+        shouldShowError = false
+
         SecureStorage.removeItem(STORAGE_KEYS.AUTH_TOKEN)
         SecureStorage.removeItem(STORAGE_KEYS.AUTH_USER)
-        // 使用 setTimeout 确保清除操作完成后再跳转
+
         setTimeout(() => {
           if (window.location.pathname !== '/auth') {
             window.location.replace('/auth')
@@ -92,7 +92,7 @@ request.interceptors.response.use(
         return Promise.reject(customError)
       }
 
-      // 优先使用 detail（详细错误），其次 message
+
       if (data?.detail) {
         message = data.detail
       } else if (data?.message) {
@@ -116,7 +116,7 @@ request.interceptors.response.use(
       message = '网络连接失败，请检查网络连接'
     }
 
-    // 显示错误消息（401 不显示）
+
     if (shouldShowError) {
       showError(message)
     }
@@ -126,7 +126,7 @@ request.interceptors.response.use(
   }
 )
 
-// 封装常用请求方法
+
 export const ApiClient = {
   async get<T = unknown>(url: string, config?: AxiosRequestConfig): Promise<T> {
     const response = await request.get(url, config)

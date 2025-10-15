@@ -6,7 +6,7 @@
     <div
       class="bg-bg-elevated rounded-xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden flex flex-col"
     >
-      <!-- Header -->
+      
       <div
         class="px-6 py-4 border-b-2 border-border-primary flex justify-between items-center flex-shrink-0"
       >
@@ -26,10 +26,10 @@
         </button>
       </div>
 
-      <!-- Content -->
+      
       <div class="flex-1 overflow-y-auto p-6">
         <div v-if="execution" class="space-y-6">
-          <!-- 基本信息 -->
+          
           <div>
             <h4 class="text-sm font-semibold text-text-secondary mb-3 flex items-center gap-2">
               <span class="w-1 h-4 bg-[var(--color-primary)] rounded"></span>
@@ -51,7 +51,7 @@
             </div>
           </div>
 
-          <!-- 执行状态 -->
+          
           <div>
             <h4 class="text-sm font-semibold text-text-secondary mb-3 flex items-center gap-2">
               <span class="w-1 h-4 bg-success-light0 rounded"></span>
@@ -93,7 +93,7 @@
             </div>
           </div>
 
-          <!-- 响应数据 -->
+          
           <div>
             <h4 class="text-sm font-semibold text-text-secondary mb-3 flex items-center gap-2">
               <span class="w-1 h-4 bg-purple-500 rounded"></span>
@@ -107,7 +107,7 @@
             </div>
           </div>
 
-          <!-- 错误信息 -->
+          
           <div v-if="execution.error_message">
             <h4 class="text-sm font-semibold text-text-secondary mb-3 flex items-center gap-2">
               <span class="w-1 h-4 bg-red-500 rounded"></span>
@@ -118,7 +118,7 @@
             </div>
           </div>
 
-          <!-- 时间信息 -->
+          
           <div>
             <h4 class="text-sm font-semibold text-text-secondary mb-3 flex items-center gap-2">
               <span class="w-1 h-4 bg-orange-500 rounded"></span>
@@ -138,7 +138,7 @@
         </div>
       </div>
 
-      <!-- Footer -->
+      
       <div class="px-6 py-4 border-t-2 border-border-primary flex justify-end gap-3 flex-shrink-0">
         <button
           @click="$emit('update:modelValue', false)"

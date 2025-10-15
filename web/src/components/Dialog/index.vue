@@ -6,17 +6,17 @@
         class="fixed inset-0 z-50 flex items-center justify-center p-4"
         @click.self="onCancel"
       >
-        <!-- 背景遮罩 -->
+        
         <div class="absolute inset-0 bg-black bg-opacity-50 transition-opacity"></div>
 
-        <!-- 对话框内容 -->
+        
         <div
           :class="[
             'relative bg-bg-elevated rounded-lg shadow-xl border-2 border-border-primary w-full max-h-[90vh] flex flex-col transform transition-all',
             maxWidth,
           ]"
         >
-          <!-- 标题 -->
+          
           <div
             class="px-5 py-4 border-b-2 border-border-primary flex items-center justify-between flex-shrink-0"
           >
@@ -29,14 +29,14 @@
             </button>
           </div>
 
-          <!-- 内容 - 可滚动 -->
+          
           <div class="px-5 py-4 overflow-y-auto flex-1">
             <slot>
               <p class="text-sm text-text-secondary">{{ message }}</p>
             </slot>
           </div>
 
-          <!-- 按钮 -->
+          
           <div
             v-if="!hideFooter"
             class="px-5 py-4 border-t-2 border-border-primary flex gap-2 justify-end flex-shrink-0"

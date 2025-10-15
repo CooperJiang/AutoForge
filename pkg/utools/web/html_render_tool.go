@@ -12,13 +12,13 @@ import (
 	"time"
 )
 
-// HtmlRenderTool HTML 渲染工具
-// 将 HTML 内容保存为文件并生成访问 URL，或者直接渲染传入的 URL
+
+
 type HtmlRenderTool struct {
 	*utools.BaseTool
 }
 
-// NewHtmlRenderTool 创建 HTML 渲染工具实例
+
 func NewHtmlRenderTool() *HtmlRenderTool {
 	metadata := &utools.ToolMetadata{
 		Code:        "html_render",
@@ -77,11 +77,11 @@ func NewHtmlRenderTool() *HtmlRenderTool {
 	}
 }
 
-// Execute 执行 HTML 内容保存
+
 func (t *HtmlRenderTool) Execute(ctx *utools.ExecutionContext, toolConfig map[string]interface{}) (*utools.ExecutionResult, error) {
 	startTime := time.Now()
 
-	// 获取配置
+
 	content, _ := toolConfig["content"].(string)
 	if content == "" {
 		return &utools.ExecutionResult{
@@ -92,7 +92,7 @@ func (t *HtmlRenderTool) Execute(ctx *utools.ExecutionContext, toolConfig map[st
 		}, fmt.Errorf("content is required")
 	}
 
-	// 清理内容：移除 AI 思考标签和 markdown 代码块标记
+
 	content = cleanHtmlContent(content)
 
 	title, _ := toolConfig["title"].(string)
@@ -101,11 +101,11 @@ func (t *HtmlRenderTool) Execute(ctx *utools.ExecutionContext, toolConfig map[st
 		expiresHours = h
 	}
 
-	// 生成唯一 ID（基于内容的 MD5）
+
 	hash := md5.Sum([]byte(fmt.Sprintf("%s-%d", content, time.Now().UnixNano())))
 	fileID := hex.EncodeToString(hash[:])[:16]
 
-	// 确保预览目录存在
+
 	previewDir := "./data/html-preview"
 	if err := os.MkdirAll(previewDir, 0755); err != nil {
 		return &utools.ExecutionResult{
@@ -116,7 +116,7 @@ func (t *HtmlRenderTool) Execute(ctx *utools.ExecutionContext, toolConfig map[st
 		}, err
 	}
 
-	// 保存 HTML 文件
+
 	filePath := filepath.Join(previewDir, fileID+".html")
 	if err := os.WriteFile(filePath, []byte(content), 0644); err != nil {
 		return &utools.ExecutionResult{
@@ -127,17 +127,17 @@ func (t *HtmlRenderTool) Execute(ctx *utools.ExecutionContext, toolConfig map[st
 		}, err
 	}
 
-	// 生成访问 URL
+
 	renderUrl := fmt.Sprintf("/preview/%s", fileID)
 
-	// 计算过期时间
+
 	var expiresAt *int64
 	if expiresHours > 0 {
 		expires := time.Now().Add(time.Duration(expiresHours) * time.Hour).Unix()
 		expiresAt = &expires
 	}
 
-	// 构建输出
+
 	output := map[string]interface{}{
 		"url":            renderUrl,
 		"title":          title,
@@ -148,7 +148,7 @@ func (t *HtmlRenderTool) Execute(ctx *utools.ExecutionContext, toolConfig map[st
 		output["expires_at"] = *expiresAt
 	}
 
-	// 构建输出渲染配置
+
 	outputRender := &utools.OutputRenderConfig{
 		Type:    "url",
 		Primary: "url",
@@ -170,27 +170,27 @@ func (t *HtmlRenderTool) Execute(ctx *utools.ExecutionContext, toolConfig map[st
 	}, nil
 }
 
-// cleanHtmlContent 清理 HTML 内容
-// 移除 AI 思考标签、markdown 代码块标记等
+
+
 func cleanHtmlContent(content string) string {
-	// 1. 移除 <think>...</think> 标签及其内容
+
 	thinkRegex := regexp.MustCompile(`(?s)<think>.*?</think>`)
 	content = thinkRegex.ReplaceAllString(content, "")
 
-	// 2. 移除 markdown 代码块标记（```html 或 ``` 开头/结尾）
-	// 移除开头的代码块标记
+
+
 	content = regexp.MustCompile(`(?m)^` + "```" + `html?\s*\n`).ReplaceAllString(content, "")
 	content = regexp.MustCompile(`(?m)^` + "```" + `\s*\n`).ReplaceAllString(content, "")
-	// 移除结尾的代码块标记
+
 	content = regexp.MustCompile(`(?m)\n` + "```" + `\s*$`).ReplaceAllString(content, "")
 
-	// 3. 移除开头和结尾的空白字符
+
 	content = strings.TrimSpace(content)
 
 	return content
 }
 
-// init 自动注册工具
+
 func init() {
 	tool := NewHtmlRenderTool()
 	if err := utools.Register(tool); err != nil {

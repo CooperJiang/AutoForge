@@ -8,7 +8,7 @@
         <p class="mt-2 text-center text-sm text-gray-600">输入您的邮箱地址和验证码，设置新密码</p>
       </div>
 
-      <!-- 错误提示 -->
+      
       <div v-if="error" class="bg-red-50 border border-red-200 rounded-md p-4">
         <div class="flex">
           <div class="flex-shrink-0">
@@ -20,7 +20,7 @@
         </div>
       </div>
 
-      <!-- 成功提示 -->
+      
       <div v-if="successMessage" class="bg-green-50 border border-green-200 rounded-md p-4">
         <div class="flex">
           <div class="flex-shrink-0">
@@ -112,7 +112,7 @@
             class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-primary hover:bg-primary-hover focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
             <span v-if="loading" class="absolute left-0 inset-y-0 flex items-center pl-3">
-              <!-- Loading spinner -->
+              
               <svg
                 class="animate-spin h-5 w-5 text-blue-300"
                 xmlns="http://www.w3.org/2000/svg"

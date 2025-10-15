@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="grid grid-cols-1 xl:grid-cols-12 gap-6">
-      <!-- 左侧菜单 -->
+      
       <div class="xl:col-span-3">
         <ProfileSidebar
           :active-tab="activeTab"
@@ -12,9 +12,9 @@
         />
       </div>
 
-      <!-- 右侧内容区 -->
+      
       <div class="xl:col-span-9">
-        <!-- 个人资料 -->
+        
         <ProfileSection
           v-show="activeTab === 'profile'"
           :user-name="userName"
@@ -23,7 +23,7 @@
           @update-email="handleUpdateEmail"
         />
 
-        <!-- 修改密码 -->
+        
         <PasswordSection v-show="activeTab === 'password'" />
       </div>
     </div>
