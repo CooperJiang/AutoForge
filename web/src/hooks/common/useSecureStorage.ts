@@ -9,7 +9,7 @@ interface SecureStorageOptions {
 export function useSecureStorage<T>(
   key: string,
   defaultValue: T,
-  options: SecureStorageOptions = {},
+  options: SecureStorageOptions = {}
 ): [Ref<T>, (newValue: T) => void, () => void] {
   // 尝试从安全存储获取初始值
   const initialValue = SecureStorage.getItem<T>(key, defaultValue) ?? defaultValue
@@ -21,7 +21,7 @@ export function useSecureStorage<T>(
     (newValue) => {
       SecureStorage.setItem(key, newValue, options)
     },
-    { deep: true },
+    { deep: true }
   )
 
   const setValue = (newValue: T) => {
@@ -41,7 +41,7 @@ export function useSecureStorage<T>(
 // 便捷的预配置hook
 export function useAuthStorage<T>(
   key: string,
-  defaultValue: T,
+  defaultValue: T
 ): [Ref<T>, (newValue: T) => void, () => void] {
   return useSecureStorage(key, defaultValue, {
     encrypt: true,
@@ -51,7 +51,7 @@ export function useAuthStorage<T>(
 
 export function useSessionStorage<T>(
   key: string,
-  defaultValue: T,
+  defaultValue: T
 ): [Ref<T>, (newValue: T) => void, () => void] {
   return useSecureStorage(key, defaultValue, {
     encrypt: true,
@@ -61,7 +61,7 @@ export function useSessionStorage<T>(
 
 export function usePersistentStorage<T>(
   key: string,
-  defaultValue: T,
+  defaultValue: T
 ): [Ref<T>, (newValue: T) => void, () => void] {
   return useSecureStorage(key, defaultValue, {
     encrypt: true,

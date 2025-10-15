@@ -15,6 +15,14 @@ type WorkflowResponse struct {
 	ScheduleValue   string                  `json:"schedule_value"`
 	Enabled         bool                    `json:"enabled"`
 	NextRunTime     *int64                  `json:"next_run_time"`
+
+	// API 调用配置
+	APIEnabled    bool                    `json:"api_enabled"`
+	APIKey        string                  `json:"api_key,omitempty"`
+	APIParams     []models.WorkflowAPIParam `json:"api_params,omitempty"`
+	APITimeout    int                     `json:"api_timeout"`
+	APIWebhookURL string                  `json:"api_webhook_url,omitempty"`
+
 	TotalExecutions int                     `json:"total_executions"`
 	SuccessCount    int                     `json:"success_count"`
 	FailedCount     int                     `json:"failed_count"`

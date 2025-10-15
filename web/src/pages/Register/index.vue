@@ -1,10 +1,10 @@
 <template>
-  <div class="min-h-screen flex items-center justify-center bg-bg-secondary py-12 px-4 sm:px-6 lg:px-8">
+  <div
+    class="min-h-screen flex items-center justify-center bg-bg-secondary py-12 px-4 sm:px-6 lg:px-8"
+  >
     <div class="max-w-md w-full space-y-8">
       <div>
-        <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">
-          创建新账户
-        </h2>
+        <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">创建新账户</h2>
         <p class="mt-2 text-center text-sm text-gray-600">
           已有账户？
           <router-link to="/login" class="font-medium text-primary hover:text-primary-text0">
@@ -40,7 +40,9 @@
       <form class="mt-8 space-y-6" @submit.prevent="handleSubmit">
         <div class="space-y-4">
           <div>
-            <label for="username" class="block text-sm font-medium text-text-secondary">用户名</label>
+            <label for="username" class="block text-sm font-medium text-text-secondary"
+              >用户名</label
+            >
             <input
               id="username"
               v-model="form.username"
@@ -76,7 +78,9 @@
             />
           </div>
           <div>
-            <label for="confirmPassword" class="block text-sm font-medium text-text-secondary">确认密码</label>
+            <label for="confirmPassword" class="block text-sm font-medium text-text-secondary"
+              >确认密码</label
+            >
             <input
               id="confirmPassword"
               v-model="form.confirmPassword"
@@ -121,9 +125,25 @@
           >
             <span v-if="loading" class="absolute left-0 inset-y-0 flex items-center pl-3">
               <!-- Loading spinner -->
-              <svg class="animate-spin h-5 w-5 text-blue-300" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              <svg
+                class="animate-spin h-5 w-5 text-blue-300"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+              >
+                <circle
+                  class="opacity-25"
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="currentColor"
+                  stroke-width="4"
+                ></circle>
+                <path
+                  class="opacity-75"
+                  fill="currentColor"
+                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                ></path>
               </svg>
             </span>
             {{ loading ? '注册中...' : '注册' }}
@@ -152,7 +172,7 @@ const form = ref({
   email: '',
   password: '',
   confirmPassword: '',
-  code: ''
+  code: '',
 })
 
 // 状态
@@ -202,7 +222,6 @@ const handleSendCode = async () => {
 
     // 开始倒计时
     startCountdown()
-
   } catch (err: unknown) {
     const errorMessage = err instanceof Error ? err.message : '发送验证码失败'
     error.value = errorMessage
@@ -276,7 +295,7 @@ const handleSubmit = async () => {
       username: form.value.username.trim(),
       email: form.value.email.trim(),
       password: form.value.password.trim(),
-      code: form.value.code.trim()
+      code: form.value.code.trim(),
     }
 
     // 调用注册API
@@ -290,7 +309,6 @@ const handleSubmit = async () => {
     setTimeout(() => {
       router.push('/login')
     }, 2000)
-
   } catch (err: unknown) {
     // 处理注册错误
     const errorMessage = err instanceof Error ? err.message : '注册失败，请重试'

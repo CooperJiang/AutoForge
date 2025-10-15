@@ -1,7 +1,7 @@
 package cron
 
 import (
-	"log"
+	"auto-forge/pkg/logger"
 
 	"github.com/robfig/cron/v3"
 )
@@ -18,7 +18,7 @@ func InitCronManager() {
 
 	// 启动定时任务
 	cronManager.Start()
-	log.Println("定时任务管理器已启动")
+	logger.Info("Cron manager started")
 
 	// 初始化任务调度器
 	InitTaskScheduler()
@@ -37,7 +37,7 @@ func registerTasks() {
 func Stop() {
 	if cronManager != nil {
 		cronManager.Stop()
-		log.Println("定时任务管理器已停止")
+		logger.Info("Cron manager stopped")
 	}
 
 	// 停止任务调度器

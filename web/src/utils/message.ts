@@ -12,7 +12,7 @@ const initMessage = () => {
   const app = createApp({
     render() {
       return h(MessageComponent, { ref: 'messageRef' })
-    }
+    },
   })
 
   const instance = app.mount(container)
@@ -36,5 +36,5 @@ export const message = {
   info(content: string, duration = 3000) {
     const instance = initMessage()
     return instance.addMessage({ type: 'info', content, duration })
-  }
+  },
 }

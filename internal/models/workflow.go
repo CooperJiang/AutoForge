@@ -43,6 +43,17 @@ type WorkflowEnvVar struct {
 	Encrypted   bool   `json:"encrypted"`
 }
 
+// WorkflowAPIParam 工作流 API 参数配置
+type WorkflowAPIParam struct {
+	Key          string      `json:"key"`                    // 参数名
+	Type         string      `json:"type"`                   // string/number/boolean/object/array
+	Required     bool        `json:"required"`               // 是否必填
+	DefaultValue interface{} `json:"defaultValue,omitempty"` // 默认值
+	Description  string      `json:"description,omitempty"`  // 描述
+	Example      interface{} `json:"example,omitempty"`      // 示例值
+	MappingPath  string      `json:"mappingPath"`            // 映射路径，如 "nodes.0.config.prompt"
+}
+
 // WorkflowNodes 节点数组类型
 type WorkflowNodes []WorkflowNode
 
@@ -115,6 +126,30 @@ func (wev WorkflowEnvVars) Value() (driver.Value, error) {
 	return json.Marshal(wev)
 }
 
+// WorkflowAPIParams API 参数数组类型
+type WorkflowAPIParams []WorkflowAPIParam
+
+// Scan 实现 sql.Scanner 接口
+func (wap *WorkflowAPIParams) Scan(value interface{}) error {
+	if value == nil {
+		*wap = WorkflowAPIParams{}
+		return nil
+	}
+	bytes, ok := value.([]byte)
+	if !ok {
+		return nil
+	}
+	return json.Unmarshal(bytes, wap)
+}
+
+// Value 实现 driver.Valuer 接口
+func (wap WorkflowAPIParams) Value() (driver.Value, error) {
+	if len(wap) == 0 {
+		return "[]", nil
+	}
+	return json.Marshal(wap)
+}
+
 // Workflow 工作流模型
 type Workflow struct {
 	BaseModel
@@ -131,6 +166,15 @@ type Workflow struct {
 	ScheduleValue string `gorm:"size:100" json:"schedule_value"`
 	Enabled       bool   `gorm:"default:false;index:idx_enabled_next_run" json:"enabled"`
 	NextRunTime   *int64 `gorm:"index:idx_enabled_next_run" json:"next_run_time"`
+
+	// API 调用配置
+	APIEnabled      bool              `gorm:"default:false" json:"api_enabled"`                           // 是否启用 API 调用
+	APIKey          string            `gorm:"size:64;uniqueIndex:idx_api_key" json:"api_key,omitempty"`  // API Key (仅查询时返回，敏感信息)
+	APIParams       WorkflowAPIParams `gorm:"type:json" json:"api_params"`                                // API 参数配置
+	APITimeout      int               `gorm:"default:300" json:"api_timeout"`                             // API 超时时间（秒）
+	APICallCount    int               `gorm:"default:0" json:"api_call_count"`                            // API 调用次数统计
+	APILastCalledAt *int64            `gorm:"index" json:"api_last_called_at"`                            // 最后一次 API 调用时间
+	APIWebhookURL   string            `gorm:"size:500" json:"api_webhook_url,omitempty"`                  // Webhook 回调地址（异步模式）
 
 	// 统计信息
 	TotalExecutions int    `gorm:"default:0" json:"total_executions"`

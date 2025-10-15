@@ -12,18 +12,19 @@
     <div v-if="toolCode === 'http_request'" class="space-y-4">
       <!-- Curl 粘贴提示 -->
       <div class="bg-primary-light border border-primary rounded-lg p-3 text-xs text-primary">
-        💡 小提示：按 <kbd class="px-1.5 py-0.5 bg-bg-elevated border border-primary rounded">{{ isMac ? 'Cmd' : 'Ctrl' }}</kbd> + <kbd class="px-1.5 py-0.5 bg-bg-elevated border border-primary rounded">V</kbd> 可直接粘贴 cURL 命令自动解析
+        💡 小提示：按
+        <kbd class="px-1.5 py-0.5 bg-bg-elevated border border-primary rounded">{{
+          isMac ? 'Cmd' : 'Ctrl'
+        }}</kbd>
+        + <kbd class="px-1.5 py-0.5 bg-bg-elevated border border-primary rounded">V</kbd> 可直接粘贴
+        cURL 命令自动解析
       </div>
 
       <div>
         <label class="block text-sm font-medium text-text-secondary mb-2">
           请求方式 <span class="text-red-500">*</span>
         </label>
-        <BaseSelect
-          v-model="localConfig.method"
-          :options="methodOptions"
-          required
-        />
+        <BaseSelect v-model="localConfig.method" :options="methodOptions" required />
       </div>
 
       <div>
@@ -39,9 +40,7 @@
 
       <!-- Headers -->
       <div>
-        <label class="block text-sm font-medium text-text-secondary mb-2">
-          请求头（可选）
-        </label>
+        <label class="block text-sm font-medium text-text-secondary mb-2"> 请求头（可选） </label>
         <div class="space-y-2">
           <ParamInput
             v-for="(header, index) in localConfig.headers"
@@ -64,9 +63,7 @@
 
       <!-- Params -->
       <div>
-        <label class="block text-sm font-medium text-text-secondary mb-2">
-          请求参数（可选）
-        </label>
+        <label class="block text-sm font-medium text-text-secondary mb-2"> 请求参数（可选） </label>
         <div class="space-y-2">
           <ParamInput
             v-for="(param, index) in localConfig.params"
@@ -95,7 +92,8 @@
           class="flex items-center justify-between w-full mb-2 text-left"
         >
           <label class="block text-sm font-medium text-text-secondary cursor-pointer">
-            {{ bodyExpanded ? '▼' : '▶' }} 请求体 (Body) <span class="text-xs text-text-tertiary">(POST/PUT/PATCH)</span>
+            {{ bodyExpanded ? '▼' : '▶' }} 请求体 (Body)
+            <span class="text-xs text-text-tertiary">(POST/PUT/PATCH)</span>
           </label>
         </button>
         <div v-show="bodyExpanded" class="space-y-1">
@@ -115,7 +113,11 @@
       <div class="bg-primary-light border-l-4 border-primary p-3 mb-4">
         <p class="text-sm text-primary">
           <svg class="inline-block w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
-            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
+            <path
+              fill-rule="evenodd"
+              d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
+              clip-rule="evenodd"
+            />
           </svg>
           邮件发送使用系统配置，只需填写收件人和邮件内容
         </p>
@@ -134,24 +136,15 @@
       </div>
 
       <div>
-        <label class="block text-sm font-medium text-text-secondary mb-2">
-          抄送人
-        </label>
-        <BaseInput
-          v-model="emailConfig.cc"
-          placeholder="cc@example.com"
-        />
+        <label class="block text-sm font-medium text-text-secondary mb-2"> 抄送人 </label>
+        <BaseInput v-model="emailConfig.cc" placeholder="cc@example.com" />
       </div>
 
       <div>
         <label class="block text-sm font-medium text-text-secondary mb-2">
           邮件主题 <span class="text-red-500">*</span>
         </label>
-        <BaseInput
-          v-model="emailConfig.subject"
-          placeholder="定时任务执行通知"
-          required
-        />
+        <BaseInput v-model="emailConfig.subject" placeholder="定时任务执行通知" required />
       </div>
 
       <div>
@@ -166,9 +159,7 @@
           required
         />
         <div class="space-y-1 mt-2">
-          <p class="text-xs text-amber-600">
-            💡 <strong>避免被拦截的建议：</strong>
-          </p>
+          <p class="text-xs text-amber-600">💡 <strong>避免被拦截的建议：</strong></p>
           <ul class="text-xs text-text-secondary ml-4 space-y-0.5">
             <li>• 使用完整的邮件格式（称呼、正文、签名）</li>
             <li>• 说明邮件来源和目的</li>
@@ -179,13 +170,8 @@
       </div>
 
       <div>
-        <label class="block text-sm font-medium text-text-secondary mb-2">
-          内容类型
-        </label>
-        <BaseSelect
-          v-model="emailConfig.content_type"
-          :options="contentTypeOptions"
-        />
+        <label class="block text-sm font-medium text-text-secondary mb-2"> 内容类型 </label>
+        <BaseSelect v-model="emailConfig.content_type" :options="contentTypeOptions" />
       </div>
     </div>
 
@@ -194,7 +180,11 @@
       <div class="bg-primary-light border-l-4 border-primary p-3 mb-4">
         <p class="text-sm text-primary">
           <svg class="inline-block w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
-            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
+            <path
+              fill-rule="evenodd"
+              d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
+              clip-rule="evenodd"
+            />
           </svg>
           支持粘贴 cURL 命令自动填充配置（{{ isMac ? 'Cmd+V' : 'Ctrl+V' }}）
         </p>
@@ -212,21 +202,14 @@
       </div>
 
       <div>
-        <label class="block text-sm font-medium text-text-secondary mb-2">
-          请求方法
-        </label>
-        <BaseSelect
-          v-model="healthConfig.method"
-          :options="healthMethodOptions"
-        />
+        <label class="block text-sm font-medium text-text-secondary mb-2"> 请求方法 </label>
+        <BaseSelect v-model="healthConfig.method" :options="healthMethodOptions" />
       </div>
 
       <!-- Headers -->
       <div>
         <div class="flex items-center justify-between mb-2">
-          <label class="block text-sm font-medium text-text-secondary">
-            请求头 (Headers)
-          </label>
+          <label class="block text-sm font-medium text-text-secondary"> 请求头 (Headers) </label>
           <button
             type="button"
             @click="addHealthHeader"
@@ -248,9 +231,7 @@
 
       <!-- Body -->
       <div>
-        <label class="block text-sm font-medium text-text-secondary mb-2">
-          请求体 (Body)
-        </label>
+        <label class="block text-sm font-medium text-text-secondary mb-2"> 请求体 (Body) </label>
         <textarea
           v-model="healthBody"
           class="w-full px-3 py-2 border-2 border-border-primary rounded-lg focus:outline-none focus:border-primary bg-bg-elevated text-text-primary font-mono text-sm"
@@ -270,36 +251,19 @@
       </div>
 
       <div>
-        <label class="block text-sm font-medium text-text-secondary mb-2">
-          超时时间（秒）
-        </label>
-        <BaseInput
-          v-model.number="healthConfig.timeout"
-          type="number"
-          placeholder="10"
-        />
+        <label class="block text-sm font-medium text-text-secondary mb-2"> 超时时间（秒） </label>
+        <BaseInput v-model.number="healthConfig.timeout" type="number" placeholder="10" />
       </div>
 
       <div>
-        <label class="block text-sm font-medium text-text-secondary mb-2">
-          期望状态码
-        </label>
-        <BaseInput
-          v-model.number="healthConfig.expected_status"
-          type="number"
-          placeholder="200"
-        />
+        <label class="block text-sm font-medium text-text-secondary mb-2"> 期望状态码 </label>
+        <BaseInput v-model.number="healthConfig.expected_status" type="number" placeholder="200" />
         <p class="text-xs text-text-tertiary mt-1">设置为 0 表示任意 2xx 状态码</p>
       </div>
 
       <div>
-        <label class="block text-sm font-medium text-text-secondary mb-2">
-          期望内容
-        </label>
-        <BaseInput
-          v-model="healthConfig.expected_content"
-          placeholder="success"
-        />
+        <label class="block text-sm font-medium text-text-secondary mb-2"> 期望内容 </label>
+        <BaseInput v-model="healthConfig.expected_content" placeholder="success" />
         <p class="text-xs text-text-tertiary mt-1">响应体中应包含的内容</p>
       </div>
 
@@ -328,14 +292,8 @@
       </div>
 
       <div v-if="healthConfig.check_ssl">
-        <label class="block text-sm font-medium text-text-secondary mb-2">
-          SSL 到期告警天数
-        </label>
-        <BaseInput
-          v-model.number="healthConfig.ssl_warning_days"
-          type="number"
-          placeholder="30"
-        />
+        <label class="block text-sm font-medium text-text-secondary mb-2"> SSL 到期告警天数 </label>
+        <BaseInput v-model.number="healthConfig.ssl_warning_days" type="number" placeholder="30" />
       </div>
 
       <div class="flex items-center gap-2">
@@ -363,9 +321,12 @@
       </div>
     </div>
 
-    <div v-else class="text-center py-8 text-text-tertiary">
-      该工具暂无需配置参数
+    <!-- 飞书机器人工具配置 -->
+    <div v-else-if="toolCode === 'feishu_bot'" class="space-y-4">
+      <FeishuBotConfig :config="feishuConfig" @update:config="feishuConfig = $event" />
     </div>
+
+    <div v-else class="text-center py-8 text-text-tertiary">该工具暂无需配置参数</div>
   </Drawer>
 </template>
 
@@ -375,6 +336,7 @@ import Drawer from '@/components/Drawer'
 import BaseInput from '@/components/BaseInput'
 import BaseSelect from '@/components/BaseSelect'
 import ParamInput from '@/components/ParamInput'
+import FeishuBotConfig from '@/components/ToolConfigs/FeishuBotConfig.vue'
 import { message } from '@/utils/message'
 import { parseCurl } from '@/utils/curlParser'
 
@@ -442,7 +404,7 @@ const localConfig = ref<LocalConfig>({
   method: 'GET',
   headers: [],
   params: [],
-  body: ''
+  body: '',
 })
 
 const emailConfig = ref<EmailConfig>({
@@ -450,7 +412,7 @@ const emailConfig = ref<EmailConfig>({
   cc: '',
   subject: '',
   body: '',
-  content_type: 'text/plain'
+  content_type: 'text/plain',
 })
 
 const healthConfig = ref<HealthConfig>({
@@ -465,18 +427,34 @@ const healthConfig = ref<HealthConfig>({
   check_ssl: true,
   ssl_warning_days: 30,
   follow_redirects: true,
-  verify_ssl: true
+  verify_ssl: true,
 })
 
 const healthHeaders = ref<Param[]>([])
 const healthBody = ref('')
+
+const feishuConfig = ref<Record<string, any>>({
+  webhook_url: '',
+  sign_secret: '',
+  msg_type: 'text',
+  content: '',
+  title: '',
+  post_content: '',
+  image_url: '',
+  card_template: 'notification',
+  card_content: '',
+  card_status: 'info',
+  card_fields: '',
+  card_buttons: '',
+  card_custom_json: '',
+})
 
 const methodOptions = [
   { label: 'GET', value: 'GET' },
   { label: 'POST', value: 'POST' },
   { label: 'PUT', value: 'PUT' },
   { label: 'DELETE', value: 'DELETE' },
-  { label: 'PATCH', value: 'PATCH' }
+  { label: 'PATCH', value: 'PATCH' },
 ]
 
 const healthMethodOptions = [
@@ -485,88 +463,110 @@ const healthMethodOptions = [
   { label: 'HEAD', value: 'HEAD' },
   { label: 'PUT', value: 'PUT' },
   { label: 'DELETE', value: 'DELETE' },
-  { label: 'PATCH', value: 'PATCH' }
+  { label: 'PATCH', value: 'PATCH' },
 ]
 
 const contentTypeOptions = [
   { label: '纯文本', value: 'text/plain' },
-  { label: 'HTML', value: 'text/html' }
+  { label: 'HTML', value: 'text/html' },
 ]
 
 // 监听 props.config 变化，转换为本地格式
-watch(() => props.config, (newConfig) => {
-  if (newConfig) {
-    if (props.toolCode === 'http_request') {
-      try {
-        const headers = JSON.parse(newConfig.headers || '{}')
-        const body = JSON.parse(newConfig.body || '{}')
+watch(
+  () => props.config,
+  (newConfig) => {
+    if (newConfig) {
+      if (props.toolCode === 'http_request') {
+        try {
+          const headers = JSON.parse(newConfig.headers || '{}')
+          const body = JSON.parse(newConfig.body || '{}')
 
-        localConfig.value = {
+          localConfig.value = {
+            url: newConfig.url || '',
+            method: newConfig.method || 'GET',
+            headers: Object.entries(headers).map(([key, value]) => ({
+              key,
+              value: String(value),
+            })),
+            params: [],
+            body:
+              typeof body === 'object' && Object.keys(body).length > 0
+                ? JSON.stringify(body, null, 2)
+                : '',
+          }
+        } catch {
+          localConfig.value = {
+            url: newConfig.url || '',
+            method: newConfig.method || 'GET',
+            headers: [],
+            params: [],
+            body: '',
+          }
+        }
+      } else if (props.toolCode === 'email_sender') {
+        emailConfig.value = {
+          to: newConfig.to || '',
+          cc: newConfig.cc || '',
+          subject: newConfig.subject || '',
+          body: newConfig.body || '',
+          content_type: newConfig.content_type || 'text/plain',
+        }
+      } else if (props.toolCode === 'health_checker') {
+        healthConfig.value = {
           url: newConfig.url || '',
           method: newConfig.method || 'GET',
-          headers: Object.entries(headers).map(([key, value]) => ({
+          headers: newConfig.headers || '{}',
+          body: newConfig.body || '',
+          timeout: newConfig.timeout || 10,
+          expected_status: newConfig.expected_status || 200,
+          expected_content: newConfig.expected_content || '',
+          use_regex: newConfig.use_regex || false,
+          check_ssl: newConfig.check_ssl !== undefined ? newConfig.check_ssl : true,
+          ssl_warning_days: newConfig.ssl_warning_days || 30,
+          follow_redirects:
+            newConfig.follow_redirects !== undefined ? newConfig.follow_redirects : true,
+          verify_ssl: newConfig.verify_ssl !== undefined ? newConfig.verify_ssl : true,
+        }
+
+        // 解析 headers
+        try {
+          const headers = JSON.parse(newConfig.headers || '{}')
+          healthHeaders.value = Object.entries(headers).map(([key, value]) => ({
             key,
-            value: String(value)
-          })),
-          params: [],
-          body: typeof body === 'object' && Object.keys(body).length > 0
-            ? JSON.stringify(body, null, 2)
-            : ''
+            value: String(value),
+          }))
+        } catch {
+          healthHeaders.value = []
         }
-      } catch {
-        localConfig.value = {
-          url: newConfig.url || '',
-          method: newConfig.method || 'GET',
-          headers: [],
-          params: [],
-          body: ''
+
+        // 设置 body
+        healthBody.value = newConfig.body || ''
+      } else if (props.toolCode === 'feishu_bot') {
+        feishuConfig.value = {
+          webhook_url: newConfig.webhook_url || '',
+          sign_secret: newConfig.sign_secret || '',
+          msg_type: newConfig.msg_type || 'text',
+          content: newConfig.content || '',
+          title: newConfig.title || '',
+          post_content: newConfig.post_content || '',
+          image_url: newConfig.image_url || '',
+          card_template: newConfig.card_template || 'notification',
+          card_content: newConfig.card_content || '',
+          card_status: newConfig.card_status || 'info',
+          card_fields: newConfig.card_fields || '',
+          card_buttons: newConfig.card_buttons || '',
+          card_custom_json: newConfig.card_custom_json || '',
         }
       }
-    } else if (props.toolCode === 'email_sender') {
-      emailConfig.value = {
-        to: newConfig.to || '',
-        cc: newConfig.cc || '',
-        subject: newConfig.subject || '',
-        body: newConfig.body || '',
-        content_type: newConfig.content_type || 'text/plain'
-      }
-    } else if (props.toolCode === 'health_checker') {
-      healthConfig.value = {
-        url: newConfig.url || '',
-        method: newConfig.method || 'GET',
-        headers: newConfig.headers || '{}',
-        body: newConfig.body || '',
-        timeout: newConfig.timeout || 10,
-        expected_status: newConfig.expected_status || 200,
-        expected_content: newConfig.expected_content || '',
-        use_regex: newConfig.use_regex || false,
-        check_ssl: newConfig.check_ssl !== undefined ? newConfig.check_ssl : true,
-        ssl_warning_days: newConfig.ssl_warning_days || 30,
-        follow_redirects: newConfig.follow_redirects !== undefined ? newConfig.follow_redirects : true,
-        verify_ssl: newConfig.verify_ssl !== undefined ? newConfig.verify_ssl : true
-      }
-
-      // 解析 headers
-      try {
-        const headers = JSON.parse(newConfig.headers || '{}')
-        healthHeaders.value = Object.entries(headers).map(([key, value]) => ({
-          key,
-          value: String(value)
-        }))
-      } catch {
-        healthHeaders.value = []
-      }
-
-      // 设置 body
-      healthBody.value = newConfig.body || ''
     }
-  }
-}, { immediate: true })
+  },
+  { immediate: true }
+)
 
 // 同步本地配置回父组件
 const syncConfig = () => {
   const headersObj: Record<string, string> = {}
-  localConfig.value.headers.forEach(h => {
+  localConfig.value.headers.forEach((h) => {
     if (h.key) headersObj[h.key] = h.value
   })
 
@@ -584,7 +584,7 @@ const syncConfig = () => {
     url: localConfig.value.url,
     method: localConfig.value.method,
     headers: JSON.stringify(headersObj),
-    body: typeof bodyObj === 'string' ? bodyObj : JSON.stringify(bodyObj)
+    body: typeof bodyObj === 'string' ? bodyObj : JSON.stringify(bodyObj),
   })
 }
 
@@ -630,7 +630,7 @@ const removeHealthHeader = (index: number) => {
 // 同步 health headers 到 config
 const syncHealthHeaders = () => {
   const headersObj: Record<string, string> = {}
-  healthHeaders.value.forEach(h => {
+  healthHeaders.value.forEach((h) => {
     if (h.key) headersObj[h.key] = h.value
   })
   healthConfig.value.headers = JSON.stringify(headersObj)
@@ -674,7 +674,7 @@ const handlePaste = (e: ClipboardEvent) => {
         method: parsed.method,
         headers: parsed.headers,
         params: parsed.params,
-        body: formattedBody
+        body: formattedBody,
       }
 
       // 如果有 body，自动展开
@@ -737,6 +737,40 @@ const handleSave = () => {
 
     // 直接发送 healthConfig
     emit('update:config', healthConfig.value as any)
+  } else if (props.toolCode === 'feishu_bot') {
+    // 验证必填字段
+    if (!feishuConfig.value.webhook_url) {
+      message.error('请输入 Webhook URL')
+      return
+    }
+
+    // 根据消息类型验证对应的必填字段
+    const msgType = feishuConfig.value.msg_type
+    if (msgType === 'text' && !feishuConfig.value.content) {
+      message.error('请输入文本消息内容')
+      return
+    }
+    if (msgType === 'post' && !feishuConfig.value.post_content) {
+      message.error('请输入富文本内容')
+      return
+    }
+    if (msgType === 'image' && !feishuConfig.value.image_url) {
+      message.error('请输入图片 URL')
+      return
+    }
+    if (msgType === 'interactive') {
+      if (feishuConfig.value.card_template === 'custom' && !feishuConfig.value.card_custom_json) {
+        message.error('请输入自定义卡片 JSON')
+        return
+      }
+      if (feishuConfig.value.card_template !== 'custom' && !feishuConfig.value.title) {
+        message.error('请输入卡片标题')
+        return
+      }
+    }
+
+    // 直接发送 feishuConfig
+    emit('update:config', feishuConfig.value as any)
   }
 
   emit('save')

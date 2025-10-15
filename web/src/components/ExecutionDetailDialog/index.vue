@@ -1,15 +1,27 @@
 <template>
-  <div v-if="modelValue" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-    <div class="bg-bg-elevated rounded-xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden flex flex-col">
+  <div
+    v-if="modelValue"
+    class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
+  >
+    <div
+      class="bg-bg-elevated rounded-xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden flex flex-col"
+    >
       <!-- Header -->
-      <div class="px-6 py-4 border-b-2 border-border-primary flex justify-between items-center flex-shrink-0">
+      <div
+        class="px-6 py-4 border-b-2 border-border-primary flex justify-between items-center flex-shrink-0"
+      >
         <h3 class="text-xl font-bold text-text-primary">执行详情</h3>
         <button
           @click="$emit('update:modelValue', false)"
           class="text-text-tertiary hover:text-text-secondary transition-colors"
         >
           <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M6 18L18 6M6 6l12 12"
+            />
           </svg>
         </button>
       </div>
@@ -48,20 +60,29 @@
             <div class="grid grid-cols-3 gap-4 bg-bg-hover rounded-lg p-4">
               <div>
                 <p class="text-xs text-text-tertiary mb-1">状态</p>
-                <span :class="[
-                  'inline-flex px-2 py-1 text-xs font-medium rounded-full',
-                  execution.status === 'success' ? 'bg-green-100 text-success' : 'bg-red-100 text-red-700'
-                ]">
+                <span
+                  :class="[
+                    'inline-flex px-2 py-1 text-xs font-medium rounded-full',
+                    execution.status === 'success'
+                      ? 'bg-green-100 text-success'
+                      : 'bg-red-100 text-red-700',
+                  ]"
+                >
                   {{ execution.status === 'success' ? '成功' : '失败' }}
                 </span>
               </div>
               <div>
                 <p class="text-xs text-text-tertiary mb-1">HTTP状态码</p>
-                <span :class="[
-                  'inline-flex px-2 py-1 text-xs font-semibold rounded',
-                  execution.response_status >= 200 && execution.response_status < 300 ? 'bg-green-100 text-success' :
-                  execution.response_status >= 400 ? 'bg-red-100 text-red-700' : 'bg-yellow-100 text-yellow-700'
-                ]">
+                <span
+                  :class="[
+                    'inline-flex px-2 py-1 text-xs font-semibold rounded',
+                    execution.response_status >= 200 && execution.response_status < 300
+                      ? 'bg-green-100 text-success'
+                      : execution.response_status >= 400
+                        ? 'bg-red-100 text-red-700'
+                        : 'bg-yellow-100 text-yellow-700',
+                  ]"
+                >
                   {{ execution.response_status || 'N/A' }}
                 </span>
               </div>

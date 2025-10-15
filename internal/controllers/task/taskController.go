@@ -207,15 +207,22 @@ func DeleteTask(c *gin.Context) {
 // EnableTask 启用任务
 func EnableTask(c *gin.Context) {
 	id := c.Param("id")
-	userID := c.Query("user_id")
 
-	if userID == "" {
-		errors.HandleError(c, errors.New(errors.CodeInvalidParameter, "user_id不能为空"))
+	// 从认证中间件设置的上下文中获取user_id
+	userID, exists := c.Get("user_id")
+	if !exists {
+		errors.HandleError(c, errors.New(errors.CodeUnauthorized, "用户未登录"))
+		return
+	}
+
+	userIDStr, ok := userID.(string)
+	if !ok || userIDStr == "" {
+		errors.HandleError(c, errors.New(errors.CodeInvalidParameter, "用户ID无效"))
 		return
 	}
 
 	service := taskService.GetTaskService()
-	if err := service.EnableTask(id, userID); err != nil {
+	if err := service.EnableTask(id, userIDStr); err != nil {
 		errors.HandleError(c, err)
 		return
 	}
@@ -226,15 +233,22 @@ func EnableTask(c *gin.Context) {
 // DisableTask 禁用任务
 func DisableTask(c *gin.Context) {
 	id := c.Param("id")
-	userID := c.Query("user_id")
 
-	if userID == "" {
-		errors.HandleError(c, errors.New(errors.CodeInvalidParameter, "user_id不能为空"))
+	// 从认证中间件设置的上下文中获取user_id
+	userID, exists := c.Get("user_id")
+	if !exists {
+		errors.HandleError(c, errors.New(errors.CodeUnauthorized, "用户未登录"))
+		return
+	}
+
+	userIDStr, ok := userID.(string)
+	if !ok || userIDStr == "" {
+		errors.HandleError(c, errors.New(errors.CodeInvalidParameter, "用户ID无效"))
 		return
 	}
 
 	service := taskService.GetTaskService()
-	if err := service.DisableTask(id, userID); err != nil {
+	if err := service.DisableTask(id, userIDStr); err != nil {
 		errors.HandleError(c, err)
 		return
 	}

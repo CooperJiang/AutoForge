@@ -26,7 +26,7 @@ class SimpleEncryption {
       const encryptedBytes = new Uint8Array(
         atob(encryptedText)
           .split('')
-          .map((char) => char.charCodeAt(0)),
+          .map((char) => char.charCodeAt(0))
       )
       const decrypted = new Uint8Array(encryptedBytes.length)
 
@@ -232,22 +232,16 @@ class SecureStorage {
         'login_remember',
         'user_preferences',
         'theme',
-        'language'
+        'language',
       ]
 
-      let cleanedCount = 0
-      oldKeys.forEach(key => {
+      oldKeys.forEach((key) => {
         if (localStorage.getItem(key)) {
           localStorage.removeItem(key)
-          cleanedCount++
         }
       })
-
-      if (cleanedCount > 0) {
-        console.log(`已清理 ${cleanedCount} 个旧的localStorage项`)
-      }
-    } catch (error) {
-      console.warn('清理旧数据失败:', error)
+    } catch {
+      console.warn('清理旧数据失败')
     }
   }
 
@@ -266,7 +260,7 @@ class SecureStorage {
       let expiredItems = 0
       let totalSize = 0
 
-      keys.forEach(key => {
+      keys.forEach((key) => {
         const info = this.getItemInfo(key)
         if (info.exists) {
           if (info.expired) {
@@ -292,7 +286,7 @@ class SecureStorage {
         totalItems: keys.length,
         encryptedItems,
         expiredItems,
-        totalSize: `${(totalSize / 1024).toFixed(2)} KB`
+        totalSize: `${(totalSize / 1024).toFixed(2)} KB`,
       }
     } catch (error) {
       console.warn('获取存储统计失败:', error)
@@ -300,7 +294,7 @@ class SecureStorage {
         totalItems: 0,
         encryptedItems: 0,
         expiredItems: 0,
-        totalSize: '0 KB'
+        totalSize: '0 KB',
       }
     }
   }
@@ -313,17 +307,13 @@ class SecureStorage {
       const keys = this.getAllKeys()
       let cleanedCount = 0
 
-      keys.forEach(key => {
+      keys.forEach((key) => {
         const info = this.getItemInfo(key)
         if (info.expired) {
           this.removeItem(key)
           cleanedCount++
         }
       })
-
-      if (cleanedCount > 0) {
-        console.log(`已清理 ${cleanedCount} 个过期的存储项`)
-      }
 
       return cleanedCount
     } catch (error) {

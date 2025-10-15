@@ -2,7 +2,9 @@
   <div class="px-6 py-6">
     <!-- 统计卡片 -->
     <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 mb-6">
-      <div class="bg-gradient-to-br from-primary to-primary-hover rounded-xl p-6 text-white shadow-lg">
+      <div
+        class="bg-gradient-to-br from-primary to-primary-hover rounded-xl p-6 text-white shadow-lg"
+      >
         <div class="flex items-center justify-between">
           <div>
             <p class="text-blue-100 text-sm font-medium">总用户数</p>
@@ -12,7 +14,9 @@
         </div>
       </div>
 
-      <div class="bg-gradient-to-br from-success to-success-hover rounded-xl p-6 text-white shadow-lg">
+      <div
+        class="bg-gradient-to-br from-success to-success-hover rounded-xl p-6 text-white shadow-lg"
+      >
         <div class="flex items-center justify-between">
           <div>
             <p class="text-green-100 text-sm font-medium">总任务数</p>
@@ -22,7 +26,9 @@
         </div>
       </div>
 
-      <div class="bg-gradient-to-br from-accent to-accent-hover rounded-xl p-6 text-white shadow-lg">
+      <div
+        class="bg-gradient-to-br from-accent to-accent-hover rounded-xl p-6 text-white shadow-lg"
+      >
         <div class="flex items-center justify-between">
           <div>
             <p class="text-purple-100 text-sm font-medium">今日执行</p>
@@ -32,7 +38,9 @@
         </div>
       </div>
 
-      <div class="bg-gradient-to-br from-orange-500 to-orange-600 rounded-xl p-6 text-white shadow-lg">
+      <div
+        class="bg-gradient-to-br from-orange-500 to-orange-600 rounded-xl p-6 text-white shadow-lg"
+      >
         <div class="flex items-center justify-between">
           <div>
             <p class="text-orange-100 text-sm font-medium">成功率</p>
@@ -52,11 +60,14 @@
             'px-6 py-3 font-semibold transition-colors relative',
             activeTab === 'executions'
               ? 'text-green-600 bg-bg-hover'
-              : 'text-text-secondary hover:text-text-primary hover:bg-bg-hover'
+              : 'text-text-secondary hover:text-text-primary hover:bg-bg-hover',
           ]"
         >
           执行记录
-          <span v-if="activeTab === 'executions'" class="absolute bottom-0 left-0 right-0 h-0.5 bg-green-600"></span>
+          <span
+            v-if="activeTab === 'executions'"
+            class="absolute bottom-0 left-0 right-0 h-0.5 bg-green-600"
+          ></span>
         </button>
         <button
           @click="activeTab = 'tasks'"
@@ -64,11 +75,14 @@
             'px-6 py-3 font-semibold transition-colors relative',
             activeTab === 'tasks'
               ? 'text-green-600 bg-bg-hover'
-              : 'text-text-secondary hover:text-text-primary hover:bg-bg-hover'
+              : 'text-text-secondary hover:text-text-primary hover:bg-bg-hover',
           ]"
         >
           任务管理
-          <span v-if="activeTab === 'tasks'" class="absolute bottom-0 left-0 right-0 h-0.5 bg-green-600"></span>
+          <span
+            v-if="activeTab === 'tasks'"
+            class="absolute bottom-0 left-0 right-0 h-0.5 bg-green-600"
+          ></span>
         </button>
         <button
           @click="activeTab = 'users'"
@@ -76,23 +90,32 @@
             'px-6 py-3 font-semibold transition-colors relative',
             activeTab === 'users'
               ? 'text-green-600 bg-bg-hover'
-              : 'text-text-secondary hover:text-text-primary hover:bg-bg-hover'
+              : 'text-text-secondary hover:text-text-primary hover:bg-bg-hover',
           ]"
         >
           用户管理
-          <span v-if="activeTab === 'users'" class="absolute bottom-0 left-0 right-0 h-0.5 bg-green-600"></span>
+          <span
+            v-if="activeTab === 'users'"
+            class="absolute bottom-0 left-0 right-0 h-0.5 bg-green-600"
+          ></span>
         </button>
       </div>
     </div>
 
     <!-- Tab 内容 -->
     <!-- 执行记录 Tab -->
-    <div v-show="activeTab === 'executions'" class="bg-bg-elevated rounded-b-xl shadow-lg border-2 border-t-0 border-border-primary p-6">
+    <div
+      v-show="activeTab === 'executions'"
+      class="bg-bg-elevated rounded-b-xl shadow-lg border-2 border-t-0 border-border-primary p-6"
+    >
       <ExecutionsTab />
     </div>
 
     <!-- 任务列表 Tab -->
-    <div v-show="activeTab === 'tasks'" class="bg-bg-elevated rounded-b-xl shadow-lg border-2 border-t-0 border-border-primary p-6">
+    <div
+      v-show="activeTab === 'tasks'"
+      class="bg-bg-elevated rounded-b-xl shadow-lg border-2 border-t-0 border-border-primary p-6"
+    >
       <TasksTab
         :tasks="tasks"
         :total="total"
@@ -110,7 +133,10 @@
     </div>
 
     <!-- 用户管理 Tab -->
-    <div v-show="activeTab === 'users'" class="bg-bg-elevated rounded-b-xl shadow-lg border-2 border-t-0 border-border-primary p-6">
+    <div
+      v-show="activeTab === 'users'"
+      class="bg-bg-elevated rounded-b-xl shadow-lg border-2 border-t-0 border-border-primary p-6"
+    >
       <UsersTab />
     </div>
 
@@ -126,16 +152,10 @@
     />
 
     <!-- 测试结果对话框 -->
-    <TestResultDialog
-      v-model="showTestResult"
-      :result="testResult"
-    />
+    <TestResultDialog v-model="showTestResult" :result="testResult" />
 
     <!-- 任务详情对话框 -->
-    <TaskDetailDialog
-      v-model="showTaskDetail"
-      :task="selectedTask"
-    />
+    <TaskDetailDialog v-model="showTaskDetail" :task="selectedTask" />
   </div>
 </template>
 
@@ -163,7 +183,7 @@ const stats = ref<StatsResponse>({
   active_tasks: 0,
   today_executions: 0,
   success_rate: 0,
-  recent_users: []
+  recent_users: [],
 })
 
 // 任务列表
@@ -176,7 +196,7 @@ const pageSize = ref(20)
 const filters = ref({
   user_id: '',
   status: '',
-  keyword: ''
+  keyword: '',
 })
 
 // Dialog控制
@@ -210,7 +230,7 @@ const loadTasks = async () => {
     const res = await adminApi.getTasks({
       page: currentPage.value,
       page_size: pageSize.value,
-      ...filters.value
+      ...filters.value,
     })
     tasks.value = res.data.tasks || []
     total.value = res.data.total

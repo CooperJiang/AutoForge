@@ -2,7 +2,7 @@
   <div class="space-y-2">
     <BaseSelect
       :model-value="type"
-      @update:model-value="$emit('update:type', $event)"
+      @update:model-value="handleTypeChange"
       :options="scheduleOptions"
       label="执行规则"
       required
@@ -11,7 +11,7 @@
     <TimePicker
       v-if="type === 'daily'"
       :model-value="value"
-      @update:model-value="$emit('update:value', $event)"
+      @update:model-value="handleValueChange"
       hint="每天在指定时间执行"
     />
 
@@ -72,10 +72,18 @@ defineProps<{
   value: string
 }>()
 
-defineEmits<{
+const emit = defineEmits<{
   'update:type': [value: string]
   'update:value': [value: string]
 }>()
+
+const handleTypeChange = (newType: string) => {
+  emit('update:type', newType)
+}
+
+const handleValueChange = (newValue: string) => {
+  emit('update:value', newValue)
+}
 
 const scheduleOptions = [
   { label: '每天', value: 'daily' },
@@ -83,6 +91,6 @@ const scheduleOptions = [
   { label: '每月', value: 'monthly' },
   { label: '每小时', value: 'hourly' },
   { label: '间隔', value: 'interval' },
-  { label: 'Cron表达式', value: 'cron' }
+  { label: 'Cron表达式', value: 'cron' },
 ]
 </script>

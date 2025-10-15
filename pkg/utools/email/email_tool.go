@@ -24,7 +24,6 @@ func NewEmailTool() *EmailTool {
 		Category:    "notification",
 		Version:     "1.0.0",
 		Author:      "AutoForge",
-		Icon:        "mail",
 		AICallable:  true,
 		Tags:        []string{"email", "notification", "smtp", "alert"},
 	}

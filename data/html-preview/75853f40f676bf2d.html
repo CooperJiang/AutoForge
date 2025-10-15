@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>前端每日一题</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/atom-one-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+    <script>hljs.highlightAll();</script>
+</head>
+<body class="bg-gray-100 min-h-screen flex items-center justify-center p-4">
+    <div class="max-w-4xl w-full bg-white rounded-xl shadow-lg overflow-hidden">
+        <div class="bg-gradient-to-r from-indigo-500 to-purple-600 p-6 text-white">
+            <div class="flex items-center justify-between">
+                <h1 class="text-2xl font-bold">前端每日一题</h1>
+                <span class="bg-white bg-opacity-20 px-3 py-1 rounded-full text-sm font-medium">Vite & Webpack</span>
+            </div>
+        </div>
+        
+        <div class="p-6">
+            <div class="bg-indigo-50 p-4 rounded-lg mb-6">
+                <h2 class="text-xl font-semibold text-indigo-700 mb-2">📝 今日问题</h2>
+                <p class="text-gray-800">请简述 Vite 的工作原理及其相比传统构建工具（如 Webpack）的优势有哪些？并举例说明如何在一个 Vue 3 项目中使用 Vite 进行开发和构建。</p>
+            </div>
+            
+            <div class="space-y-6">
+                <section>
+                    <h3 class="text-lg font-semibold text-indigo-600 mb-3 border-b border-indigo-100 pb-2">Vite 的工作原理</h3>
+                    <div class="text-gray-700 space-y-3">
+                        <p>Vite（法语中"快"的意思）是一个现代前端构建工具，其工作原理主要基于以下两点：</p>
+                        <ol class="list-decimal list-inside pl-4 space-y-2">
+                            <li><span class="font-medium">开发环境：</span>利用浏览器原生 ES 模块（ESM）能力，实现按需加载。当浏览器请求某个模块时，Vite 才会对该模块进行转换并返回。这种方式避免了整个应用的打包过程。</li>
+                            <li><span class="font-medium">生产环境：</span>使用 Rollup 进行打包构建，它比 Webpack 更加轻量级且针对 ES 模块优化得更好。</li>
+                        </ol>
+                        <p class="mt-3">Vite 采用了预构建依赖的策略：将 node_modules 中的依赖预先构建为 ESM 格式，并通过 esbuild（Go 编写的极速构建工具）进行处理，大大加快了冷启动速度。</p>
+                    </div>
+                </section>
+                
+                <section>
+                    <h3 class="text-lg font-semibold text-indigo-600 mb-3 border-b border-indigo-100 pb-2">Vite 相比 Webpack 的优势</h3>
+                    <div class="text-gray-700 space-y-3">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="bg-green-50 p-4 rounded-lg">
+                                <h4 class="font-medium text-green-700 mb-2">⚡ 更快的启动速度</h4>
+                                <p>Vite 无需提前打包整个应用，避免了随着应用规模增长而线性增长的启动时间。</p>
+                            </div>
+                            <div class="bg-blue-50 p-4 rounded-lg">
+                                <h4 class="font-medium text-blue-700 mb-2">🔄 即时热更新</h4>
+                                <p>修改代码时，Vite 只需要重新编译变化的模块，而不是整个包，使热更新速度与项目大小解耦。</p>
+                            </div>
+                            <div class="bg-amber-50 p-4 rounded-lg">
+                                <h4 class="font-medium text-amber-700 mb-2">🛠️ 内置优化支持</h4>
+                                <p>对 TypeScript、JSX、CSS 等提供开箱即用的支持，减少配置负担。</p>
+                            </div>
+                            <div class="bg-purple-50 p-4 rounded-lg">
+                                <h4 class="font-medium text-purple-700 mb-2">📦 优化的构建</h4>
+                                <p>生产环境使用 Rollup 构建，具有更好的 tree-shaking 和代码分割能力。</p>
+                            </div>
+                        </div>
+                        <div class="bg-gray-50 p-4 rounded-lg mt-4">
+                            <h4 class="font-medium text-gray-700 mb-2">📈 性能对比</h4>
+                            <p>对于大型项目，Webpack 冷启动可能需要几十秒甚至几分钟，而 Vite 通常只需要几百毫秒；Webpack 的热更新随着项目增大而变慢，而 Vite 保持恒定的快速响应。</p>
+                        </div>
+                    </div>
+                </section>
+                
+                <section>
+                    <h3 class="text-lg font-semibold text-indigo-600 mb-3 border-b border-indigo-100 pb-2">在 Vue 3 项目中使用 Vite</h3>
+                    <div class="text-gray-700 space-y-4">
+                        <h4 class="font-medium">1. 创建新的 Vue 3 + Vite 项目</h4>
+                        <pre><code class="language-bash">npm create vite@latest my-vue-app --template vue
+cd my-vue-app
+npm install
+npm run dev</code></pre>
+                        
+                        <h4 class="font-medium mt-4">2. Vite 配置文件</h4>
+                        <p>在项目根目录创建 <code class="bg-gray-100 px-1 rounded">vite.config.js</code>:</p>
+                        <pre><code class="language-javascript">import { defineConfig } from 'vite'
+import vue from '@vitejs/plugin-vue'
+import path from 'path'
+
+export default defineConfig({
+  plugins: [vue()],
+  resolve: {
+    alias: {
+      '@': path.resolve(__dirname, 'src')
+    }
+  },
+  server: {
+    port: 3000,
+    open: true,
+    proxy: {
+      '/api': {
+        target: 'http://localhost:8080',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api/, '')
+      }
+    }
+  },
+  build: {
+    outDir: 'dist',
+    minify: 'terser',
+    terserOptions: {
+      compress: {
+        drop_console: true,
+        drop_debugger: true
+      }
+    }
+  }
+})</code></pre>
+                        
+                        <h4 class="font-medium mt-4">3. 开发与构建命令</h4>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="bg-gray-50 p-4 rounded-lg">
+                                <h5 class="text-gray-700 font-medium mb-2">开发环境</h5>
+                                <pre class="text-sm"><code class="language-bash">npm run dev</code></pre>
+                                <p class="mt-2 text-sm">启动开发服务器，默认在 http://localhost:3000</p>
+                            </div>
+                            <div class="bg-gray-50 p-4 rounded-lg">
+                                <h5 class="text-gray-700 font-medium mb-2">生产构建</h5>
+                                <pre class="text-sm"><code class="language-bash">npm run build</code></pre>
+                                <p class="mt-2 text-sm">构建生产版本到 dist 目录</p>
+                            </div>
+                        </div>
+                        
+                        <h4 class="font-medium mt-4">4. 添加插件增强功能</h4>
+                        <p>Vite 有丰富的插件生态，例如添加页面路由：</p>
+                        <pre><code class="language-bash">npm install vue-router@4</code></pre>
+                        
+                        <p class="mt-2">在 <code class="bg-gray-100 px-1 rounded">src/router/index.js</code> 中配置：</p>
+                        <pre><code class="language-javascript">import { createRouter, createWebHistory } from 'vue-router'
+import Home from '../views/Home.vue'
+
+const routes = [
+  {
+    path: '/',
+    name: 'Home',
+    component: Home
+  },
+  {
+    path: '/about',
+    name: 'About',
+    component: () => import('../views/About.vue') // 懒加载路由
+  }
+]
+
+const router = createRouter({
+  history: createWebHistory(),
+  routes
+})
+
+export default router</code></pre>
+                        
+                        <p class="mt-4">在 <code class="bg-gray-100 px-1 rounded">src/main.js</code> 中使用：</p>
+                        <pre><code class="language-javascript">import { createApp } from 'vue'
+import App from './App.vue'
+import router from './router'
+
+createApp(App).use(router).mount('#app')</code></pre>
+                    </div>
+                </section>
+                
+                <section class="bg-gray-50 p-4 rounded-lg">
+                    <h3 class="text-lg font-semibold text-gray-700 mb-3">总结</h3>
+                    <p class="text-gray-700">
+                        Vite 通过利用浏览器原生 ES 模块功能和先进的打包策略，成功解决了传统构建工具在开发体验上的痛点。它特别适合现代前端框架如 Vue 3，能够提供极速的开发体验和高效的生产构建。对于新项目，特别是中大型应用，使用 Vite 作为构建工具能够显著提升开发效率。
+                    </p>
+                </section>
+            </div>
+        </div>
+        
+        <div class="bg-gray-50 px-6 py-4 flex justify-between items-center border-t border-gray-200">
+            <span class="text-gray-500 text-sm">更新于: 2025年10月14日</span>
+            <span class="bg-indigo-100 text-indigo-800 px-3 py-1 rounded-full text-sm font-medium">前端工程化</span>
+        </div>
+    </div>
+    
+    <script>
+        // 添加代码高亮和其他交互效果
+        document.addEventListener('DOMContentLoaded', (event) => {
+            hljs.highlightAll();
+        });
+    </script>
+</body>
+</html>

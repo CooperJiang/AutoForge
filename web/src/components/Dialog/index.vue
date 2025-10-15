@@ -1,16 +1,30 @@
 <template>
   <Teleport to="body">
     <Transition name="dialog">
-      <div v-if="modelValue" class="fixed inset-0 z-50 flex items-center justify-center p-4" @click.self="onCancel">
+      <div
+        v-if="modelValue"
+        class="fixed inset-0 z-50 flex items-center justify-center p-4"
+        @click.self="onCancel"
+      >
         <!-- 背景遮罩 -->
         <div class="absolute inset-0 bg-black bg-opacity-50 transition-opacity"></div>
 
         <!-- 对话框内容 -->
-        <div :class="['relative bg-bg-elevated rounded-lg shadow-xl border-2 border-border-primary w-full max-h-[90vh] flex flex-col transform transition-all', maxWidth]">
+        <div
+          :class="[
+            'relative bg-bg-elevated rounded-lg shadow-xl border-2 border-border-primary w-full max-h-[90vh] flex flex-col transform transition-all',
+            maxWidth,
+          ]"
+        >
           <!-- 标题 -->
-          <div class="px-5 py-4 border-b-2 border-border-primary flex items-center justify-between flex-shrink-0">
+          <div
+            class="px-5 py-4 border-b-2 border-border-primary flex items-center justify-between flex-shrink-0"
+          >
             <h3 class="text-base font-semibold text-text-primary">{{ title }}</h3>
-            <button @click="onCancel" class="text-text-tertiary hover:text-text-secondary transition-colors">
+            <button
+              @click="onCancel"
+              class="text-text-tertiary hover:text-text-secondary transition-colors"
+            >
               <X :size="20" />
             </button>
           </div>
@@ -23,7 +37,10 @@
           </div>
 
           <!-- 按钮 -->
-          <div v-if="!hideFooter" class="px-5 py-4 border-t-2 border-border-primary flex gap-2 justify-end flex-shrink-0">
+          <div
+            v-if="!hideFooter"
+            class="px-5 py-4 border-t-2 border-border-primary flex gap-2 justify-end flex-shrink-0"
+          >
             <slot name="footer">
               <BaseButton v-if="cancelText" variant="secondary" @click="onCancel">
                 {{ cancelText }}
@@ -54,14 +71,14 @@ interface Props {
   hideFooter?: boolean
 }
 
-const props = withDefaults(defineProps<Props>(), {
+withDefaults(defineProps<Props>(), {
   title: '确认',
   message: '确定要执行此操作吗？',
   confirmText: '确定',
   cancelText: '取消',
   confirmVariant: 'primary',
   maxWidth: 'max-w-md',
-  hideFooter: false
+  hideFooter: false,
 })
 
 const emit = defineEmits<{

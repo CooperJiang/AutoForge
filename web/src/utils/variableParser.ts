@@ -36,7 +36,7 @@ export function parseObjectVariables(obj: any, context: VariableContext): any {
   }
 
   if (Array.isArray(obj)) {
-    return obj.map(item => parseObjectVariables(item, context))
+    return obj.map((item) => parseObjectVariables(item, context))
   }
 
   if (typeof obj === 'object') {
@@ -109,7 +109,7 @@ export function extractObjectVariables(obj: any): string[] {
   }
 
   if (Array.isArray(obj)) {
-    return obj.flatMap(item => extractObjectVariables(item))
+    return obj.flatMap((item) => extractObjectVariables(item))
   }
 
   if (typeof obj === 'object') {
@@ -126,7 +126,10 @@ export function extractObjectVariables(obj: any): string[] {
 /**
  * 验证变量引用是否有效
  */
-export function validateVariable(variable: string, availableNodes: string[]): {
+export function validateVariable(
+  variable: string,
+  availableNodes: string[]
+): {
   valid: boolean
   message?: string
 } {
@@ -142,7 +145,7 @@ export function validateVariable(variable: string, availableNodes: string[]): {
   if (!availableNodes.includes(root)) {
     return {
       valid: false,
-      message: `节点 "${root}" 不存在`
+      message: `节点 "${root}" 不存在`,
     }
   }
 
@@ -159,50 +162,50 @@ export function getNodeOutputSchema(nodeType: string, toolCode?: string): Record
       'response.status': '响应状态码',
       'response.data': '响应数据',
       'response.headers': '响应头',
-      'error': '错误信息（如果失败）'
+      error: '错误信息（如果失败）',
     }
   }
 
   // 邮件发送
   if (toolCode === 'email_sender') {
     return {
-      'success': '是否发送成功',
-      'messageId': '邮件ID',
-      'error': '错误信息（如果失败）'
+      success: '是否发送成功',
+      messageId: '邮件ID',
+      error: '错误信息（如果失败）',
     }
   }
 
   // 健康检查
   if (toolCode === 'health_checker') {
     return {
-      'healthy': '是否健康',
-      'status': '状态码',
-      'responseTime': '响应时间（毫秒）',
-      'error': '错误信息（如果失败）'
+      healthy: '是否健康',
+      status: '状态码',
+      responseTime: '响应时间（毫秒）',
+      error: '错误信息（如果失败）',
     }
   }
 
   // 条件判断
   if (nodeType === 'condition') {
     return {
-      'result': '条件结果 (true/false)',
-      'branch': '执行的分支 (true/false)'
+      result: '条件结果 (true/false)',
+      branch: '执行的分支 (true/false)',
     }
   }
 
   // 开关
   if (nodeType === 'switch') {
     return {
-      'matchedCase': '匹配的分支',
-      'value': '实际值'
+      matchedCase: '匹配的分支',
+      value: '实际值',
     }
   }
 
   // 触发器
   if (nodeType === 'trigger') {
     return {
-      'timestamp': '触发时间',
-      'type': '触发类型'
+      timestamp: '触发时间',
+      type: '触发类型',
     }
   }
 

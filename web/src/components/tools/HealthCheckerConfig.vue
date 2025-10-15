@@ -1,7 +1,12 @@
 <template>
   <div class="space-y-4">
     <div class="bg-primary-light border border-primary rounded-lg p-3 text-xs text-primary">
-      💡 小提示：按 <kbd class="px-1.5 py-0.5 bg-bg-elevated border border-primary rounded">{{ isMac ? 'Cmd' : 'Ctrl' }}</kbd> + <kbd class="px-1.5 py-0.5 bg-bg-elevated border border-primary rounded">V</kbd> 可直接粘贴 cURL 命令自动解析
+      💡 小提示：按
+      <kbd class="px-1.5 py-0.5 bg-bg-elevated border border-primary rounded">{{
+        isMac ? 'Cmd' : 'Ctrl'
+      }}</kbd>
+      + <kbd class="px-1.5 py-0.5 bg-bg-elevated border border-primary rounded">V</kbd> 可直接粘贴
+      cURL 命令自动解析
     </div>
 
     <div>
@@ -16,9 +21,7 @@
     </div>
 
     <div>
-      <label class="block text-sm font-medium text-text-secondary mb-2">
-        请求方法
-      </label>
+      <label class="block text-sm font-medium text-text-secondary mb-2"> 请求方法 </label>
       <BaseSelect
         v-model="localConfig.method"
         :options="methodOptions"
@@ -28,9 +31,7 @@
 
     <div>
       <div class="flex items-center justify-between mb-2">
-        <label class="block text-sm font-medium text-text-secondary">
-          请求头 (Headers)
-        </label>
+        <label class="block text-sm font-medium text-text-secondary"> 请求头 (Headers) </label>
         <button
           type="button"
           @click="addHeader"
@@ -51,9 +52,7 @@
     </div>
 
     <div>
-      <label class="block text-sm font-medium text-text-secondary mb-2">
-        请求体 (Body)
-      </label>
+      <label class="block text-sm font-medium text-text-secondary mb-2"> 请求体 (Body) </label>
       <textarea
         v-model="localConfig.body"
         @input="emitUpdate"
@@ -65,9 +64,7 @@
     </div>
 
     <div>
-      <label class="block text-sm font-medium text-text-secondary mb-2">
-        超时时间（秒）
-      </label>
+      <label class="block text-sm font-medium text-text-secondary mb-2"> 超时时间（秒） </label>
       <BaseInput
         v-model.number="localConfig.timeout"
         type="number"
@@ -77,9 +74,7 @@
     </div>
 
     <div>
-      <label class="block text-sm font-medium text-text-secondary mb-2">
-        期望状态码
-      </label>
+      <label class="block text-sm font-medium text-text-secondary mb-2"> 期望状态码 </label>
       <BaseInput
         v-model.number="localConfig.expected_status"
         type="number"
@@ -144,19 +139,23 @@ const localConfig = ref({
   expected_status: 200,
   response_pattern: '',
   ssl_expiry_days: 30,
-  ...props.config
+  ...props.config,
 })
 
 const methodOptions = [
   { label: 'GET', value: 'GET' },
   { label: 'POST', value: 'POST' },
   { label: 'PUT', value: 'PUT' },
-  { label: 'DELETE', value: 'DELETE' }
+  { label: 'DELETE', value: 'DELETE' },
 ]
 
-watch(() => props.config, (newVal) => {
-  localConfig.value = { ...localConfig.value, ...newVal }
-}, { deep: true })
+watch(
+  () => props.config,
+  (newVal) => {
+    localConfig.value = { ...localConfig.value, ...newVal }
+  },
+  { deep: true }
+)
 
 const addHeader = () => {
   if (!Array.isArray(localConfig.value.headers)) {

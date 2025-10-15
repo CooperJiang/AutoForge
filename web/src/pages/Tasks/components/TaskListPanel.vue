@@ -21,7 +21,9 @@
       v-if="filteredTasks.length === 0"
       class="bg-bg-elevated border-2 border-border-primary rounded-lg p-8 text-center"
     >
-      <p class="text-text-tertiary">{{ tasks.length === 0 ? '暂无任务，请添加一个定时任务' : '没有符合条件的任务' }}</p>
+      <p class="text-text-tertiary">
+        {{ tasks.length === 0 ? '暂无任务，请添加一个定时任务' : '没有符合条件的任务' }}
+      </p>
     </div>
 
     <div v-else class="space-y-3">
@@ -77,6 +79,6 @@ defineEmits<{
 const statusFilterOptions = [
   { label: '全部状态', value: 'all' },
   { label: '已启用', value: 'enabled' },
-  { label: '已禁用', value: 'disabled' }
+  { label: '已禁用', value: 'disabled' },
 ]
 </script>

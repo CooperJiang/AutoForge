@@ -3,7 +3,9 @@
     <div v-if="!nextRunTime || nextRunTime === 0" class="text-text-tertiary">--</div>
     <div v-else-if="countdown <= 0" class="text-orange-600 font-medium text-sm">即将执行</div>
     <div v-else>
-      <span class="text-sm font-medium" :class="timeColorClass" :title="formattedTime">{{ formattedCountdown }}</span>
+      <span class="text-sm font-medium" :class="timeColorClass" :title="formattedTime">{{
+        formattedCountdown
+      }}</span>
     </div>
   </div>
 </template>

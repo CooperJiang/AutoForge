@@ -7,10 +7,7 @@
         <div class="space-y-3">
           <div>
             <label class="block text-xs font-medium text-text-secondary mb-1">节点名称</label>
-            <BaseInput
-              v-model="localNode.name"
-              placeholder="输入节点名称"
-            />
+            <BaseInput v-model="localNode.name" placeholder="输入节点名称" />
           </div>
         </div>
       </div>
@@ -23,17 +20,20 @@
         <div v-if="node.toolCode === 'http_request'" class="space-y-4">
           <!-- Curl 粘贴提示 -->
           <div class="bg-primary-light border border-primary rounded-lg p-3 text-xs text-primary">
-            💡 小提示：按 <kbd class="px-1.5 py-0.5 bg-bg-elevated border border-primary rounded">{{ isMac ? 'Cmd' : 'Ctrl' }}</kbd> + <kbd class="px-1.5 py-0.5 bg-bg-elevated border border-primary rounded">V</kbd> 可直接粘贴 cURL 命令自动解析
+            💡 小提示：按
+            <kbd class="px-1.5 py-0.5 bg-bg-elevated border border-primary rounded">{{
+              isMac ? 'Cmd' : 'Ctrl'
+            }}</kbd>
+            +
+            <kbd class="px-1.5 py-0.5 bg-bg-elevated border border-primary rounded">V</kbd>
+            可直接粘贴 cURL 命令自动解析
           </div>
 
           <div>
             <label class="block text-sm font-medium text-text-secondary mb-2">
               请求方式 <span class="text-red-500">*</span>
             </label>
-            <BaseSelect
-              v-model="localNode.config.method"
-              :options="methodOptions"
-            />
+            <BaseSelect v-model="localNode.config.method" :options="methodOptions" />
           </div>
 
           <div>
@@ -107,7 +107,8 @@
               class="flex items-center justify-between w-full mb-2 text-left"
             >
               <label class="block text-sm font-medium text-text-secondary cursor-pointer">
-                {{ bodyExpanded ? '▼' : '▶' }} 请求体 (Body) <span class="text-xs text-text-tertiary">(POST/PUT/PATCH)</span>
+                {{ bodyExpanded ? '▼' : '▶' }} 请求体 (Body)
+                <span class="text-xs text-text-tertiary">(POST/PUT/PATCH)</span>
               </label>
             </button>
             <div v-show="bodyExpanded" class="space-y-1">
@@ -135,6 +136,65 @@
           v-else-if="node.toolCode === 'health_checker'"
           v-model:config="localNode.config"
         />
+
+        <!-- 飞书机器人 -->
+        <FeishuBotConfig
+          v-else-if="node.toolCode === 'feishu_bot'"
+          v-model:config="localNode.config"
+          :previous-nodes="props.previousNodes"
+          :env-vars="props.envVars"
+        />
+
+        <!-- OpenAI Chat -->
+        <OpenAIConfig
+          v-else-if="node.toolCode === 'openai_chatgpt'"
+          v-model:config="localNode.config"
+          :previous-nodes="props.previousNodes"
+          :env-vars="props.envVars"
+        />
+
+        <!-- OpenAI Image -->
+        <OpenAIImageConfig
+          v-else-if="node.toolCode === 'openai_image'"
+          v-model:config="localNode.config"
+          :previous-nodes="props.previousNodes"
+          :env-vars="props.envVars"
+        />
+
+        <JsonTransformConfig
+          v-else-if="node.toolCode === 'json_transform'"
+          v-model:config="localNode.config"
+          :previous-nodes="props.previousNodes"
+          :env-vars="props.envVars"
+        />
+
+        <!-- 输出格式化 -->
+        <OutputFormatterConfig
+          v-else-if="node.toolCode === 'output_formatter'"
+          v-model:config="localNode.config"
+          :previous-nodes="props.previousNodes"
+          :env-vars="props.envVars"
+        />
+
+        <!-- HTML 渲染 -->
+        <HtmlRenderConfig
+          v-else-if="node.toolCode === 'html_render'"
+          v-model:config="localNode.config"
+          :previous-nodes="props.previousNodes"
+          :env-vars="props.envVars"
+        />
+
+        <!-- Redis 存储器 -->
+        <RedisContextConfig
+          v-else-if="node.toolCode === 'redis_context'"
+          v-model:config="localNode.config"
+        />
+      </div>
+
+      <!-- 外部 API 触发器配置 -->
+      <div v-if="node.type === 'external_trigger'" class="border-t border-border-primary pt-4">
+        <h3 class="text-sm font-semibold text-text-primary mb-3">外部 API 触发配置</h3>
+        <ExternalTriggerConfig v-model:config="localNode.config" @update="handleConfigUpdate" />
       </div>
 
       <!-- 触发器配置 -->
@@ -146,10 +206,7 @@
       <!-- 条件配置 -->
       <div v-if="node.type === 'condition'" class="border-t border-border-primary pt-4">
         <h3 class="text-sm font-semibold text-text-primary mb-3">条件配置</h3>
-        <ConditionConfig
-          v-model:config="localNode.config"
-          :previous-nodes="props.previousNodes"
-        />
+        <ConditionConfig v-model:config="localNode.config" :previous-nodes="props.previousNodes" />
       </div>
 
       <!-- 延迟配置 -->
@@ -181,14 +238,17 @@
             <span
               :class="[
                 'px-2 py-1 rounded text-xs font-medium',
-                testResult.success ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
+                testResult.success ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700',
               ]"
             >
               {{ testResult.success ? '✓ 成功' : '✗ 失败' }}
             </span>
           </div>
 
-          <div v-if="testResult.error" class="mb-3 p-3 bg-red-50 border-l-4 border-red-400 text-sm text-red-700">
+          <div
+            v-if="testResult.error"
+            class="mb-3 p-3 bg-red-50 border-l-4 border-red-400 text-sm text-red-700"
+          >
             <div class="font-semibold mb-1">错误信息：</div>
             <div class="font-mono text-xs">{{ testResult.error }}</div>
           </div>
@@ -199,7 +259,11 @@
               <pre>{{ JSON.stringify(testResult.output, null, 2) }}</pre>
             </div>
             <div class="text-xs text-text-secondary">
-              💡 可以在后续节点中通过 <code class="px-1 py-0.5 bg-bg-tertiary rounded">&#123;&#123;{{ node.id }}.fieldName&#125;&#125;</code> 引用这些字段
+              💡 可以在后续节点中通过
+              <code class="px-1 py-0.5 bg-bg-tertiary rounded"
+                >&#123;&#123;{{ node.id }}.fieldName&#125;&#125;</code
+              >
+              引用这些字段
             </div>
           </div>
         </div>
@@ -207,11 +271,7 @@
 
       <!-- 操作按钮 -->
       <div class="flex items-center justify-between pt-4 border-t border-border-primary">
-        <BaseButton
-          size="sm"
-          variant="danger"
-          @click="handleDelete"
-        >
+        <BaseButton size="sm" variant="danger" @click="handleDelete">
           <Trash2 class="w-4 h-4 mr-1" />
           删除节点
         </BaseButton>
@@ -226,29 +286,35 @@
             <Play class="w-4 h-4 mr-1" />
             {{ testRunning ? '测试中...' : '测试运行' }}
           </BaseButton>
-          <BaseButton
-            size="sm"
-            variant="ghost"
-            @click="handleClose"
-          >
-            取消
-          </BaseButton>
-          <BaseButton
-            size="sm"
-            @click="handleSave"
-          >
-            保存配置
-          </BaseButton>
+          <BaseButton size="sm" variant="ghost" @click="handleClose"> 取消 </BaseButton>
+          <BaseButton size="sm" @click="handleSave"> 保存配置 </BaseButton>
         </div>
       </div>
     </div>
   </Drawer>
+
+  <!-- 删除确认对话框 -->
+  <Dialog
+    v-model="showDeleteConfirm"
+    title="删除节点"
+    max-width="max-w-md"
+    @confirm="confirmDelete"
+    @cancel="showDeleteConfirm = false"
+  >
+    <div class="py-2">
+      <p class="text-text-primary">
+        确定要删除节点 <span class="font-semibold text-primary">{{ node?.name }}</span> 吗？
+      </p>
+      <p class="text-text-secondary text-sm mt-1">此操作无法撤销。</p>
+    </div>
+  </Dialog>
 </template>
 
 <script setup lang="ts">
 import { ref, watch, onMounted, onUnmounted, computed } from 'vue'
-import { Trash2, GitBranch, Play } from 'lucide-vue-next'
+import { Trash2, Play } from 'lucide-vue-next'
 import Drawer from '@/components/Drawer'
+import Dialog from '@/components/Dialog'
 import BaseButton from '@/components/BaseButton'
 import BaseInput from '@/components/BaseInput'
 import BaseSelect from '@/components/BaseSelect'
@@ -256,10 +322,18 @@ import ParamInput from '@/components/ParamInput'
 import VariableSelector from '@/components/VariableSelector'
 import EmailToolConfig from '@/components/tools/EmailToolConfig.vue'
 import HealthCheckerConfig from '@/components/tools/HealthCheckerConfig.vue'
+import FeishuBotConfig from '@/components/tools/FeishuBotConfig.vue'
+import OpenAIConfig from '@/components/tools/OpenAIConfig.vue'
+import OpenAIImageConfig from '@/components/tools/OpenAIImageConfig.vue'
+import JsonTransformConfig from '@/components/tools/JsonTransformConfig.vue'
+import OutputFormatterConfig from '@/components/tools/OutputFormatterConfig.vue'
+import HtmlRenderConfig from '@/components/tools/HtmlRenderConfig.vue'
+import RedisContextConfig from '@/components/tools/RedisContextConfig.vue'
 import TriggerConfig from '@/components/tools/TriggerConfig.vue'
 import ConditionConfig from '@/components/tools/ConditionConfig.vue'
 import DelayConfig from '@/components/tools/DelayConfig.vue'
 import SwitchConfig from '@/components/tools/SwitchConfig.vue'
+import ExternalTriggerConfig from './ExternalTriggerConfig.vue'
 import RetryConfig from '@/components/RetryConfig'
 import type { WorkflowNode, WorkflowEnvVar, NodeRetryConfig } from '@/types/workflow'
 import { message } from '@/utils/message'
@@ -274,7 +348,7 @@ interface Props {
 
 const props = withDefaults(defineProps<Props>(), {
   previousNodes: () => [],
-  envVars: () => []
+  envVars: () => [],
 })
 
 const emit = defineEmits<{
@@ -294,7 +368,7 @@ const localNode = ref<WorkflowNode>({
   type: 'tool',
   name: '',
   config: {},
-  position: { x: 0, y: 0 }
+  position: { x: 0, y: 0 },
 })
 
 const methodOptions = [
@@ -302,7 +376,7 @@ const methodOptions = [
   { label: 'POST', value: 'POST' },
   { label: 'PUT', value: 'PUT' },
   { label: 'DELETE', value: 'DELETE' },
-  { label: 'PATCH', value: 'PATCH' }
+  { label: 'PATCH', value: 'PATCH' },
 ]
 
 // 默认重试配置
@@ -310,14 +384,14 @@ const defaultRetryConfig: NodeRetryConfig = {
   enabled: false,
   maxRetries: 3,
   retryInterval: 5,
-  exponentialBackoff: false
+  exponentialBackoff: false,
 }
 
 // 格式化环境变量供 VariableSelector 使用
 const formattedEnvVars = computed(() => {
-  return props.envVars.map(v => ({
+  return props.envVars.map((v) => ({
     key: v.key,
-    description: v.description || v.key
+    description: v.description || v.key,
   }))
 })
 
@@ -326,34 +400,42 @@ const updateRetryConfig = (config: NodeRetryConfig) => {
   localNode.value.retry = config
 }
 
-watch(() => props.modelValue, (val) => {
-  isOpen.value = val
-  if (val && props.node) {
-    localNode.value = JSON.parse(JSON.stringify(props.node))
+watch(
+  () => props.modelValue,
+  (val) => {
+    isOpen.value = val
+    if (val && props.node) {
+      localNode.value = JSON.parse(JSON.stringify(props.node))
 
-    // 初始化HTTP配置
-    if (localNode.value.type === 'tool' && localNode.value.toolCode === 'http_request') {
-      if (!localNode.value.config.method) localNode.value.config.method = 'GET'
-      if (!localNode.value.config.url) localNode.value.config.url = ''
-      if (!localNode.value.config.headers) localNode.value.config.headers = []
-      if (!localNode.value.config.params) localNode.value.config.params = []
-      if (!localNode.value.config.body) localNode.value.config.body = ''
-    }
-    // 其他工具默认配置
-    else if (localNode.value.type === 'tool') {
-      if (localNode.value.toolCode === 'health_checker') {
-        localNode.value.config.timeout = localNode.value.config.timeout || 30
-        localNode.value.config.expectedStatus = localNode.value.config.expectedStatus || 200
+      // 初始化HTTP配置
+      if (localNode.value.type === 'tool' && localNode.value.toolCode === 'http_request') {
+        if (!localNode.value.config.method) localNode.value.config.method = 'GET'
+        if (!localNode.value.config.url) localNode.value.config.url = ''
+        if (!localNode.value.config.headers) localNode.value.config.headers = []
+        if (!localNode.value.config.params) localNode.value.config.params = []
+        if (!localNode.value.config.body) localNode.value.config.body = ''
+      }
+      // 其他工具默认配置
+      else if (localNode.value.type === 'tool') {
+        if (localNode.value.toolCode === 'health_checker') {
+          localNode.value.config.timeout = localNode.value.config.timeout || 30
+          localNode.value.config.expectedStatus = localNode.value.config.expectedStatus || 200
+        }
+      }
+      // 触发器默认配置
+      else if (localNode.value.type === 'trigger') {
+        // 只设置 enabled，其他由 TriggerConfig 组件管理
+        localNode.value.config.enabled =
+          localNode.value.config.enabled !== undefined ? localNode.value.config.enabled : true
+
+        // 删除旧的 time 字段（如果存在）
+        if ('time' in localNode.value.config) {
+          delete localNode.value.config.time
+        }
       }
     }
-    // 触发器默认配置
-    else if (localNode.value.type === 'trigger') {
-      localNode.value.config.scheduleType = localNode.value.config.scheduleType || 'daily'
-      localNode.value.config.time = localNode.value.config.time || '09:00'
-      localNode.value.config.enabled = localNode.value.config.enabled !== undefined ? localNode.value.config.enabled : true
-    }
   }
-})
+)
 
 watch(isOpen, (val) => {
   emit('update:modelValue', val)
@@ -419,7 +501,7 @@ const handlePaste = (e: ClipboardEvent) => {
       method: parsed.method,
       headers: parsed.headers,
       params: parsed.params,
-      body: formattedBody
+      body: formattedBody,
     }
 
     // 如果有 body，自动展开
@@ -437,20 +519,36 @@ const handleClose = () => {
   isOpen.value = false
 }
 
+const handleConfigUpdate = (config: any) => {
+  localNode.value.config = config
+}
+
 const handleSave = () => {
   if (props.node) {
-    emit('update', props.node.id, {
+    const updateData = {
       name: localNode.value.name,
       config: localNode.value.config,
-      retry: localNode.value.retry
-    })
+      retry: localNode.value.retry,
+    }
+
+    emit('update', props.node.id, updateData)
     handleClose()
   }
 }
 
+// 删除确认对话框
+const showDeleteConfirm = ref(false)
+
 const handleDelete = () => {
-  if (props.node && confirm('确定要删除此节点吗？')) {
+  if (props.node) {
+    showDeleteConfirm.value = true
+  }
+}
+
+const confirmDelete = () => {
+  if (props.node) {
     emit('delete', props.node.id)
+    showDeleteConfirm.value = false
   }
 }
 
@@ -467,7 +565,7 @@ const handleTestRun = async () => {
       if (!localNode.value.config.url) {
         testResult.value = {
           success: false,
-          error: '请填写接口地址'
+          error: '请填写接口地址',
         }
         return
       }
@@ -479,7 +577,7 @@ const handleTestRun = async () => {
     // const response = await nodeApi.testRun(localNode.value)
 
     // Mock 测试结果
-    await new Promise(resolve => setTimeout(resolve, 1500))
+    await new Promise((resolve) => setTimeout(resolve, 1500))
 
     if (localNode.value.toolCode === 'http_request') {
       testResult.value = {
@@ -488,17 +586,17 @@ const handleTestRun = async () => {
           status: 200,
           statusText: 'OK',
           headers: {
-            'content-type': 'application/json'
+            'content-type': 'application/json',
           },
           body: {
             success: true,
             data: {
               id: 12345,
-              message: '请求成功'
-            }
+              message: '请求成功',
+            },
           },
-          responseTime: 234
-        }
+          responseTime: 234,
+        },
       }
     } else if (localNode.value.toolCode === 'health_checker') {
       testResult.value = {
@@ -506,23 +604,23 @@ const handleTestRun = async () => {
         output: {
           healthy: true,
           status: 200,
-          responseTime: 156
-        }
+          responseTime: 156,
+        },
       }
     } else if (localNode.value.toolCode === 'email') {
       testResult.value = {
         success: true,
         output: {
           sent: true,
-          messageId: 'msg-12345'
-        }
+          messageId: 'msg-12345',
+        },
       }
     } else {
       testResult.value = {
         success: true,
         output: {
-          result: '执行成功'
-        }
+          result: '执行成功',
+        },
       }
     }
 
@@ -530,7 +628,7 @@ const handleTestRun = async () => {
   } catch (error: any) {
     testResult.value = {
       success: false,
-      error: error.message || '测试运行失败'
+      error: error.message || '测试运行失败',
     }
     message.error('节点测试运行失败')
   } finally {

@@ -26,7 +26,6 @@ func NewHealthCheckerTool() *HealthCheckerTool {
 		Category:    "monitoring",
 		Version:     "1.0.0",
 		Author:      "AutoForge",
-		Icon:        "heart-pulse",
 		AICallable:  true,
 		Tags:        []string{"health", "monitoring", "check", "uptime", "ssl"},
 	}
@@ -320,6 +319,7 @@ func (t *HealthCheckerTool) Execute(ctx *utools.ExecutionContext, config map[str
 		"response_time": responseTime,
 		"body_size":     len(bodyBytes),
 		"headers":       resp.Header,
+		"response_body": responseBody, // 原始返回内容
 	}
 
 	if sslInfo != nil {

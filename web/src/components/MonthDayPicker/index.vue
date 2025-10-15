@@ -8,9 +8,11 @@
         type="button"
         @click="selectDay(day)"
         class="px-2 py-1.5 text-xs font-medium rounded border-2 transition-colors"
-        :class="selectedDay === day
-          ? 'bg-primary text-white border-primary'
-          : 'bg-bg-elevated text-text-secondary border-border-primary hover:border-primary'"
+        :class="
+          selectedDay === day
+            ? 'bg-primary text-white border-primary'
+            : 'bg-bg-elevated text-text-secondary border-border-primary hover:border-primary'
+        "
       >
         {{ day }}
       </button>
@@ -71,7 +73,10 @@ const emitValue = () => {
 }
 
 watch(() => time.value, emitValue)
-watch(() => props.modelValue, (newVal) => {
-  parseValue(newVal)
-})
+watch(
+  () => props.modelValue,
+  (newVal) => {
+    parseValue(newVal)
+  }
+)
 </script>

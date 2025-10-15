@@ -54,7 +54,7 @@ func (s *ToolService) ListTools() ([]models.Tool, error) {
 			Category:     metadata.Category,
 			Version:      metadata.Version,
 			Author:       metadata.Author,
-			Icon:         metadata.Icon,
+			Icon:         "", // Icon is now configured in frontend
 			ConfigSchema: string(schemaJSON),
 			AICallable:   metadata.AICallable,
 			Enabled:      true,
@@ -87,7 +87,7 @@ func (s *ToolService) GetToolByCode(code string) (*models.Tool, error) {
 		Category:     metadata.Category,
 		Version:      metadata.Version,
 		Author:       metadata.Author,
-		Icon:         metadata.Icon,
+		Icon:         "", // Icon is now configured in frontend
 		ConfigSchema: string(schemaJSON),
 		AICallable:   metadata.AICallable,
 		Enabled:      true,

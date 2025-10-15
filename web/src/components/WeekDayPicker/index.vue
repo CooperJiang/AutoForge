@@ -8,9 +8,11 @@
         type="button"
         @click="toggleDay(day.value)"
         class="px-2 py-1.5 text-xs font-medium rounded border-2 transition-colors"
-        :class="selectedDays.includes(day.value)
-          ? 'bg-primary text-white border-primary'
-          : 'bg-bg-elevated text-text-secondary border-border-primary hover:border-primary'"
+        :class="
+          selectedDays.includes(day.value)
+            ? 'bg-primary text-white border-primary'
+            : 'bg-bg-elevated text-text-secondary border-border-primary hover:border-primary'
+        "
       >
         {{ day.label }}
       </button>
@@ -41,7 +43,7 @@ const weekDays = [
   { label: '周三', value: 3 },
   { label: '周四', value: 4 },
   { label: '周五', value: 5 },
-  { label: '周六', value: 6 }
+  { label: '周六', value: 6 },
 ]
 
 const selectedDays = ref<number[]>([])
@@ -58,7 +60,10 @@ const parseValue = (value: string) => {
   const parts = value.split(':')
   if (parts.length >= 4) {
     // days:HH:MM:SS
-    const days = parts[0].split(',').map(d => parseInt(d)).filter(d => !isNaN(d))
+    const days = parts[0]
+      .split(',')
+      .map((d) => parseInt(d))
+      .filter((d) => !isNaN(d))
     selectedDays.value = days.length > 0 ? days : [1]
     time.value = `${parts[1]}:${parts[2]}:${parts[3]}`
   } else {
@@ -89,7 +94,10 @@ const emitValue = () => {
 }
 
 watch(() => time.value, emitValue)
-watch(() => props.modelValue, (newVal) => {
-  parseValue(newVal)
-})
+watch(
+  () => props.modelValue,
+  (newVal) => {
+    parseValue(newVal)
+  }
+)
 </script>

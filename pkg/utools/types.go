@@ -20,17 +20,22 @@ type Tool interface {
 	Execute(ctx *ExecutionContext, config map[string]interface{}) (*ExecutionResult, error)
 }
 
-// ToolMetadata 工具元数据
 type ToolMetadata struct {
-	Code        string   `json:"code"`        // 工具唯一标识，如: http_request
-	Name        string   `json:"name"`        // 工具显示名称，如: HTTP 请求
-	Description string   `json:"description"` // 工具描述
-	Category    string   `json:"category"`    // 工具分类: network, notification, data, automation, etc.
-	Version     string   `json:"version"`     // 工具版本
-	Author      string   `json:"author"`      // 工具作者
-	Icon        string   `json:"icon"`        // 工具图标 (可选，用于前端显示)
-	AICallable  bool     `json:"ai_callable"` // 是否可被 AI Agent 调用
-	Tags        []string `json:"tags"`        // 标签，用于搜索和分类
+	Code               string                    `json:"code"`
+	Name               string                    `json:"name"`
+	Description        string                    `json:"description"`
+	Category           string                    `json:"category"`
+	Version            string                    `json:"version"`
+	Author             string                    `json:"author"`
+	AICallable         bool                      `json:"ai_callable"`
+	Tags               []string                  `json:"tags"`
+	OutputFieldsSchema map[string]OutputFieldDef `json:"output_fields_schema,omitempty"`
+}
+
+type OutputFieldDef struct {
+	Type     string                    `json:"type"`
+	Label    string                    `json:"label"`
+	Children map[string]OutputFieldDef `json:"children,omitempty"`
 }
 
 // ConfigSchema 工具配置的 JSON Schema 定义
@@ -69,13 +74,29 @@ type ExecutionContext struct {
 
 // ExecutionResult 执行结果
 type ExecutionResult struct {
-	Success      bool                   `json:"success"`       // 是否成功
-	Message      string                 `json:"message"`       // 消息
-	Output       map[string]interface{} `json:"output"`        // 输出数据
-	Error        string                 `json:"error"`         // 错误信息
-	DurationMs   int64                  `json:"duration_ms"`   // 执行耗时(毫秒)
-	StatusCode   int                    `json:"status_code"`   // 状态码（如 HTTP 工具返回的状态码）
-	ResponseBody string                 `json:"response_body"` // 响应体（原始内容）
+	Success      bool                   `json:"success"`                 // 是否成功
+	Message      string                 `json:"message"`                 // 消息
+	Output       map[string]interface{} `json:"output"`                  // 输出数据
+	Error        string                 `json:"error"`                   // 错误信息
+	DurationMs   int64                  `json:"duration_ms"`             // 执行耗时(毫秒)
+	StatusCode   int                    `json:"status_code"`             // 状态码（如 HTTP 工具返回的状态码）
+	ResponseBody string                 `json:"response_body"`           // 响应体（原始内容）
+	OutputRender *OutputRenderConfig    `json:"output_render,omitempty"` // 输出渲染配置（可选）
+}
+
+// OutputRenderConfig 输出渲染配置
+// 用于指示前端如何渲染输出数据
+type OutputRenderConfig struct {
+	Type    string                 `json:"type"`    // 输出类型：image, video, html, markdown, text, gallery, json
+	Primary string                 `json:"primary"` // 主要显示字段的路径，如 "content" 或 "data.url"
+	Fields  map[string]FieldRender `json:"fields"`  // 各字段的渲染配置
+}
+
+// FieldRender 字段渲染配置
+type FieldRender struct {
+	Type    string `json:"type"`    // 字段类型：image, video, url, text, json, code, markdown
+	Label   string `json:"label"`   // 显示标签
+	Display bool   `json:"display"` // 是否显示该字段
 }
 
 // BaseTool 工具基础实现 - 提供通用功能

@@ -1,0 +1,176 @@
+ <!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>前端每日一题 - 前端工程化</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&display=swap');
+        body {
+            font-family: 'Noto Sans SC', sans-serif;
+            background-color: #f5f7fa;
+        }
+        .card-shadow {
+            box-shadow: 0 10px 25px -5px rgba(59, 130, 246, 0.1), 0 8px 10px -6px rgba(59, 130, 246, 0.1);
+        }
+    </style>
+</head>
+<body class="py-12 px-4">
+    <div class="max-w-3xl mx-auto card-shadow rounded-xl overflow-hidden bg-white">
+        <!-- 卡片头部 -->
+        <div class="bg-gradient-to-r from-blue-600 to-blue-400 px-6 py-5 flex justify-between items-center">
+            <div>
+                <h1 class="text-white text-2xl font-bold">前端每日一题</h1>
+                <p class="text-blue-100 mt-1">深入理解核心概念，提升专业技能</p>
+            </div>
+            <div class="bg-white bg-opacity-20 rounded-full p-3">
+                <i class="fas fa-code text-white text-2xl"></i>
+            </div>
+        </div>
+        
+        <!-- 题目部分 -->
+        <div class="px-6 py-5 border-b border-gray-200">
+            <h2 class="text-lg font-semibold text-gray-800 flex items-center">
+                <span class="inline-block w-8 h-8 rounded-full bg-blue-100 text-blue-600 mr-3 flex items-center justify-center">Q</span>
+                今日题目
+            </h2>
+            <div class="mt-3 pl-11 text-gray-700">
+                请解释什么是前端工程化，并简述它在现代前端开发中的主要作用和优势？同时，请列举并说明至少三种常见的前端工程化工具或技术。
+            </div>
+        </div>
+        
+        <!-- 解答部分 -->
+        <div class="px-6 py-5">
+            <h2 class="text-lg font-semibold text-gray-800 flex items-center">
+                <span class="inline-block w-8 h-8 rounded-full bg-green-100 text-green-600 mr-3 flex items-center justify-center">A</span>
+                解答思路
+            </h2>
+            
+            <div class="mt-4 pl-11 space-y-6">
+                <!-- 前端工程化解释 -->
+                <div>
+                    <h3 class="text-md font-medium text-gray-800 mb-2">什么是前端工程化？</h3>
+                    <p class="text-gray-700">前端工程化是指使用软件工程的技术和方法来提高前端开发效率、规范前端开发流程、提升代码质量和性能的一系列实践。它将前端开发从传统的手工作坊式生产转变为更加系统化、标准化、自动化的工程化生产模式。</p>
+                </div>
+                
+                <!-- 主要作用和优势 -->
+                <div>
+                    <h3 class="text-md font-medium text-gray-800 mb-2">主要作用和优势</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="bg-blue-50 rounded-lg p-3 flex items-start">
+                            <div class="bg-blue-100 rounded-full p-2 mr-3 mt-1">
+                                <i class="fas fa-tachometer-alt text-blue-600 text-sm"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-medium text-gray-800">提高开发效率</h4>
+                                <p class="text-sm text-gray-600">通过自动化构建、热重载等技术，减少重复工作，加速开发流程。</p>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-green-50 rounded-lg p-3 flex items-start">
+                            <div class="bg-green-100 rounded-full p-2 mr-3 mt-1">
+                                <i class="fas fa-check-circle text-green-600 text-sm"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-medium text-gray-800">提升代码质量</h4>
+                                <p class="text-sm text-gray-600">通过代码规范检查、自动化测试等工具，保证代码质量和可维护性。</p>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-purple-50 rounded-lg p-3 flex items-start">
+                            <div class="bg-purple-100 rounded-full p-2 mr-3 mt-1">
+                                <i class="fas fa-sitemap text-purple-600 text-sm"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-medium text-gray-800">优化项目结构</h4>
+                                <p class="text-sm text-gray-600">采用模块化、组件化的方式组织代码，提高代码复用性和可维护性。</p>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-yellow-50 rounded-lg p-3 flex items-start">
+                            <div class="bg-yellow-100 rounded-full p-2 mr-3 mt-1">
+                                <i class="fas fa-rocket text-yellow-600 text-sm"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-medium text-gray-800">优化应用性能</h4>
+                                <p class="text-sm text-gray-600">通过代码压缩、分包、懒加载等技术提升应用加载和运行性能。</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 常见工程化工具和技术 -->
+                <div>
+                    <h3 class="text-md font-medium text-gray-800 mb-3">常见前端工程化工具和技术</h3>
+                    
+                    <div class="space-y-4">
+                        <div class="border border-gray-200 rounded-lg p-4">
+                            <div class="flex items-center">
+                                <div class="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center mr-3">
+                                    <i class="fab fa-npm text-red-600 text-xl"></i>
+                                </div>
+                                <h4 class="font-medium text-gray-800">1. 包管理工具</h4>
+                            </div>
+                            <p class="mt-2 text-gray-700">如 npm、Yarn、pnpm 等，用于管理项目依赖，简化依赖安装和版本控制过程。这些工具提供了包的版本管理、依赖解析、命令脚本运行等功能，是现代前端开发的基础设施。</p>
+                        </div>
+                        
+                        <div class="border border-gray-200 rounded-lg p-4">
+                            <div class="flex items-center">
+                                <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center mr-3">
+                                    <i class="fas fa-cogs text-blue-600 text-xl"></i>
+                                </div>
+                                <h4 class="font-medium text-gray-800">2. 构建工具</h4>
+                            </div>
+                            <p class="mt-2 text-gray-700">如 Webpack、Vite、Rollup 等，负责将源代码转换成可在浏览器中运行的代码。这些工具支持代码转译（如 ES6 转 ES5）、代码压缩、资源处理（CSS、图片等）、代码分割、热更新等功能，极大提升了开发体验和应用性能。</p>
+                        </div>
+                        
+                        <div class="border border-gray-200 rounded-lg p-4">
+                            <div class="flex items-center">
+                                <div class="w-10 h-10 bg-yellow-100 rounded-lg flex items-center justify-center mr-3">
+                                    <i class="fas fa-spell-check text-yellow-600 text-xl"></i>
+                                </div>
+                                <h4 class="font-medium text-gray-800">3. 代码规范和质量工具</h4>
+                            </div>
+                            <p class="mt-2 text-gray-700">如 ESLint、Prettier、TypeScript 等，用于保证代码质量和一致性。ESLint 帮助发现和修复代码中的问题，Prettier 确保代码风格一致，TypeScript 提供静态类型检查，这些工具共同提高了代码的可靠性和可维护性。</p>
+                        </div>
+                        
+                        <div class="border border-gray-200 rounded-lg p-4">
+                            <div class="flex items-center">
+                                <div class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center mr-3">
+                                    <i class="fas fa-sync-alt text-green-600 text-xl"></i>
+                                </div>
+                                <h4 class="font-medium text-gray-800">4. 自动化测试工具</h4>
+                            </div>
+                            <p class="mt-2 text-gray-700">如 Jest、Mocha、Cypress 等，用于编写和运行自动化测试。单元测试确保各个组件功能正常，集成测试验证组件间交互，端到端测试模拟用户行为验证整个应用，通过自动化测试提前发现并修复问题。</p>
+                        </div>
+                        
+                        <div class="border border-gray-200 rounded-lg p-4">
+                            <div class="flex items-center">
+                                <div class="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center mr-3">
+                                    <i class="fas fa-code-branch text-purple-600 text-xl"></i>
+                                </div>
+                                <h4 class="font-medium text-gray-800">5. CI/CD 工具</h4>
+                            </div>
+                            <p class="mt-2 text-gray-700">如 GitHub Actions、Jenkins、GitLab CI 等，用于实现持续集成和持续部署。这些工具可以在代码提交后自动运行测试、构建项目，并将代码部署到测试或生产环境，加速了开发到部署的流程。</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 卡片底部 -->
+        <div class="bg-gray-50 px-6 py-4 border-t border-gray-200 flex justify-between items-center">
+            <div class="text-gray-500 text-sm">
+                <i class="far fa-calendar-alt mr-1"></i> 2025年10月14日
+            </div>
+            <div class="flex space-x-2">
+                <span class="px-3 py-1 rounded-full bg-blue-100 text-blue-700 text-xs font-medium">前端工程化</span>
+                <span class="px-3 py-1 rounded-full bg-blue-100 text-blue-700 text-xs font-medium">开发效率</span>
+                <span class="px-3 py-1 rounded-full bg-blue-100 text-blue-700 text-xs font-medium">工具链</span>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

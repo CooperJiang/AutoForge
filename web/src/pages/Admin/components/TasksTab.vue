@@ -2,30 +2,16 @@
   <div>
     <!-- 搜索筛选栏 -->
     <div class="flex gap-3 mb-6 items-center">
-      <div class="flex-shrink-0" style="width: 200px;">
-        <BaseInput
-          v-model="filters.user_id"
-          placeholder="用户ID"
-        />
+      <div class="flex-shrink-0" style="width: 200px">
+        <BaseInput v-model="filters.user_id" placeholder="用户ID" />
       </div>
-      <div class="flex-shrink-0" style="width: 150px;">
-        <BaseSelect
-          v-model="filters.status"
-          :options="statusOptions"
-          placeholder="全部状态"
-        />
+      <div class="flex-shrink-0" style="width: 150px">
+        <BaseSelect v-model="filters.status" :options="statusOptions" placeholder="全部状态" />
       </div>
       <div class="flex-1">
-        <BaseInput
-          v-model="filters.keyword"
-          placeholder="搜索任务名称或URL"
-        />
+        <BaseInput v-model="filters.keyword" placeholder="搜索任务名称或URL" />
       </div>
-      <BaseButton
-        @click="$emit('search', filters)"
-        variant="primary"
-        class="flex-shrink-0"
-      >
+      <BaseButton @click="$emit('search', filters)" variant="primary" class="flex-shrink-0">
         搜索
       </BaseButton>
     </div>
@@ -63,25 +49,38 @@
                 </button>
               </div>
             </td>
-            <td class="py-3 text-sm text-text-primary font-mono w-28 truncate align-middle" :title="task.user_id">
+            <td
+              class="py-3 text-sm text-text-primary font-mono w-28 truncate align-middle"
+              :title="task.user_id"
+            >
               {{ maskUserId(task.user_id) }}
             </td>
-            <td class="py-3 text-sm text-text-primary font-medium w-32 truncate align-middle" :title="task.name">
+            <td
+              class="py-3 text-sm text-text-primary font-medium w-32 truncate align-middle"
+              :title="task.name"
+            >
               {{ task.name }}
             </td>
             <td class="py-3 text-sm text-text-secondary w-28 align-middle">
-              <span class="inline-flex px-2 py-0.5 text-xs font-medium rounded bg-bg-tertiary text-text-secondary">
+              <span
+                class="inline-flex px-2 py-0.5 text-xs font-medium rounded bg-bg-tertiary text-text-secondary"
+              >
                 {{ task.tool_code || 'N/A' }}
               </span>
             </td>
-            <td class="py-3 text-sm text-text-secondary w-32 truncate align-middle" :title="getScheduleText(task)">
+            <td
+              class="py-3 text-sm text-text-secondary w-32 truncate align-middle"
+              :title="getScheduleText(task)"
+            >
               {{ getScheduleText(task) }}
             </td>
             <td class="py-3 w-20 align-middle">
               <span
                 :class="[
-                  'inline-block px-2 py-1 text-xs font-medium rounded-full whitespace-nowrap',
-                  task.enabled ? 'bg-green-100 text-green-700' : 'bg-bg-tertiary text-text-secondary'
+                  'inline-block px-2 py-1 text-xs font-medium rounded-full whitespace-nowrap border',
+                  task.enabled
+                    ? 'bg-green-500/10 text-green-600 dark:text-green-400 border-green-500/20'
+                    : 'bg-slate-500/10 text-slate-600 dark:text-slate-400 border-slate-500/20',
                 ]"
               >
                 {{ task.enabled ? '已启用' : '已禁用' }}
@@ -94,7 +93,7 @@
               <div class="flex gap-2">
                 <button
                   @click="$emit('view', task)"
-                  class="p-1.5 bg-purple-100 hover:bg-purple-200 text-purple-700 rounded-lg transition-colors"
+                  class="p-1.5 bg-purple-500/10 hover:bg-purple-500/20 text-purple-600 dark:text-purple-400 rounded-lg transition-colors border border-purple-500/20"
                   title="查看详情"
                 >
                   <Eye :size="16" />
@@ -102,10 +101,10 @@
                 <button
                   @click="$emit('toggle-status', task)"
                   :class="[
-                    'p-1.5 rounded-lg transition-colors',
+                    'p-1.5 rounded-lg transition-colors border',
                     task.enabled
-                      ? 'bg-bg-tertiary hover:bg-gray-200 text-text-secondary'
-                      : 'bg-green-100 hover:bg-green-200 text-green-700'
+                      ? 'bg-slate-500/10 hover:bg-slate-500/20 text-slate-600 dark:text-slate-400 border-slate-500/20'
+                      : 'bg-green-500/10 hover:bg-green-500/20 text-green-600 dark:text-green-400 border-green-500/20',
                   ]"
                   :title="task.enabled ? '禁用' : '启用'"
                 >
@@ -114,14 +113,14 @@
                 </button>
                 <button
                   @click="$emit('execute', task)"
-                  class="p-1.5 bg-primary-light hover:bg-primary-active text-primary rounded-lg transition-colors"
+                  class="p-1.5 bg-blue-500/10 hover:bg-blue-500/20 text-blue-600 dark:text-blue-400 rounded-lg transition-colors border border-blue-500/20"
                   title="立即执行"
                 >
                   <Zap :size="16" />
                 </button>
                 <button
                   @click="$emit('delete', task)"
-                  class="p-1.5 bg-red-100 hover:bg-red-200 text-red-700 rounded-lg transition-colors"
+                  class="p-1.5 bg-red-500/10 hover:bg-red-500/20 text-red-600 dark:text-red-400 rounded-lg transition-colors border border-red-500/20"
                   title="删除"
                 >
                   <Trash2 :size="16" />
@@ -135,9 +134,7 @@
 
     <!-- 分页 -->
     <div class="flex justify-between items-center mt-6">
-      <div class="text-sm text-text-secondary">
-        共 {{ total }} 条记录
-      </div>
+      <div class="text-sm text-text-secondary">共 {{ total }} 条记录</div>
       <div class="flex gap-2">
         <button
           @click="$emit('prev-page')"
@@ -192,13 +189,13 @@ defineEmits<{
 const filters = ref({
   user_id: '',
   status: '',
-  keyword: ''
+  keyword: '',
 })
 
 const statusOptions = [
   { label: '全部状态', value: '' },
   { label: '已启用', value: 'enabled' },
-  { label: '已禁用', value: 'disabled' }
+  { label: '已禁用', value: 'disabled' },
 ]
 
 const getScheduleText = (task: Task) => {
@@ -208,7 +205,7 @@ const getScheduleText = (task: Task) => {
     monthly: '每月',
     hourly: '每小时',
     interval: '间隔',
-    cron: 'Cron'
+    cron: 'Cron',
   }
   const type = typeMap[task.schedule_type] || task.schedule_type
   return `${type} ${task.schedule_value}`

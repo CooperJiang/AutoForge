@@ -1,23 +1,35 @@
 <template>
-  <div class="min-h-screen bg-gradient-to-br from-bg-secondary via-bg-secondary to-bg-secondary flex items-center justify-center p-4 overflow-hidden relative">
+  <div
+    class="min-h-screen bg-gradient-to-br from-bg-secondary via-bg-secondary to-bg-secondary flex items-center justify-center p-4 overflow-hidden relative"
+  >
     <!-- 背景装饰 -->
     <div class="absolute inset-0 overflow-hidden pointer-events-none">
-      <div class="absolute top-20 left-10 w-72 h-72 bg-green-200 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-blob"></div>
-      <div class="absolute top-40 right-10 w-72 h-72 bg-cyan-200 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-blob animation-delay-2000"></div>
-      <div class="absolute -bottom-8 left-1/2 w-72 h-72 bg-teal-200 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-blob animation-delay-4000"></div>
+      <div
+        class="absolute top-20 left-10 w-72 h-72 bg-green-200 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-blob"
+      ></div>
+      <div
+        class="absolute top-40 right-10 w-72 h-72 bg-cyan-200 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-blob animation-delay-2000"
+      ></div>
+      <div
+        class="absolute -bottom-8 left-1/2 w-72 h-72 bg-teal-200 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-blob animation-delay-4000"
+      ></div>
     </div>
 
     <div class="max-w-6xl w-full grid lg:grid-cols-2 gap-8 items-center relative z-10">
       <!-- 左侧介绍区域 -->
       <div class="hidden lg:block space-y-8 animate-fade-in-left">
         <div class="space-y-4">
-          <div class="inline-flex items-center gap-2 px-3 py-1.5 bg-bg-elevated/50 backdrop-blur-sm border border-green-200 rounded-full">
+          <div
+            class="inline-flex items-center gap-2 px-3 py-1.5 bg-bg-elevated/50 backdrop-blur-sm border border-green-200 rounded-full"
+          >
             <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
             <span class="text-sm font-medium text-text-secondary">智能定时任务管理</span>
           </div>
           <h1 class="text-5xl font-bold text-text-primary leading-tight">
-            让任务<br/>
-            <span class="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">自动执行</span>
+            让任务<br />
+            <span class="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent"
+              >自动执行</span
+            >
           </h1>
           <p class="text-lg text-text-secondary leading-relaxed max-w-md">
             简单易用的定时任务系统，支持多种调度规则，轻松管理您的 HTTP 定时任务
@@ -26,10 +38,15 @@
 
         <!-- 功能亮点 -->
         <div class="space-y-4">
-          <div v-for="(feature, index) in features" :key="index"
-               class="flex items-start gap-3 p-4 bg-bg-elevated/60 backdrop-blur-sm border border-border-primary rounded-xl hover:shadow-md transition-all duration-300 animate-fade-in-up"
-               :style="{ animationDelay: `${index * 100}ms` }">
-            <div class="flex-shrink-0 w-10 h-10 bg-gradient-to-br from-primary to-accent rounded-lg flex items-center justify-center">
+          <div
+            v-for="(feature, index) in features"
+            :key="index"
+            class="flex items-start gap-3 p-4 bg-bg-elevated/60 backdrop-blur-sm border border-border-primary rounded-xl hover:shadow-md transition-all duration-300 animate-fade-in-up"
+            :style="{ animationDelay: `${index * 100}ms` }"
+          >
+            <div
+              class="flex-shrink-0 w-10 h-10 bg-gradient-to-br from-primary to-accent rounded-lg flex items-center justify-center"
+            >
               <component :is="feature.icon" class="w-5 h-5 text-white" />
             </div>
             <div>
@@ -42,10 +59,14 @@
 
       <!-- 右侧登录/注册表单 -->
       <div class="flex justify-center lg:justify-end">
-        <div class="bg-bg-elevated/80 backdrop-blur-xl border-2 border-bg-elevated shadow-2xl rounded-2xl p-8 max-w-md w-full animate-fade-in-up">
+        <div
+          class="bg-bg-elevated/80 backdrop-blur-xl border-2 border-bg-elevated shadow-2xl rounded-2xl p-8 max-w-md w-full animate-fade-in-up"
+        >
           <!-- 图标和标题 -->
           <div class="text-center mb-6">
-            <div class="inline-flex items-center justify-center w-20 h-20 mb-4 animate-bounce-subtle">
+            <div
+              class="inline-flex items-center justify-center w-20 h-20 mb-4 animate-bounce-subtle"
+            >
               <img src="/logo.png" alt="Logo" class="w-full h-full object-contain" />
             </div>
             <h2 class="text-2xl font-bold text-text-primary mb-2">欢迎使用</h2>
@@ -60,7 +81,7 @@
                 'flex-1 py-2 px-4 text-sm font-medium rounded-md transition-all duration-200',
                 activeTab === 'login'
                   ? 'bg-bg-elevated text-text-primary shadow-sm'
-                  : 'text-text-secondary hover:text-text-primary'
+                  : 'text-text-secondary hover:text-text-primary',
               ]"
             >
               登录
@@ -71,7 +92,7 @@
                 'flex-1 py-2 px-4 text-sm font-medium rounded-md transition-all duration-200',
                 activeTab === 'register'
                   ? 'bg-bg-elevated text-text-primary shadow-sm'
-                  : 'text-text-secondary hover:text-text-primary'
+                  : 'text-text-secondary hover:text-text-primary',
               ]"
             >
               注册
@@ -95,12 +116,7 @@
               required
             />
 
-            <BaseButton
-              type="submit"
-              variant="primary"
-              :loading="loading"
-              class="w-full"
-            >
+            <BaseButton type="submit" variant="primary" :loading="loading" class="w-full">
               登录
             </BaseButton>
 
@@ -118,9 +134,21 @@
                 class="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-bg-elevated border-2 border-border-primary text-text-secondary font-medium rounded-lg hover:bg-bg-hover hover:border-slate-300 transition-all duration-200 shadow-sm"
               >
                 <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none">
-                  <path d="M12 2L2 7L12 12L22 7L12 2Z" fill="currentColor" opacity="0.6"/>
-                  <path d="M2 17L12 22L22 17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                  <path d="M2 12L12 17L22 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  <path d="M12 2L2 7L12 12L22 7L12 2Z" fill="currentColor" opacity="0.6" />
+                  <path
+                    d="M2 17L12 22L22 17"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                  <path
+                    d="M2 12L12 17L22 12"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
                 </svg>
                 使用 Linux.do 登录
               </a>
@@ -171,12 +199,7 @@
               required
             />
 
-            <BaseButton
-              type="submit"
-              variant="primary"
-              :loading="loading"
-              class="w-full"
-            >
+            <BaseButton type="submit" variant="primary" :loading="loading" class="w-full">
               注册
             </BaseButton>
           </form>
@@ -189,7 +212,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
-import { Clock, Zap, Shield, Gauge } from 'lucide-vue-next'
+import { Zap, Shield, Gauge } from 'lucide-vue-next'
 import { message } from '@/utils/message'
 import * as userApi from '@/api/user'
 import * as configApi from '@/api/config'
@@ -206,8 +229,8 @@ const countdown = ref(0)
 // OAuth2 配置
 const oauth2Config = ref({
   linuxdo: {
-    enabled: false
-  }
+    enabled: false,
+  },
 })
 
 // 功能亮点
@@ -215,24 +238,24 @@ const features = [
   {
     icon: Zap,
     title: '灵活调度',
-    description: '支持每天、每周、每月、间隔、Cron表达式等多种调度方式'
+    description: '支持每天、每周、每月、间隔、Cron表达式等多种调度方式',
   },
   {
     icon: Shield,
     title: '可靠执行',
-    description: '自动执行HTTP任务，完整记录执行日志和响应结果'
+    description: '自动执行HTTP任务，完整记录执行日志和响应结果',
   },
   {
     icon: Gauge,
     title: '实时监控',
-    description: '查看任务执行状态、响应时间和详细的执行记录'
-  }
+    description: '查看任务执行状态、响应时间和详细的执行记录',
+  },
 ]
 
 // 登录表单
 const loginForm = ref({
   account: '',
-  password: ''
+  password: '',
 })
 
 // 注册表单
@@ -240,7 +263,7 @@ const registerForm = ref({
   username: '',
   email: '',
   code: '',
-  password: ''
+  password: '',
 })
 
 // 发送验证码
@@ -273,7 +296,7 @@ const handleLogin = async () => {
   try {
     const res = await userApi.login({
       account: loginForm.value.account,
-      password: loginForm.value.password
+      password: loginForm.value.password,
     })
 
     // 保存token和用户信息到SecureStorage
@@ -302,7 +325,7 @@ const handleRegister = async () => {
       username: registerForm.value.username,
       email: registerForm.value.email,
       password: registerForm.value.password,
-      code: registerForm.value.code
+      code: registerForm.value.code,
     })
 
     message.success('注册成功，请登录')
@@ -317,7 +340,7 @@ const handleRegister = async () => {
       username: '',
       email: '',
       code: '',
-      password: ''
+      password: '',
     }
   } catch (error: any) {
     message.error(error.response?.data?.message || '注册失败')
@@ -346,7 +369,7 @@ const handleOAuth2Callback = async () => {
       // 调用封装好的API
       const res = await userApi.linuxdoCallback({
         code,
-        state: state || ''
+        state: state || '',
       })
 
       // 保存token和用户信息到SecureStorage（与普通登录相同）
@@ -369,7 +392,7 @@ const loadPublicConfig = async () => {
   try {
     const res = await configApi.getPublicConfig()
     oauth2Config.value = res.data.oauth2
-  } catch (error) {
+  } catch {
     console.error('获取配置失败:', error)
     // 配置获取失败不影响基本登录功能
   }
@@ -421,7 +444,8 @@ onMounted(() => {
 }
 
 @keyframes bounce-subtle {
-  0%, 100% {
+  0%,
+  100% {
     transform: translateY(0);
   }
   50% {

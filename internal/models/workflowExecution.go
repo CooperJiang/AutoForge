@@ -16,21 +16,36 @@ const (
 	ExecutionStatusCancelled = "cancelled" // 已取消
 )
 
+// OutputRenderConfig 输出渲染配置
+type OutputRenderConfig struct {
+	Type    string                  `json:"type"`
+	Primary string                  `json:"primary"`
+	Fields  map[string]FieldRender `json:"fields"`
+}
+
+// FieldRender 字段渲染配置
+type FieldRender struct {
+	Type    string `json:"type"`
+	Label   string `json:"label"`
+	Display bool   `json:"display"`
+}
+
 // NodeExecutionLog 节点执行日志
 type NodeExecutionLog struct {
-	NodeID      string                 `json:"node_id"`
-	NodeType    string                 `json:"node_type"`
-	NodeName    string                 `json:"node_name"`
-	Status      string                 `json:"status"` // pending/running/success/failed/skipped
-	StartTime   *int64                 `json:"start_time"`
-	EndTime     *int64                 `json:"end_time"`
-	DurationMs  int64                  `json:"duration_ms"`
-	Input       map[string]interface{} `json:"input,omitempty"`
-	Output      map[string]interface{} `json:"output,omitempty"`
-	Error       string                 `json:"error,omitempty"`
-	RetryCount  int                    `json:"retry_count"`
-	ToolCode    string                 `json:"tool_code,omitempty"`
-	ToolVersion string                 `json:"tool_version,omitempty"`
+	NodeID       string                 `json:"node_id"`
+	NodeType     string                 `json:"node_type"`
+	NodeName     string                 `json:"node_name"`
+	Status       string                 `json:"status"` // pending/running/success/failed/skipped
+	StartTime    *int64                 `json:"start_time"`
+	EndTime      *int64                 `json:"end_time"`
+	DurationMs   int64                  `json:"duration_ms"`
+	Input        map[string]interface{} `json:"input,omitempty"`
+	Output       map[string]interface{} `json:"output,omitempty"`
+	OutputRender *OutputRenderConfig    `json:"output_render,omitempty"`
+	Error        string                 `json:"error,omitempty"`
+	RetryCount   int                    `json:"retry_count"`
+	ToolCode     string                 `json:"tool_code,omitempty"`
+	ToolVersion  string                 `json:"tool_version,omitempty"`
 }
 
 // NodeExecutionLogs 节点执行日志数组

@@ -9,7 +9,9 @@
     <form @submit.prevent="handleSubmit" class="space-y-4">
       <div>
         <label class="block text-sm font-medium text-text-secondary mb-2">当前邮箱</label>
-        <div class="px-4 py-2.5 bg-bg-hover border border-border-primary rounded-lg text-text-primary">
+        <div
+          class="px-4 py-2.5 bg-bg-hover border border-border-primary rounded-lg text-text-primary"
+        >
           {{ userEmail }}
         </div>
       </div>
@@ -22,11 +24,7 @@
       <div>
         <label class="block text-sm font-medium text-text-secondary mb-2">邮箱验证码</label>
         <div class="flex gap-3">
-          <BaseInput
-            v-model="form.code"
-            placeholder="输入6位验证码"
-            class="flex-1"
-          />
+          <BaseInput v-model="form.code" placeholder="输入6位验证码" class="flex-1" />
           <BaseButton
             type="button"
             variant="secondary"
@@ -40,20 +38,10 @@
         </div>
       </div>
       <div class="flex justify-end gap-3">
-        <BaseButton
-          type="button"
-          variant="secondary"
-          @click="handleReset"
-          size="sm"
-        >
+        <BaseButton type="button" variant="secondary" @click="handleReset" size="sm">
           重置
         </BaseButton>
-        <BaseButton
-          type="submit"
-          variant="primary"
-          :disabled="updating"
-          size="sm"
-        >
+        <BaseButton type="submit" variant="primary" :disabled="updating" size="sm">
           {{ updating ? '保存中...' : '保存修改' }}
         </BaseButton>
       </div>
@@ -81,7 +69,7 @@ const emit = defineEmits<{
 
 const form = ref({
   email: '',
-  code: ''
+  code: '',
 })
 const updating = ref(false)
 const sendingCode = ref(false)
@@ -133,7 +121,7 @@ const handleSubmit = async () => {
   try {
     await userApi.updateProfile({
       email: form.value.email,
-      code: form.value.code
+      code: form.value.code,
     })
     message.success('邮箱修改成功')
     emit('update', { email: form.value.email, code: form.value.code })

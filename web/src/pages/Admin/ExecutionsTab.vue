@@ -2,34 +2,24 @@
   <div>
     <!-- 搜索筛选栏 -->
     <div class="flex gap-3 mb-6 items-center">
-      <div class="flex-shrink-0" style="width: 200px;">
-        <BaseInput
-          v-model="filters.user_id"
-          placeholder="用户ID"
-        />
+      <div class="flex-shrink-0" style="width: 200px">
+        <BaseInput v-model="filters.user_id" placeholder="用户ID" />
       </div>
-      <div class="flex-shrink-0" style="width: 200px;">
-        <BaseInput
-          v-model="filters.task_id"
-          placeholder="任务ID"
-        />
+      <div class="flex-shrink-0" style="width: 200px">
+        <BaseInput v-model="filters.task_id" placeholder="任务ID" />
       </div>
-      <div class="flex-shrink-0" style="width: 150px;">
+      <div class="flex-shrink-0" style="width: 150px">
         <BaseSelect
           v-model="filters.status"
           :options="[
             { label: '全部状态', value: '' },
             { label: '成功', value: 'success' },
-            { label: '失败', value: 'failed' }
+            { label: '失败', value: 'failed' },
           ]"
           placeholder="全部状态"
         />
       </div>
-      <BaseButton
-        @click="loadExecutions"
-        variant="primary"
-        class="flex-shrink-0"
-      >
+      <BaseButton @click="loadExecutions" variant="primary" class="flex-shrink-0">
         搜索
       </BaseButton>
     </div>
@@ -55,18 +45,23 @@
             :key="exec.id"
             class="border-b border-border-primary hover:bg-bg-hover transition-colors"
           >
-            <td class="py-3 text-sm text-text-primary font-mono text-xs">{{ truncateId(exec.id, 8) }}</td>
-            <td class="py-3 text-sm text-text-primary font-medium max-w-[200px] truncate" :title="exec.task?.name || exec.task_id">
+            <td class="py-3 text-sm text-text-primary font-mono text-xs">
+              {{ truncateId(exec.id, 8) }}
+            </td>
+            <td
+              class="py-3 text-sm text-text-primary font-medium max-w-[200px] truncate"
+              :title="exec.task?.name || exec.task_id"
+            >
               {{ exec.task?.name || '未知任务' }}
             </td>
             <td class="py-3 text-sm text-text-primary font-mono">{{ maskUserId(exec.user_id) }}</td>
             <td class="py-3">
               <span
                 :class="[
-                  'px-2 py-1 text-xs font-medium rounded-full',
+                  'px-2 py-1 text-xs font-medium rounded-full border',
                   exec.status === 'success'
-                    ? 'bg-green-100 text-green-700'
-                    : 'bg-red-100 text-red-700'
+                    ? 'bg-green-500/10 text-green-600 dark:text-green-400 border-green-500/20'
+                    : 'bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/20',
                 ]"
               >
                 {{ exec.status === 'success' ? '成功' : '失败' }}
@@ -75,12 +70,12 @@
             <td class="py-3">
               <span
                 :class="[
-                  'px-2 py-1 text-xs font-semibold rounded',
+                  'px-2 py-1 text-xs font-semibold rounded border',
                   exec.response_status >= 200 && exec.response_status < 300
-                    ? 'bg-green-100 text-green-700'
+                    ? 'bg-green-500/10 text-green-600 dark:text-green-400 border-green-500/20'
                     : exec.response_status >= 400
-                    ? 'bg-red-100 text-red-700'
-                    : 'bg-yellow-100 text-yellow-700'
+                      ? 'bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/20'
+                      : 'bg-yellow-500/10 text-yellow-600 dark:text-yellow-400 border-yellow-500/20',
                 ]"
               >
                 {{ exec.response_status || 'N/A' }}
@@ -113,9 +108,7 @@
 
     <!-- 分页 -->
     <div class="flex justify-between items-center mt-6">
-      <div class="text-sm text-text-secondary">
-        共 {{ total }} 条记录
-      </div>
+      <div class="text-sm text-text-secondary">共 {{ total }} 条记录</div>
       <div class="flex gap-2">
         <button
           @click="prevPage"
@@ -138,10 +131,7 @@
     </div>
 
     <!-- 执行详情对话框 -->
-    <ExecutionDetailDialog
-      v-model="showExecutionDetail"
-      :execution="selectedExecution"
-    />
+    <ExecutionDetailDialog v-model="showExecutionDetail" :execution="selectedExecution" />
 
     <!-- 删除确认对话框 -->
     <Dialog
@@ -178,7 +168,7 @@ const pageSize = ref(20)
 const filters = ref({
   user_id: '',
   task_id: '',
-  status: ''
+  status: '',
 })
 
 // 详情对话框
@@ -198,7 +188,7 @@ const loadExecutions = async () => {
     const res = await adminApi.getExecutions({
       page: currentPage.value,
       page_size: pageSize.value,
-      ...filters.value
+      ...filters.value,
     })
     executions.value = res.data.executions || []
     total.value = res.data.total

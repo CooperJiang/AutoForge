@@ -15,7 +15,7 @@ interface ConfirmState extends ConfirmOptions {
 
 const state = ref<ConfirmState>({
   show: false,
-  message: ''
+  message: '',
 })
 
 export function useConfirm() {
@@ -24,7 +24,7 @@ export function useConfirm() {
       state.value = {
         ...options,
         show: true,
-        resolve
+        resolve,
       }
     })
   }
@@ -43,6 +43,6 @@ export function useConfirm() {
     state,
     confirm,
     handleConfirm,
-    handleCancel
+    handleCancel,
   }
 }

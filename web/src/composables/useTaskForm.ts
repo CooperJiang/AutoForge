@@ -79,7 +79,7 @@ export function useTaskForm() {
           body: JSON.stringify(config.body || {}, null, 2),
         }
         isConfigured.value = true
-      } catch (error) {
+      } catch {
         console.error('Failed to parse task config:', error)
       }
     }
@@ -105,7 +105,7 @@ export function useTaskForm() {
           body: JSON.stringify(config.body || {}, null, 2),
         }
         isConfigured.value = true
-      } catch (error) {
+      } catch {
         console.error('Failed to parse task config:', error)
       }
     }

@@ -1,4 +1,4 @@
-import { ref, watch, onMounted } from 'vue'
+import { ref, onMounted } from 'vue'
 
 /**
  * 主题类型
@@ -58,11 +58,6 @@ function applyTheme(theme: 'light' | 'dark') {
 
   // 更新应用的主题
   appliedTheme.value = theme
-
-  // 打印日志（开发环境）
-  if (import.meta.env.DEV) {
-    console.log(`🎨 主题已切换: ${theme}`)
-  }
 }
 
 /**
@@ -71,7 +66,7 @@ function applyTheme(theme: 'light' | 'dark') {
 function saveTheme(theme: Theme) {
   try {
     localStorage.setItem(THEME_STORAGE_KEY, theme)
-  } catch (error) {
+  } catch {
     console.error('保存主题失败:', error)
   }
 }
@@ -85,7 +80,7 @@ function loadTheme(): Theme {
     if (saved === 'light' || saved === 'dark' || saved === 'auto') {
       return saved
     }
-  } catch (error) {
+  } catch {
     console.error('读取主题失败:', error)
   }
   return 'light'

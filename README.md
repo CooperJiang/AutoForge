@@ -62,7 +62,7 @@ Cooper 是一个强大而优雅的工作流自动化平台，旨在让自动化�
   <img src="docs/images/home.png" alt="Cooper 主界面" width="800">
 </p>
 
-Cooper 提供了现代化的用户界面，让工作流的创建、管理和监控变得直观简单。
+提供了现代化的用户界面，让工作流的创建、管理和监控变得直观简单。
 
 ---
 
@@ -195,31 +195,37 @@ cd web && pnpm install && pnpm dev
 
 ## 🏗 架构设计
 
-Cooper 采用前后端分离的架构设计：
+Cooper 采用现代化的前后端分离架构：
 
 ```
-┌─────────────────────────────────────────────────────┐
-│                    前端 (Vue 3)                      │
-│  ┌──────────┐  ┌──────────┐  ┌──────────┐          │
-│  │ 工作流编辑 │  │ 执行监控  │  │ 任务管理  │          │
-│  └──────────┘  └──────────┘  └──────────┘          │
-└─────────────────────────────────────────────────────┘
-                         │
-                         │ HTTP/WebSocket
-                         ▼
-┌─────────────────────────────────────────────────────┐
-│                    后端 (Go)                         │
-│  ┌──────────┐  ┌──────────┐  ┌──────────┐          │
-│  │ API 服务  │  │ 工作流引擎 │  │ 调度器   │          │
-│  └──────────┘  └──────────┘  └──────────┘          │
-└─────────────────────────────────────────────────────┘
-                         │
-                         │
-                         ▼
-                   ┌──────────┐
-                   │  MySQL   │
-                   └──────────┘
+┌───────────────────────────────────────────────┐
+│          前端层 (Vue 3 + TypeScript)           │
+│                                               │
+│  工作流编辑器  │  执行监控  │  任务管理  │  用户中心 │
+│                                               │
+└───────────────────┬───────────────────────────┘
+                    │ RESTful API
+                    ▼
+┌───────────────────────────────────────────────┐
+│           后端层 (Go + Gin Framework)          │
+│                                               │
+│  API 网关  │  工作流引擎  │  调度器  │  认证服务 │
+│                                               │
+└───────────────────┬───────────────────────────┘
+                    │
+                    ▼
+┌───────────────────────────────────────────────┐
+│            数据层 (MySQL/SQLite)               │
+│                                               │
+│  工作流定义  │  执行历史  │  用户数据  │  日志   │
+│                                               │
+└───────────────────────────────────────────────┘
 ```
+
+**核心模块**：
+- **工作流引擎**：负责工作流的解析、验证和执行
+- **调度器**：基于 Cron 的任务调度系统，支持多种触发方式
+- **执行器**：异步执行工作流节点，支持并发和错误处理
 
 详细的架构设计请参考 [工作流设计文档](./docs/workflow-design.md)。
 
@@ -229,27 +235,13 @@ Cooper 采用前后端分离的架构设计：
 
 我们欢迎所有形式的贡献！无论是报告 Bug、提出新功能建议，还是提交代码。
 
-### 如何贡献
-
 1. Fork 本仓库
 2. 创建您的特性分支 (`git checkout -b feature/AmazingFeature`)
 3. 提交您的更改 (`git commit -m 'Add some AmazingFeature'`)
 4. 推送到分支 (`git push origin feature/AmazingFeature`)
 5. 开启一个 Pull Request
 
-### 代码规范
-
-请确保您的代码符合我们的规范：
-
-- **Go 代码**: 遵循 [Effective Go](https://golang.org/doc/effective_go)
-- **Vue 代码**: 遵循 [Vue 3 Style Guide](https://vuejs.org/style-guide/)
-- **组件开发**: 遵循 [组件开发规范](./docs/COMPONENT_DEVELOPMENT.md)
-
-提交代码前，请运行：
-```bash
-make fmt    # 格式化代码
-make lint   # 代码检查
-```
+更多开发规范请查看 [开发文档](./docs/DEVELOPMENT_GUIDE.md) 和 [组件开发规范](./docs/COMPONENT_DEVELOPMENT.md)。
 
 ---
 
@@ -287,32 +279,19 @@ make lint   # 代码检查
 
 ---
 
-## 🙏 致谢
-
-Cooper 的诞生离不开以下优秀的开源项目：
-
-- [Gin](https://github.com/gin-gonic/gin) - 高性能 HTTP Web 框架
-- [GORM](https://github.com/go-gorm/gorm) - 优雅的 Go ORM 库
-- [Vue.js](https://vuejs.org/) - 渐进式 JavaScript 框架
-- [Tailwind CSS](https://tailwindcss.com/) - 现代化 CSS 框架
-- [VueFlow](https://github.com/bcakmakoglu/vue-flow) - 强大的流程图编辑器
-
-感谢所有贡献者和使用者 ❤️
-
----
-
-## 📧 联系方式
-
-- **GitHub Issues**: [提交问题](https://github.com/CooperJiang/Cooper/issues)
-- **Pull Requests**: [贡献代码](https://github.com/CooperJiang/Cooper/pulls)
-
----
-
 <div align="center">
 
-**⭐ 如果这个项目对你有帮助，请给个 Star！⭐**
+### 🌟 如果这个项目对你有帮助
 
-Made with ❤️ by [CooperJiang](https://github.com/CooperJiang)
+**请给我们一个 Star ⭐️**
+
+[![Star History Chart](https://api.star-history.com/svg?repos=CooperJiang/Cooper&type=Date)](https://star-history.com/#CooperJiang/Cooper&Date)
+
+---
+
+**Made with ❤️ by Cooper Team**
+
+[🏠 在线体验](https://task.mmmss.com/) · [📚 文档](./docs/DEVELOPMENT_GUIDE.md) · [💬 问题反馈](https://github.com/CooperJiang/Cooper/issues)
 
 [⬆ 回到顶部](#cooper)
 

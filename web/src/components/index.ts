@@ -27,6 +27,8 @@ import TaskDetailDialog from './TaskDetailDialog'
 import ExecutionDetailDialog from './ExecutionDetailDialog'
 import VariableSelector from './VariableSelector'
 import RetryConfig from './RetryConfig'
+import Tabs from './Tabs'
+import Slider from './Slider'
 
 /* 导出 message 工具函数 */
 export { message } from '@/utils/message'
@@ -46,12 +48,14 @@ const componentMap = {
   Pagination,
   Table,
   AppHeader,
+  Tabs,
 
   // 表单组件
   TimePicker,
   ParamInput,
   WeekDayPicker,
   MonthDayPicker,
+  Slider,
 
   // 展示组件
   JsonViewer,
@@ -79,6 +83,8 @@ export {
   Pagination,
   Table,
   AppHeader,
+  Tabs,
+  Slider,
   TimePicker,
   ParamInput,
   JsonViewer,

@@ -204,15 +204,30 @@ func (ws *WorkflowScheduler) executeWorkflow(wf *models.Workflow) {
 		return
 	}
 
-	// 异步执行工作流
+	// 更新工作流的下次执行时间
+	go ws.updateNextRunTime(wf)
+
+	// 异步执行工作流 (调度执行，无外部参数)
 	go func() {
-		if err := ws.engineService.ExecuteWorkflow(execution.GetID(), nil); err != nil {
+		if err := ws.engineService.ExecuteWorkflow(execution.GetID(), nil, nil); err != nil {
 			logger.Error("工作流执行失败: WorkflowID=%s, ExecutionID=%s, Error=%v",
 				wf.GetID(), execution.GetID(), err)
 		} else {
 			logger.Info("工作流执行完成: %s (ExecutionID: %s)", wf.Name, execution.GetID())
 		}
 	}()
+}
+
+// updateNextRunTime 更新工作流的下次执行时间
+func (ws *WorkflowScheduler) updateNextRunTime(wf *models.Workflow) {
+	nextRunTime := ws.workflowService.CalculateNextRunTime(wf.ScheduleType, wf.ScheduleValue)
+
+	db := database.GetDB()
+	if err := db.Model(&models.Workflow{}).Where("id = ?", wf.GetID()).Update("next_run_time", nextRunTime).Error; err != nil {
+		logger.Error("更新工作流下次执行时间失败: WorkflowID=%s, Error=%v", wf.GetID(), err)
+	} else {
+		logger.Info("已更新工作流下次执行时间: WorkflowID=%s, NextRunTime=%d", wf.GetID(), nextRunTime)
+	}
 }
 
 // StopWorkflowScheduler 停止工作流调度器

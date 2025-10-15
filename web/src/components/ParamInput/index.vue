@@ -24,7 +24,12 @@
       class="p-1 text-error hover:bg-error-light rounded transition-colors duration-200"
     >
       <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M6 18L18 6M6 6l12 12"
+        />
       </svg>
     </button>
   </div>
@@ -44,12 +49,12 @@ interface Props {
 
 const props = withDefaults(defineProps<Props>(), {
   keyPlaceholder: '键',
-  valuePlaceholder: '值'
+  valuePlaceholder: '值',
 })
 
 const emit = defineEmits<{
   'update:param': [param: Param]
-  'remove': []
+  remove: []
 }>()
 
 const updateKey = (key: string) => {

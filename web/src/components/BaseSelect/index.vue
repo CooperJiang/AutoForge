@@ -19,7 +19,12 @@
           stroke="currentColor"
           viewBox="0 0 24 24"
         >
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M19 9l-7 7-7-7"
+          />
         </svg>
       </div>
     </button>
@@ -55,7 +60,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted, nextTick } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 
 interface Option {
   label: string
@@ -72,7 +77,7 @@ interface Props {
 
 const props = withDefaults(defineProps<Props>(), {
   placeholder: '请选择',
-  required: false
+  required: false,
 })
 
 const emit = defineEmits<{
@@ -84,7 +89,7 @@ const selectRef = ref<HTMLElement>()
 const dropdownPosition = ref({ top: 0, left: 0, width: 0 })
 
 const selectedLabel = computed(() => {
-  const option = props.options.find(opt => opt.value === props.modelValue)
+  const option = props.options.find((opt) => opt.value === props.modelValue)
   return option?.label || ''
 })
 
@@ -92,13 +97,12 @@ const dropdownStyle = computed(() => ({
   top: `${dropdownPosition.value.top}px`,
   left: `${dropdownPosition.value.left}px`,
   width: `${dropdownPosition.value.width}px`,
-  zIndex: 9999
+  zIndex: 9999,
 }))
 
 const calculatePosition = () => {
   if (!selectRef.value) return
 
-  const rect = selectRef.value.getBoundingClientRect()
   const button = selectRef.value.querySelector('button')
   const buttonRect = button?.getBoundingClientRect()
 
@@ -106,7 +110,7 @@ const calculatePosition = () => {
     dropdownPosition.value = {
       top: buttonRect.bottom + 4,
       left: buttonRect.left,
-      width: buttonRect.width
+      width: buttonRect.width,
     }
   }
 }

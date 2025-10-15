@@ -3,10 +3,7 @@ import typography from '@tailwindcss/typography'
 
 /** @type {import('tailwindcss').Config} */
 export default {
-  content: [
-    "./index.html",
-    "./src/**/*.{vue,js,ts,jsx,tsx}",
-  ],
+  content: ['./index.html', './src/**/*.{vue,js,ts,jsx,tsx}'],
   darkMode: 'class', // 使用 class 策略，通过 .dark 类切换主题
   theme: {
     extend: {
@@ -76,10 +73,10 @@ export default {
 
       // 阴影
       boxShadow: {
-        'sm': 'var(--shadow-sm)',
-        'md': 'var(--shadow-md)',
-        'lg': 'var(--shadow-lg)',
-        'xl': 'var(--shadow-xl)',
+        sm: 'var(--shadow-sm)',
+        md: 'var(--shadow-md)',
+        lg: 'var(--shadow-lg)',
+        xl: 'var(--shadow-xl)',
       },
 
       // 背景渐变
@@ -95,13 +92,10 @@ export default {
           'system-ui',
           '-apple-system',
           'BlinkMacSystemFont',
-          'sans-serif'
-        ]
+          'sans-serif',
+        ],
       },
     },
   },
-  plugins: [
-    forms,
-    typography,
-  ],
+  plugins: [forms, typography],
 }

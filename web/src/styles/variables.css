@@ -84,41 +84,41 @@
 /* ============================================
    暗色主题
    ============================================ */
-html[data-theme="dark"] {
+html[data-theme='dark'] {
   /* 1. 背景色 - 温暖深色系统 */
-  --color-bg-primary: #1a1a1a;        /* 主背景 - 温暖深灰 */
-  --color-bg-secondary: #121212;      /* 次级背景 - 更深 */
-  --color-bg-tertiary: #242424;       /* 三级背景 - 浅一点 */
-  --color-bg-elevated: #1f1f1f;       /* 卡片/弹窗背景 - 略亮 */
+  --color-bg-primary: #1a1a1a; /* 主背景 - 温暖深灰 */
+  --color-bg-secondary: #121212; /* 次级背景 - 更深 */
+  --color-bg-tertiary: #242424; /* 三级背景 - 浅一点 */
+  --color-bg-elevated: #1f1f1f; /* 卡片/弹窗背景 - 略亮 */
   --color-bg-overlay: rgba(0, 0, 0, 0.85);
-  --color-bg-hover: #2a2a2a;          /* 悬停态 - 明显变化 */
-  --color-bg-active: #333333;         /* 激活态 */
+  --color-bg-hover: #2a2a2a; /* 悬停态 - 明显变化 */
+  --color-bg-active: #333333; /* 激活态 */
 
   /* 2. 文本色 - 柔和对比 */
-  --color-text-primary: #e8e8e8;      /* 主文本 - 柔和白 */
-  --color-text-secondary: #b8b8b8;    /* 次要文本 - 中灰 */
-  --color-text-tertiary: #8a8a8a;     /* 三级文本 - 深灰 */
-  --color-text-disabled: #5a5a5a;     /* 禁用态 */
-  --color-text-inverse: #1a1a1a;      /* 反色文本 */
-  --color-text-placeholder: #6a6a6a;  /* 占位符 */
+  --color-text-primary: #e8e8e8; /* 主文本 - 柔和白 */
+  --color-text-secondary: #b8b8b8; /* 次要文本 - 中灰 */
+  --color-text-tertiary: #8a8a8a; /* 三级文本 - 深灰 */
+  --color-text-disabled: #5a5a5a; /* 禁用态 */
+  --color-text-inverse: #1a1a1a; /* 反色文本 */
+  --color-text-placeholder: #6a6a6a; /* 占位符 */
 
   /* 3. 边框色 - 更明显的分割 */
-  --color-border-primary: #2d2d2d;    /* 主边框 - 可见但不突兀 */
-  --color-border-secondary: #3a3a3a;  /* 次级边框 */
-  --color-border-focus: #73d13d;      /* 焦点边框 - 护眼绿 */
-  --color-border-error: #ef4444;      /* 错误边框 - 红色 */
+  --color-border-primary: #2d2d2d; /* 主边框 - 可见但不突兀 */
+  --color-border-secondary: #3a3a3a; /* 次级边框 */
+  --color-border-focus: #73d13d; /* 焦点边框 - 护眼绿 */
+  --color-border-error: #ef4444; /* 错误边框 - 红色 */
 
   /* 4. 品牌色 - 护眼绿 - 暗色模式 */
-  --color-primary: #73d13d;           /* 主色 - 护眼绿 */
-  --color-primary-hover: #52c41a;     /* 悬停 - 深绿 */
-  --color-primary-active: #389e0d;    /* 激活 - 更深绿 */
-  --color-primary-light: #162312;     /* 浅色背景 */
-  --color-primary-text: #000000;      /* 按钮文字 - 黑色 */
+  --color-primary: #73d13d; /* 主色 - 护眼绿 */
+  --color-primary-hover: #52c41a; /* 悬停 - 深绿 */
+  --color-primary-active: #389e0d; /* 激活 - 更深绿 */
+  --color-primary-light: #162312; /* 浅色背景 */
+  --color-primary-text: #000000; /* 按钮文字 - 黑色 */
 
   /* 4. 品牌色 - Cyan - 保持鲜艳度 */
-  --color-accent: #06b6d4;            /* 强调色 - 青色 */
-  --color-accent-hover: #0891b2;      /* 悬停 */
-  --color-accent-light: #164e63;      /* 浅色背景 */
+  --color-accent: #06b6d4; /* 强调色 - 青色 */
+  --color-accent-hover: #0891b2; /* 悬停 */
+  --color-accent-light: #164e63; /* 浅色背景 */
 
   /* 5. 功能色 - Success */
   --color-success: #73d13d;
@@ -159,7 +159,9 @@ html[data-theme="dark"] {
    主题切换过渡动画
    ============================================ */
 html {
-  transition: background-color 0.3s ease, color 0.3s ease;
+  transition:
+    background-color 0.3s ease,
+    color 0.3s ease;
 }
 
 * {

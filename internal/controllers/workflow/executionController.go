@@ -38,9 +38,9 @@ func ExecuteWorkflow(c *gin.Context) {
 		return
 	}
 
-	// 异步执行工作流
+	// 异步执行工作流，传递外部参数
 	go func() {
-		if err := engineService.ExecuteWorkflow(execution.GetID(), req.EnvVars); err != nil {
+		if err := engineService.ExecuteWorkflow(execution.GetID(), req.EnvVars, req.Params); err != nil {
 			log.Error("工作流执行失败: ExecutionID=%s, Error=%v", execution.GetID(), err)
 		}
 	}()

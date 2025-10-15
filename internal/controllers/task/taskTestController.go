@@ -1,16 +1,16 @@
 package task
 
 import (
+	"auto-forge/internal/models"
+	"auto-forge/pkg/common"
+	"auto-forge/pkg/errors"
+	"auto-forge/pkg/utools"
 	"context"
 	"encoding/json"
 	"io"
 	"net/http"
 	"net/url"
 	"strings"
-	"auto-forge/internal/models"
-	"auto-forge/pkg/common"
-	"auto-forge/pkg/errors"
-	"auto-forge/pkg/utools"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -18,22 +18,24 @@ import (
 
 // TestTaskRequest 测试任务请求
 type TestTaskRequest struct {
-	ToolCode string                `json:"tool_code"`
-	URL      string                `json:"url"`
-	Method   string                `json:"method"`
-	Headers  models.KeyValueArray  `json:"headers"`
-	Params   models.KeyValueArray  `json:"params"`
-	Body     string                `json:"body"`
+	ToolCode string                 `json:"tool_code"`
+	URL      string                 `json:"url"`
+	Method   string                 `json:"method"`
+	Headers  models.KeyValueArray   `json:"headers"`
+	Params   models.KeyValueArray   `json:"params"`
+	Body     string                 `json:"body"`
 	Config   map[string]interface{} `json:"config"`
 }
 
 // TestTaskResponse 测试任务响应
 type TestTaskResponse struct {
-	Success        bool   `json:"success"`
-	StatusCode     int    `json:"status_code"`
-	ResponseBody   string `json:"response_body"`
-	DurationMs     int64  `json:"duration_ms"`
-	ErrorMessage   string `json:"error_message,omitempty"`
+	Success      bool                   `json:"success"`
+	StatusCode   int                    `json:"status_code"`
+	ResponseBody string                 `json:"response_body"`
+	DurationMs   int64                  `json:"duration_ms"`
+	ErrorMessage string                 `json:"error_message,omitempty"`
+	Output       map[string]interface{} `json:"output,omitempty"`
+	Message      string                 `json:"message,omitempty"`
 }
 
 // TestTask 测试任务配置
@@ -111,21 +113,31 @@ func testWithToolSystem(c *gin.Context, req *TestTaskRequest) {
 
 	result, err := tool.Execute(ctx, config)
 	if err != nil {
-		errors.ResponseSuccess(c, TestTaskResponse{
+		resp := TestTaskResponse{
 			Success:      false,
 			ErrorMessage: "执行失败: " + err.Error(),
-		}, "测试完成")
+		}
+		if result != nil {
+			resp.StatusCode = result.StatusCode
+			resp.DurationMs = result.DurationMs
+			resp.Output = result.Output
+			resp.Message = result.Message
+		}
+		errors.ResponseSuccess(c, resp, "测试完成")
 		return
 	}
 
 	// 返回结果
-	errors.ResponseSuccess(c, TestTaskResponse{
+	response := TestTaskResponse{
 		Success:      result.Success,
 		StatusCode:   result.StatusCode,
 		ResponseBody: result.Message + "\n\n详细信息:\n" + result.ResponseBody,
 		DurationMs:   result.DurationMs,
 		ErrorMessage: result.Error,
-	}, "测试完成")
+		Output:       result.Output,
+		Message:      result.Message,
+	}
+	errors.ResponseSuccess(c, response, "测试完成")
 }
 
 // testHTTPRequest 测试 HTTP 请求（兼容旧接口）

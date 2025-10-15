@@ -2,30 +2,21 @@
   <div>
     <!-- 搜索筛选栏 -->
     <div class="flex gap-3 mb-6 items-center">
-      <div class="flex-shrink-0" style="width: 200px;">
-        <BaseInput
-          v-model="filters.keyword"
-          placeholder="搜索用户名或邮箱"
-        />
+      <div class="flex-shrink-0" style="width: 200px">
+        <BaseInput v-model="filters.keyword" placeholder="搜索用户名或邮箱" />
       </div>
-      <div class="flex-shrink-0" style="width: 150px;">
+      <div class="flex-shrink-0" style="width: 150px">
         <BaseSelect
           v-model="filters.status"
           :options="[
             { label: '全部状态', value: 0 },
             { label: '正常', value: 1 },
-            { label: '禁用', value: 2 }
+            { label: '禁用', value: 2 },
           ]"
           placeholder="全部状态"
         />
       </div>
-      <BaseButton
-        @click="loadUsers"
-        variant="primary"
-        class="flex-shrink-0"
-      >
-        搜索
-      </BaseButton>
+      <BaseButton @click="loadUsers" variant="primary" class="flex-shrink-0"> 搜索 </BaseButton>
     </div>
 
     <!-- 表格 -->
@@ -53,12 +44,12 @@
             <td class="py-3">
               <span
                 :class="[
-                  'px-2 py-1 text-xs font-medium rounded-full',
+                  'px-2 py-1 text-xs font-medium rounded-full border',
                   user.role === 1
-                    ? 'bg-purple-100 text-purple-700'
+                    ? 'bg-purple-500/10 text-purple-600 dark:text-purple-400 border-purple-500/20'
                     : user.role === 2
-                    ? 'bg-primary-light text-primary'
-                    : 'bg-green-100 text-green-700'
+                      ? 'bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/20'
+                      : 'bg-green-500/10 text-green-600 dark:text-green-400 border-green-500/20',
                 ]"
               >
                 {{ getRoleText(user.role) }}
@@ -66,10 +57,16 @@
             </td>
             <td class="py-3">
               <div class="flex gap-2">
-                <span class="px-2 py-1 text-xs font-medium rounded bg-primary-light text-primary" :title="`总任务数: ${user.total_tasks}`">
+                <span
+                  class="px-2 py-1 text-xs font-medium rounded border bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/20"
+                  :title="`总任务数: ${user.total_tasks}`"
+                >
                   总: {{ user.total_tasks }}
                 </span>
-                <span class="px-2 py-1 text-xs font-medium rounded bg-green-50 text-green-700" :title="`启用任务数: ${user.enabled_tasks}`">
+                <span
+                  class="px-2 py-1 text-xs font-medium rounded border bg-green-500/10 text-green-600 dark:text-green-400 border-green-500/20"
+                  :title="`启用任务数: ${user.enabled_tasks}`"
+                >
                   启用: {{ user.enabled_tasks }}
                 </span>
               </div>
@@ -77,10 +74,10 @@
             <td class="py-3">
               <span
                 :class="[
-                  'px-2 py-1 text-xs font-medium rounded-full',
+                  'px-2 py-1 text-xs font-medium rounded-full border',
                   user.status === 1
-                    ? 'bg-green-100 text-green-700'
-                    : 'bg-bg-tertiary text-text-secondary'
+                    ? 'bg-green-500/10 text-green-600 dark:text-green-400 border-green-500/20'
+                    : 'bg-slate-500/10 text-slate-600 dark:text-slate-400 border-slate-500/20',
                 ]"
               >
                 {{ user.status === 1 ? '正常' : '禁用' }}
@@ -92,10 +89,10 @@
                 <button
                   @click="toggleUserStatus(user)"
                   :class="[
-                    'px-3 py-1.5 text-xs font-medium rounded-lg transition-colors',
+                    'px-3 py-1.5 text-xs font-medium rounded-lg transition-colors border',
                     user.status === 1
-                      ? 'bg-bg-tertiary hover:bg-gray-200 text-text-secondary'
-                      : 'bg-green-100 hover:bg-green-200 text-green-700'
+                      ? 'bg-slate-500/10 hover:bg-slate-500/20 text-slate-600 dark:text-slate-400 border-slate-500/20'
+                      : 'bg-green-500/10 hover:bg-green-500/20 text-green-600 dark:text-green-400 border-green-500/20',
                   ]"
                   :title="user.status === 1 ? '禁用用户' : '启用用户'"
                 >
@@ -110,9 +107,7 @@
 
     <!-- 分页 -->
     <div class="flex justify-between items-center mt-6">
-      <div class="text-sm text-text-secondary">
-        共 {{ total }} 条记录
-      </div>
+      <div class="text-sm text-text-secondary">共 {{ total }} 条记录</div>
       <div class="flex gap-2">
         <button
           @click="prevPage"
@@ -155,7 +150,7 @@ const pageSize = ref(20)
 // 筛选条件
 const filters = ref({
   keyword: '',
-  status: 0
+  status: 0,
 })
 
 // 计算总页数
@@ -169,7 +164,7 @@ const loadUsers = async () => {
     const params: any = {
       page: currentPage.value,
       page_size: pageSize.value,
-      keyword: filters.value.keyword
+      keyword: filters.value.keyword,
     }
     if (filters.value.status > 0) {
       params.status = filters.value.status
@@ -203,7 +198,7 @@ const getRoleText = (role: number): string => {
   const roleMap: Record<number, string> = {
     1: '超级管理员',
     2: '管理员',
-    3: '普通用户'
+    3: '普通用户',
   }
   return roleMap[role] || '未知'
 }

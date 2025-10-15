@@ -16,7 +16,9 @@
                     <h4 class="text-sm font-medium text-gray-900">修改密码</h4>
                     <p class="text-sm text-gray-500">更新您的登录密码</p>
                   </div>
-                  <button class="px-4 py-2 border border-border-secondary text-sm font-medium rounded-md text-text-secondary bg-bg-elevated hover:bg-bg-secondary">
+                  <button
+                    class="px-4 py-2 border border-border-secondary text-sm font-medium rounded-md text-text-secondary bg-bg-elevated hover:bg-bg-secondary"
+                  >
                     修改
                   </button>
                 </div>
@@ -25,7 +27,9 @@
                     <h4 class="text-sm font-medium text-gray-900">修改邮箱</h4>
                     <p class="text-sm text-gray-500">更新您的邮箱地址</p>
                   </div>
-                  <button class="px-4 py-2 border border-border-secondary text-sm font-medium rounded-md text-text-secondary bg-bg-elevated hover:bg-bg-secondary">
+                  <button
+                    class="px-4 py-2 border border-border-secondary text-sm font-medium rounded-md text-text-secondary bg-bg-elevated hover:bg-bg-secondary"
+                  >
                     修改
                   </button>
                 </div>
@@ -41,8 +45,12 @@
                     <h4 class="text-sm font-medium text-gray-900">邮件通知</h4>
                     <p class="text-sm text-gray-500">接收重要更新的邮件通知</p>
                   </div>
-                  <button class="relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent bg-primary transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2">
-                    <span class="translate-x-5 inline-block h-5 w-5 transform rounded-full bg-bg-elevated shadow ring-0 transition duration-200 ease-in-out"></span>
+                  <button
+                    class="relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent bg-primary transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+                  >
+                    <span
+                      class="translate-x-5 inline-block h-5 w-5 transform rounded-full bg-bg-elevated shadow ring-0 transition duration-200 ease-in-out"
+                    ></span>
                   </button>
                 </div>
               </div>
@@ -57,7 +65,9 @@
                     <h4 class="text-sm font-medium text-gray-900">个人资料可见性</h4>
                     <p class="text-sm text-gray-500">控制其他用户是否可以查看您的个人资料</p>
                   </div>
-                  <select class="block w-32 px-3 py-2 border border-border-secondary rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary sm:text-sm">
+                  <select
+                    class="block w-32 px-3 py-2 border border-border-secondary rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary sm:text-sm"
+                  >
                     <option>公开</option>
                     <option>私密</option>
                   </select>

@@ -9,9 +9,7 @@
     <!-- 顶部操作栏 -->
     <div class="mb-4 flex items-center justify-between">
       <h1 class="text-2xl font-bold text-text-primary">定时任务管理</h1>
-      <BaseButton variant="primary" @click="goToCreateTask">
-        ➕ 创建任务
-      </BaseButton>
+      <BaseButton variant="primary" @click="goToCreateTask"> ➕ 创建任务 </BaseButton>
     </div>
 
     <!-- 任务列表 -->
@@ -29,9 +27,14 @@
         <template #body>
           <tr v-for="task in tasks" :key="task.id" class="hover:bg-bg-hover">
             <td class="font-medium w-[15%]" :title="task.name">{{ task.name }}</td>
-            <td class="text-text-secondary w-[20%]" :title="task.description || '-'">{{ task.description || '-' }}</td>
+            <td class="text-text-secondary w-[20%]" :title="task.description || '-'">
+              {{ task.description || '-' }}
+            </td>
             <td class="w-[12%]">
-              <span class="inline-block px-2 py-1 text-xs rounded-md bg-primary-light text-primary border border-primary max-w-full overflow-hidden text-ellipsis" :title="task.tool_code">
+              <span
+                class="inline-block px-2 py-1 text-xs rounded-md bg-primary-light text-primary border border-primary max-w-full overflow-hidden text-ellipsis"
+                :title="task.tool_code"
+              >
                 {{ task.tool_code }}
               </span>
             </td>
@@ -43,9 +46,11 @@
             <td class="w-[8%]">
               <span
                 class="inline-block px-2 py-1 text-xs rounded-md whitespace-nowrap"
-                :class="task.enabled
-                  ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
-                  : 'bg-bg-hover text-text-secondary border border-border-primary'"
+                :class="
+                  task.enabled
+                    ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                    : 'bg-bg-hover text-text-secondary border border-border-primary'
+                "
               >
                 {{ task.enabled ? '✓ 启用' : '✗ 禁用' }}
               </span>
@@ -58,9 +63,7 @@
                 <BaseButton size="sm" variant="ghost" @click="handleViewExecutions(task)">
                   记录
                 </BaseButton>
-                <BaseButton size="sm" variant="ghost" @click="handleEdit(task)">
-                  编辑
-                </BaseButton>
+                <BaseButton size="sm" variant="ghost" @click="handleEdit(task)"> 编辑 </BaseButton>
                 <BaseButton
                   size="sm"
                   :variant="task.enabled ? 'secondary' : 'success'"
@@ -112,13 +115,7 @@ import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { message } from '@/utils/message'
 import type { Task } from '@/api/task'
-import {
-  getTaskList,
-  deleteTask,
-  enableTask,
-  disableTask,
-  triggerTask,
-} from '@/api/task'
+import { getTaskList, deleteTask, enableTask, disableTask, triggerTask } from '@/api/task'
 import BaseButton from '@/components/BaseButton'
 import Table from '@/components/Table'
 import Pagination from '@/components/Pagination'
@@ -165,7 +162,6 @@ const loadTasks = async () => {
   }
 }
 
-
 const getScheduleTypeName = (type: string) => {
   return scheduleTypeMap[type] || type
 }
@@ -176,7 +172,7 @@ const formatTime = (timestamp: number) => {
     month: '2-digit',
     day: '2-digit',
     hour: '2-digit',
-    minute: '2-digit'
+    minute: '2-digit',
   })
 }
 

@@ -1,5 +1,11 @@
 import request from '@/utils/request'
 
+export interface OutputFieldDef {
+  type: 'string' | 'number' | 'boolean' | 'object' | 'array'
+  label: string
+  children?: Record<string, OutputFieldDef>
+}
+
 export interface Tool {
   id?: string
   code: string
@@ -13,17 +19,16 @@ export interface Tool {
   ai_callable: boolean
   enabled: boolean
   tags: string
+  output_fields_schema?: Record<string, OutputFieldDef>
   created_at?: string
   updated_at?: string
 }
 
-// 获取工具列表
 export const getToolList = async () => {
   const response = await request.get<Tool[]>('/api/v1/tools')
   return response.data
 }
 
-// 获取工具详情
 export const getToolDetail = async (code: string) => {
   const response = await request.get<Tool>(`/api/v1/tools/${code}`)
   return response.data

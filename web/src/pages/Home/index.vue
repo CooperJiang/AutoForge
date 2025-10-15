@@ -50,9 +50,7 @@
     <!-- 主要内容 -->
     <main class="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
       <div class="text-center">
-        <h1 class="text-4xl font-bold text-gray-900 mb-8">
-          欢迎来到用户端
-        </h1>
+        <h1 class="text-4xl font-bold text-gray-900 mb-8">欢迎来到用户端</h1>
         <p class="text-xl text-gray-600 mb-12">
           这是一个基于 Vue 3 + TypeScript + TailwindCSS 的用户端模板
         </p>
@@ -60,21 +58,15 @@
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mt-12">
           <div class="bg-bg-elevated p-6 rounded-lg shadow-md">
             <h3 class="text-lg font-semibold text-gray-900 mb-4">现代技术栈</h3>
-            <p class="text-gray-600">
-              使用 Vue 3 Composition API、TypeScript 和 TailwindCSS 构建
-            </p>
+            <p class="text-gray-600">使用 Vue 3 Composition API、TypeScript 和 TailwindCSS 构建</p>
           </div>
           <div class="bg-bg-elevated p-6 rounded-lg shadow-md">
             <h3 class="text-lg font-semibold text-gray-900 mb-4">安全认证</h3>
-            <p class="text-gray-600">
-              内置用户认证系统，支持登录、注册、密码重置等功能
-            </p>
+            <p class="text-gray-600">内置用户认证系统，支持登录、注册、密码重置等功能</p>
           </div>
           <div class="bg-bg-elevated p-6 rounded-lg shadow-md">
             <h3 class="text-lg font-semibold text-gray-900 mb-4">响应式设计</h3>
-            <p class="text-gray-600">
-              完全响应式设计，在各种设备上都有良好的用户体验
-            </p>
+            <p class="text-gray-600">完全响应式设计，在各种设备上都有良好的用户体验</p>
           </div>
         </div>
 
@@ -95,7 +87,7 @@
 import { useAuth } from '@/hooks/user/useAuth'
 import { useMessage } from '@/composables/useMessage'
 
-const { isAuthenticated, logout, user } = useAuth()
+const { isAuthenticated, logout } = useAuth()
 const { success } = useMessage()
 
 const handleLogout = () => {

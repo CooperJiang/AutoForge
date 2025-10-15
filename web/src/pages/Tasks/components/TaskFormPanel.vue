@@ -8,24 +8,27 @@
       </div>
     </div>
 
-    <form @submit.prevent="handleSubmit" class="space-y-3 max-h-[calc(100vh-10rem)] overflow-y-auto pr-1">
+    <form
+      @submit.prevent="handleSubmit"
+      class="space-y-3 max-h-[calc(100vh-10rem)] overflow-y-auto pr-1"
+    >
       <BaseInput
-        v-model="taskForm.name"
+        v-model="localTaskForm.name"
         label="任务名称"
         placeholder="例如：每日签到"
         required
       />
 
       <ScheduleSelector
-        v-model:type="taskForm.scheduleType"
-        v-model:value="taskForm.scheduleValue"
+        v-model:type="localTaskForm.scheduleType"
+        v-model:value="localTaskForm.scheduleValue"
       />
 
       <div class="pt-3 border-t-2 border-border-primary space-y-2">
         <h3 class="text-xs font-semibold text-text-secondary">工具配置</h3>
 
         <BaseSelect
-          v-model="taskForm.tool_code"
+          v-model="localTaskForm.tool_code"
           :options="toolOptions"
           label="选择工具"
           placeholder="请选择工具"
@@ -33,7 +36,7 @@
           @change="$emit('tool-change')"
         />
 
-        <div v-if="taskForm.tool_code" class="space-y-2">
+        <div v-if="localTaskForm.tool_code" class="space-y-2">
           <BaseButton
             variant="secondary"
             type="button"
@@ -57,12 +60,7 @@
       </div>
 
       <div class="flex gap-2 pt-2">
-        <BaseButton
-          variant="primary"
-          type="submit"
-          :full-width="true"
-          :disabled="!isConfigured"
-        >
+        <BaseButton variant="primary" type="submit" :full-width="true" :disabled="!isConfigured">
           {{ editingTask ? '保存修改' : '创建任务' }}
         </BaseButton>
         <BaseButton
@@ -86,8 +84,9 @@ import BaseButton from '@/components/BaseButton'
 import ScheduleSelector from './ScheduleSelector.vue'
 import type { TaskFormData } from '@/composables/useTaskForm'
 import type { Task } from '@/api/task'
+import { ref, watch } from 'vue'
 
-defineProps<{
+const props = defineProps<{
   taskForm: TaskFormData
   toolOptions: { label: string; value: string }[]
   isConfigured: boolean
@@ -101,7 +100,29 @@ const emit = defineEmits<{
   'tool-change': []
   'config-click': []
   'test-click': []
+  'update:taskForm': [value: TaskFormData]
 }>()
+
+// Local editable copy to avoid mutating prop directly
+const localTaskForm = ref<TaskFormData>({ ...props.taskForm })
+
+// Keep local in sync when parent updates
+watch(
+  () => props.taskForm,
+  (val) => {
+    localTaskForm.value = { ...val }
+  },
+  { deep: true }
+)
+
+// Emit updates for v-model:task-form usage in parent
+watch(
+  localTaskForm,
+  (val) => {
+    emit('update:taskForm', { ...val })
+  },
+  { deep: true }
+)
 
 const handleSubmit = () => {
   emit('submit')

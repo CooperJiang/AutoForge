@@ -8,53 +8,53 @@
 
 ### 🎨 基础组件
 
-| 组件 | 路径 | 说明 |
-|------|------|------|
-| BaseButton | `./BaseButton` | 基础按钮组件，支持多种变体和尺寸 |
-| BaseInput | `./BaseInput` | 基础输入框组件，支持标签、验证等 |
-| BaseSelect | `./BaseSelect` | 下拉选择组件，支持搜索和多选 |
-| Dialog | `./Dialog` | 模态对话框组件 |
-| Drawer | `./Drawer` | 侧边抽屉组件 |
-| Message | `./Message` | 消息提示组件 |
-| MessageContainer | `./MessageContainer` | 消息容器组件 |
+| 组件             | 路径                 | 说明                             |
+| ---------------- | -------------------- | -------------------------------- |
+| BaseButton       | `./BaseButton`       | 基础按钮组件，支持多种变体和尺寸 |
+| BaseInput        | `./BaseInput`        | 基础输入框组件，支持标签、验证等 |
+| BaseSelect       | `./BaseSelect`       | 下拉选择组件，支持搜索和多选     |
+| Dialog           | `./Dialog`           | 模态对话框组件                   |
+| Drawer           | `./Drawer`           | 侧边抽屉组件                     |
+| Message          | `./Message`          | 消息提示组件                     |
+| MessageContainer | `./MessageContainer` | 消息容器组件                     |
 
 ### 📋 布局组件
 
-| 组件 | 路径 | 说明 |
-|------|------|------|
-| AppHeader | `./AppHeader` | 应用顶部导航栏 |
-| Pagination | `./Pagination` | 分页组件 |
-| Table | `./Table` | 数据表格组件 |
+| 组件       | 路径           | 说明           |
+| ---------- | -------------- | -------------- |
+| AppHeader  | `./AppHeader`  | 应用顶部导航栏 |
+| Pagination | `./Pagination` | 分页组件       |
+| Table      | `./Table`      | 数据表格组件   |
 
 ### 📝 表单组件
 
-| 组件 | 路径 | 说明 |
-|------|------|------|
-| TimePicker | `./TimePicker` | 时间选择器 |
-| WeekDayPicker | `./WeekDayPicker` | 星期选择器 |
-| MonthDayPicker | `./MonthDayPicker` | 月份日期选择器 |
-| ParamInput | `./ParamInput` | 键值对参数输入组件 |
+| 组件             | 路径                 | 说明                                     |
+| ---------------- | -------------------- | ---------------------------------------- |
+| TimePicker       | `./TimePicker`       | 时间选择器                               |
+| WeekDayPicker    | `./WeekDayPicker`    | 星期选择器                               |
+| MonthDayPicker   | `./MonthDayPicker`   | 月份日期选择器                           |
+| ParamInput       | `./ParamInput`       | 键值对参数输入组件                       |
 | VariableSelector | `./VariableSelector` | 变量选择器（支持环境变量、节点输出引用） |
 
 ### 🎭 展示组件
 
-| 组件 | 路径 | 说明 |
-|------|------|------|
-| JsonViewer | `./JsonViewer` | JSON 查看器，支持语法高亮 |
-| NextRunCountdown | `./NextRunCountdown` | 倒计时组件 |
+| 组件             | 路径                 | 说明                      |
+| ---------------- | -------------------- | ------------------------- |
+| JsonViewer       | `./JsonViewer`       | JSON 查看器，支持语法高亮 |
+| NextRunCountdown | `./NextRunCountdown` | 倒计时组件                |
 
 ### 💬 对话框组件
 
-| 组件 | 路径 | 说明 |
-|------|------|------|
-| TestResultDialog | `./TestResultDialog` | 测试结果对话框 |
-| TaskDetailDialog | `./TaskDetailDialog` | 任务详情对话框 |
+| 组件                  | 路径                      | 说明           |
+| --------------------- | ------------------------- | -------------- |
+| TestResultDialog      | `./TestResultDialog`      | 测试结果对话框 |
+| TaskDetailDialog      | `./TaskDetailDialog`      | 任务详情对话框 |
 | ExecutionDetailDialog | `./ExecutionDetailDialog` | 执行详情对话框 |
 
 ### 🔧 高级组件
 
-| 组件 | 路径 | 说明 |
-|------|------|------|
+| 组件        | 路径            | 说明                           |
+| ----------- | --------------- | ------------------------------ |
 | RetryConfig | `./RetryConfig` | 重试配置组件，支持指数退避策略 |
 
 ### 🛠️ 工具组件
@@ -90,9 +90,7 @@ app.mount('#app')
 
 ```vue
 <template>
-  <BaseButton size="lg" variant="primary">
-    点击我
-  </BaseButton>
+  <BaseButton size="lg" variant="primary"> 点击我 </BaseButton>
 </template>
 ```
 
@@ -106,9 +104,11 @@ import { createCooperUI } from './components'
 import App from './App.vue'
 
 const app = createApp(App)
-app.use(createCooperUI({
-  components: ['BaseButton', 'BaseInput', 'Dialog']
-}))
+app.use(
+  createCooperUI({
+    components: ['BaseButton', 'BaseInput', 'Dialog'],
+  })
+)
 app.mount('#app')
 ```
 
@@ -181,12 +181,12 @@ type Size = 'xs' | 'sm' | 'md' | 'lg' | 'xl'
 
 ```typescript
 type ButtonVariant =
-  | 'primary'    // 主要操作
-  | 'secondary'  // 次要操作
-  | 'success'    // 成功操作
-  | 'danger'     // 危险操作
-  | 'warning'    // 警告操作
-  | 'ghost'      // 幽灵按钮
+  | 'primary' // 主要操作
+  | 'secondary' // 次要操作
+  | 'success' // 成功操作
+  | 'danger' // 危险操作
+  | 'warning' // 警告操作
+  | 'ghost' // 幽灵按钮
 ```
 
 #### 颜色主题
@@ -272,12 +272,14 @@ export { message } from '@/utils/message'
 ### v1.0.0 (2025-01-12)
 
 **重大重构**
+
 - ✅ 将所有单文件组件重构为文件夹结构
 - ✅ 创建统一的导出文件 `index.ts`
 - ✅ 更新所有组件引用路径
 - ✅ 添加组件设计规范文档
 
 **组件清单**
+
 - 21 个基础组件
 - 6 个工具配置组件
 - 支持全局注册和按需引入

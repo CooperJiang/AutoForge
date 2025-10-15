@@ -44,10 +44,7 @@ export function formatDate(date: Date | string | number, format = 'YYYY-MM-DD HH
  * @param num 数字
  * @param options 选项
  */
-export function formatNumber(
-  num: number,
-  options?: Intl.NumberFormatOptions
-): string {
+export function formatNumber(num: number, options?: Intl.NumberFormatOptions): string {
   return new Intl.NumberFormat('zh-CN', options).format(num)
 }
 
@@ -131,7 +128,7 @@ export function formatTime(
     day: '2-digit',
     hour: format === 'date' ? undefined : '2-digit',
     minute: format === 'date' ? undefined : '2-digit',
-    second: format === 'full' ? '2-digit' : undefined
+    second: format === 'full' ? '2-digit' : undefined,
   }
 
   return date.toLocaleString('zh-CN', options)

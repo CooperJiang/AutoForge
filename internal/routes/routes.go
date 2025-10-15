@@ -20,6 +20,9 @@ func RegisterRoutes(r *gin.Engine) {
 	// 注册OAuth2回调路由（独立路由，不在 /api/v1 下）
 	RegisterOAuth2CallbackRoutes(r)
 
+	// 注册预览路由（独立路由，不在 /api/v1 下）
+	RegisterPreviewRoutes(r)
+
 	prefix := r.Group("/api")
 	version := prefix.Group("/v1")
 
@@ -50,6 +53,9 @@ func RegisterRoutes(r *gin.Engine) {
 
 		// 工作流相关路由
 		RegisterWorkflowRoutes(version)
+
+		// 公开工作流调用路由（无需认证）
+		RegisterPublicWorkflowRoutes(version)
 
 		// 在这里添加其他模块路由
 		// 例如：

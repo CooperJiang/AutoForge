@@ -24,5 +24,5 @@
 
 <script setup lang="ts">
 import AppHeader from '@/components/AppHeader'
-import Sidebar from '@/components/Sidebar.vue'
+import Sidebar from '@/components/Sidebar'
 </script>

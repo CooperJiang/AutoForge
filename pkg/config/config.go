@@ -28,6 +28,7 @@ type Config struct {
 	CORS     CORSConfig     `yaml:"cors" env:"CORS"`
 	Frontend FrontendConfig `yaml:"frontend" env:"FRONTEND"`
 	OAuth2   OAuth2Config   `yaml:"oauth2" env:"OAUTH2"`
+	OpenAI   OpenAIConfig   `yaml:"openai" env:"OPENAI"`
 }
 
 // AppConfig 应用基础配置
@@ -139,6 +140,13 @@ type LinuxDoOAuth2Config struct {
 	RedirectURL  string   `yaml:"redirect_url" env:"REDIRECT_URL"`
 	Scopes       []string `yaml:"scopes" env:"SCOPES"`
 	Enabled      bool     `yaml:"enabled" env:"ENABLED"`
+}
+
+// OpenAIConfig OpenAI配置
+type OpenAIConfig struct {
+	APIKey  string `yaml:"api_key" env:"API_KEY"`
+	APIBase string `yaml:"api_base" env:"API_BASE"`
+	Enabled bool   `yaml:"enabled" env:"ENABLED"`
 }
 
 var (

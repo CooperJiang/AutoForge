@@ -4,6 +4,7 @@
     title="测试结果"
     confirm-text="关闭"
     cancel-text=""
+    max-width="max-w-4xl"
     @update:model-value="$emit('update:modelValue', $event)"
     @confirm="$emit('update:modelValue', false)"
   >
@@ -14,9 +15,7 @@
         <span
           :class="[
             'px-2 py-1 rounded text-xs font-medium',
-            result.success
-              ? 'bg-green-100 text-green-800'
-              : 'bg-red-100 text-red-800'
+            result.success ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800',
           ]"
         >
           {{ result.success ? '成功' : '失败' }}
@@ -39,7 +38,19 @@
       <div v-if="result.error_message" class="space-y-1">
         <span class="text-sm font-medium text-text-secondary">错误信息:</span>
         <div class="bg-red-50 border border-red-200 rounded-lg p-3">
-          <pre class="text-xs text-red-800 whitespace-pre-wrap break-words">{{ result.error_message }}</pre>
+          <pre class="text-xs text-red-800 whitespace-pre-wrap break-words">{{
+            result.error_message
+          }}</pre>
+        </div>
+      </div>
+
+      <!-- 工具消息 -->
+      <div v-if="result.message" class="space-y-1">
+        <span class="text-sm font-medium text-text-secondary">工具消息:</span>
+        <div class="bg-bg-hover border border-border-primary rounded-lg p-3">
+          <pre class="text-xs text-text-secondary whitespace-pre-wrap break-words">{{
+            result.message
+          }}</pre>
         </div>
       </div>
 
@@ -48,11 +59,18 @@
         <span class="text-sm font-medium text-text-secondary">响应内容:</span>
         <JsonViewer :content="result.response_body" />
       </div>
+
+      <!-- 输出内容 -->
+      <div v-if="outputJson" class="space-y-1">
+        <span class="text-sm font-medium text-text-secondary">输出内容:</span>
+        <JsonViewer :content="outputJson" />
+      </div>
     </div>
   </Dialog>
 </template>
 
 <script setup lang="ts">
+import { computed } from 'vue'
 import Dialog from '@/components/Dialog'
 import JsonViewer from '@/components/JsonViewer'
 
@@ -62,12 +80,23 @@ interface TestResult {
   response_body?: string
   duration_ms?: number
   error_message?: string
+  output?: Record<string, any>
+  message?: string
 }
 
-defineProps<{
+const props = defineProps<{
   modelValue: boolean
   result: TestResult | null
 }>()
+
+const outputJson = computed(() => {
+  if (!props.result || !props.result.output) return ''
+  try {
+    return JSON.stringify(props.result.output, null, 2)
+  } catch {
+    return ''
+  }
+})
 
 defineEmits<{
   'update:modelValue': [value: boolean]

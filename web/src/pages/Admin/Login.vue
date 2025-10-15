@@ -1,5 +1,7 @@
 <template>
-  <div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-bg-secondary via-bg-secondary to-bg-secondary">
+  <div
+    class="min-h-screen flex items-center justify-center bg-gradient-to-br from-bg-secondary via-bg-secondary to-bg-secondary"
+  >
     <div class="w-full max-w-md px-6">
       <!-- Logo 和标题 -->
       <div class="text-center mb-8">
@@ -14,9 +16,7 @@
       <div class="bg-bg-elevated rounded-2xl shadow-xl border-2 border-border-primary p-8">
         <form @submit.prevent="handleLogin">
           <div class="mb-6">
-            <label class="block text-sm font-medium text-text-secondary mb-2">
-              管理员密码
-            </label>
+            <label class="block text-sm font-medium text-text-secondary mb-2"> 管理员密码 </label>
             <input
               v-model="password"
               type="password"

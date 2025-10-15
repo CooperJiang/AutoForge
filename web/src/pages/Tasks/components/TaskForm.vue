@@ -8,39 +8,37 @@
       </div>
     </div>
 
-    <form @submit.prevent="handleSubmit" class="space-y-3 max-h-[calc(100vh-10rem)] overflow-y-auto pr-1">
-      <BaseInput
-        v-model="form.name"
-        label="任务名称"
-        placeholder="例如：每日签到"
-        required
-      />
+    <form
+      @submit.prevent="handleSubmit"
+      class="space-y-3 max-h-[calc(100vh-10rem)] overflow-y-auto pr-1"
+    >
+      <BaseInput v-model="localForm.name" label="任务名称" placeholder="例如：每日签到" required />
 
       <div class="space-y-2">
         <BaseSelect
-          v-model="form.scheduleType"
+          v-model="localForm.scheduleType"
           :options="scheduleOptions"
           label="执行规则"
           required
         />
 
         <TimePicker
-          v-if="form.scheduleType === 'daily'"
-          v-model="form.scheduleValue"
+          v-if="localForm.scheduleType === 'daily'"
+          v-model="localForm.scheduleValue"
           hint="每天在指定时间执行"
         />
 
         <BaseInput
-          v-if="form.scheduleType === 'hourly'"
-          v-model="form.scheduleValue"
+          v-if="localForm.scheduleType === 'hourly'"
+          v-model="localForm.scheduleValue"
           placeholder="分:秒 (例如: 30:00)"
           hint="每小时的第N分N秒执行（最小间隔5分钟）"
           required
         />
 
         <BaseInput
-          v-if="form.scheduleType === 'interval'"
-          v-model="form.scheduleValue"
+          v-if="localForm.scheduleType === 'interval'"
+          v-model="localForm.scheduleValue"
           type="number"
           placeholder="秒数"
           :min="300"
@@ -49,20 +47,20 @@
         />
 
         <WeekDayPicker
-          v-if="form.scheduleType === 'weekly'"
-          v-model="form.scheduleValue"
+          v-if="localForm.scheduleType === 'weekly'"
+          v-model="localForm.scheduleValue"
           hint="每周在选定的星期几执行"
         />
 
         <MonthDayPicker
-          v-if="form.scheduleType === 'monthly'"
-          v-model="form.scheduleValue"
+          v-if="localForm.scheduleType === 'monthly'"
+          v-model="localForm.scheduleValue"
           hint="每月在选定的日期执行"
         />
 
         <BaseInput
-          v-if="form.scheduleType === 'cron'"
-          v-model="form.scheduleValue"
+          v-if="localForm.scheduleType === 'cron'"
+          v-model="localForm.scheduleValue"
           placeholder="0 0 * * * *"
           hint="Cron表达式: 秒 分 时 日 月 周"
           required
@@ -73,7 +71,7 @@
         <h3 class="text-xs font-semibold text-text-secondary">工具配置</h3>
 
         <BaseSelect
-          v-model="form.tool_code"
+          v-model="localForm.tool_code"
           :options="toolOptions"
           label="选择工具"
           placeholder="请选择工具"
@@ -81,7 +79,7 @@
           @change="$emit('tool-change')"
         />
 
-        <div v-if="form.tool_code" class="space-y-2">
+        <div v-if="localForm.tool_code" class="space-y-2">
           <BaseButton
             variant="secondary"
             type="button"
@@ -107,7 +105,13 @@
         <BaseButton variant="primary" type="submit" :full-width="true" :disabled="!isConfigured">
           {{ editingTask ? '保存修改' : '创建任务' }}
         </BaseButton>
-        <BaseButton v-if="editingTask" variant="secondary" type="button" @click="$emit('cancel')" :full-width="true">
+        <BaseButton
+          v-if="editingTask"
+          variant="secondary"
+          type="button"
+          @click="$emit('cancel')"
+          :full-width="true"
+        >
           取消
         </BaseButton>
       </div>
@@ -122,6 +126,7 @@ import BaseSelect from '@/components/BaseSelect'
 import TimePicker from '@/components/TimePicker'
 import WeekDayPicker from '@/components/WeekDayPicker'
 import MonthDayPicker from '@/components/MonthDayPicker'
+import { ref, watch } from 'vue'
 
 interface TaskForm {
   name: string
@@ -135,20 +140,42 @@ interface TaskForm {
   body: string
 }
 
-defineProps<{
+const props = defineProps<{
   form: TaskForm
   editingTask: any
   toolOptions: { label: string; value: string }[]
   isConfigured: boolean
 }>()
 
-defineEmits<{
+const emit = defineEmits<{
   submit: []
   cancel: []
   'tool-change': []
   'open-config': []
   'test-config': []
+  'update:form': [value: TaskForm]
 }>()
+
+// Local editable copy to avoid mutating prop directly
+const localForm = ref<TaskForm>({ ...props.form })
+
+// Keep local in sync when parent updates
+watch(
+  () => props.form,
+  (val) => {
+    localForm.value = { ...val }
+  },
+  { deep: true }
+)
+
+// Emit updates for v-model:form usage in parent
+watch(
+  localForm,
+  (val) => {
+    emit('update:form', { ...val })
+  },
+  { deep: true }
+)
 
 const scheduleOptions = [
   { label: '每天', value: 'daily' },
@@ -156,7 +183,7 @@ const scheduleOptions = [
   { label: '每月', value: 'monthly' },
   { label: '每小时', value: 'hourly' },
   { label: '间隔', value: 'interval' },
-  { label: 'Cron表达式', value: 'cron' }
+  { label: 'Cron表达式', value: 'cron' },
 ]
 
 const handleSubmit = () => {

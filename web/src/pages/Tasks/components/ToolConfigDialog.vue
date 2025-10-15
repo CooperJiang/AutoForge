@@ -9,18 +9,19 @@
     <div v-if="toolCode === 'http_request'" class="space-y-4">
       <!-- Curl 粘贴提示 -->
       <div class="bg-primary-light border border-primary rounded-lg p-3 text-xs text-primary">
-        💡 小提示：按 <kbd class="px-1.5 py-0.5 bg-bg-elevated border border-primary rounded">{{ isMac ? 'Cmd' : 'Ctrl' }}</kbd> + <kbd class="px-1.5 py-0.5 bg-bg-elevated border border-primary rounded">V</kbd> 可直接粘贴 cURL 命令自动解析
+        💡 小提示：按
+        <kbd class="px-1.5 py-0.5 bg-bg-elevated border border-primary rounded">{{
+          isMac ? 'Cmd' : 'Ctrl'
+        }}</kbd>
+        + <kbd class="px-1.5 py-0.5 bg-bg-elevated border border-primary rounded">V</kbd> 可直接粘贴
+        cURL 命令自动解析
       </div>
 
       <div>
         <label class="block text-sm font-medium text-text-secondary mb-2">
           请求方式 <span class="text-red-500">*</span>
         </label>
-        <BaseSelect
-          v-model="localConfig.method"
-          :options="methodOptions"
-          required
-        />
+        <BaseSelect v-model="localConfig.method" :options="methodOptions" required />
       </div>
 
       <div>
@@ -36,9 +37,7 @@
 
       <!-- Headers -->
       <div>
-        <label class="block text-sm font-medium text-text-secondary mb-2">
-          请求头（可选）
-        </label>
+        <label class="block text-sm font-medium text-text-secondary mb-2"> 请求头（可选） </label>
         <div class="space-y-2">
           <ParamInput
             v-for="(header, index) in localConfig.headers"
@@ -61,9 +60,7 @@
 
       <!-- Params -->
       <div>
-        <label class="block text-sm font-medium text-text-secondary mb-2">
-          请求参数（可选）
-        </label>
+        <label class="block text-sm font-medium text-text-secondary mb-2"> 请求参数（可选） </label>
         <div class="space-y-2">
           <ParamInput
             v-for="(param, index) in localConfig.params"
@@ -92,7 +89,8 @@
           class="flex items-center justify-between w-full mb-2 text-left"
         >
           <label class="block text-sm font-medium text-text-secondary cursor-pointer">
-            {{ bodyExpanded ? '▼' : '▶' }} 请求体 (Body) <span class="text-xs text-text-tertiary">(POST/PUT/PATCH)</span>
+            {{ bodyExpanded ? '▼' : '▶' }} 请求体 (Body)
+            <span class="text-xs text-text-tertiary">(POST/PUT/PATCH)</span>
           </label>
         </button>
         <div v-show="bodyExpanded" class="space-y-1">
@@ -107,9 +105,7 @@
       </div>
     </div>
 
-    <div v-else class="text-center py-8 text-text-tertiary">
-      该工具暂无需配置参数
-    </div>
+    <div v-else class="text-center py-8 text-text-tertiary">该工具暂无需配置参数</div>
   </Dialog>
 </template>
 
@@ -162,7 +158,7 @@ const localConfig = ref<LocalConfig>({
   method: 'GET',
   headers: [],
   params: [],
-  body: ''
+  body: '',
 })
 
 const methodOptions = [
@@ -170,44 +166,49 @@ const methodOptions = [
   { label: 'POST', value: 'POST' },
   { label: 'PUT', value: 'PUT' },
   { label: 'DELETE', value: 'DELETE' },
-  { label: 'PATCH', value: 'PATCH' }
+  { label: 'PATCH', value: 'PATCH' },
 ]
 
 // 监听 props.config 变化，转换为本地格式
-watch(() => props.config, (newConfig) => {
-  if (newConfig) {
-    try {
-      const headers = JSON.parse(newConfig.headers || '{}')
-      const body = JSON.parse(newConfig.body || '{}')
+watch(
+  () => props.config,
+  (newConfig) => {
+    if (newConfig) {
+      try {
+        const headers = JSON.parse(newConfig.headers || '{}')
+        const body = JSON.parse(newConfig.body || '{}')
 
-      localConfig.value = {
-        url: newConfig.url || '',
-        method: newConfig.method || 'GET',
-        headers: Object.entries(headers).map(([key, value]) => ({
-          key,
-          value: String(value)
-        })),
-        params: [],
-        body: typeof body === 'object' && Object.keys(body).length > 0
-          ? JSON.stringify(body, null, 2)
-          : ''
-      }
-    } catch {
-      localConfig.value = {
-        url: newConfig.url || '',
-        method: newConfig.method || 'GET',
-        headers: [],
-        params: [],
-        body: ''
+        localConfig.value = {
+          url: newConfig.url || '',
+          method: newConfig.method || 'GET',
+          headers: Object.entries(headers).map(([key, value]) => ({
+            key,
+            value: String(value),
+          })),
+          params: [],
+          body:
+            typeof body === 'object' && Object.keys(body).length > 0
+              ? JSON.stringify(body, null, 2)
+              : '',
+        }
+      } catch {
+        localConfig.value = {
+          url: newConfig.url || '',
+          method: newConfig.method || 'GET',
+          headers: [],
+          params: [],
+          body: '',
+        }
       }
     }
-  }
-}, { immediate: true })
+  },
+  { immediate: true }
+)
 
 // 同步本地配置回父组件
 const syncConfig = () => {
   const headersObj: Record<string, string> = {}
-  localConfig.value.headers.forEach(h => {
+  localConfig.value.headers.forEach((h) => {
     if (h.key) headersObj[h.key] = h.value
   })
 
@@ -225,7 +226,7 @@ const syncConfig = () => {
     url: localConfig.value.url,
     method: localConfig.value.method,
     headers: JSON.stringify(headersObj),
-    body: typeof bodyObj === 'string' ? bodyObj : JSON.stringify(bodyObj)
+    body: typeof bodyObj === 'string' ? bodyObj : JSON.stringify(bodyObj),
   })
 }
 
@@ -282,7 +283,7 @@ const handlePaste = (e: ClipboardEvent) => {
       method: parsed.method,
       headers: parsed.headers,
       params: parsed.params,
-      body: formattedBody
+      body: formattedBody,
     }
     message.success('cURL 命令解析成功')
   } else {

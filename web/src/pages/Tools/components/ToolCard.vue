@@ -9,18 +9,19 @@
         :class="[
           'flex-shrink-0 w-12 h-12 rounded-xl flex items-center justify-center text-white',
           'shadow-lg group-hover:scale-110 transition-transform duration-300',
-          iconBgClass
+          toolIconBg,
         ]"
       >
-        <component :is="iconComponent" class="w-6 h-6" />
+        <component v-if="isLucideIcon" :is="toolIcon" class="w-6 h-6" />
+        <img v-else :src="toolIcon" alt="Tool Icon" class="w-6 h-6 object-contain" />
       </div>
       <div class="flex-1 min-w-0">
-        <h3 class="text-base font-bold text-text-primary mb-1 group-hover:text-primary transition-colors truncate">
+        <h3
+          class="text-base font-bold text-text-primary mb-1 group-hover:text-primary transition-colors truncate"
+        >
           {{ tool.name }}
         </h3>
-        <p class="text-xs text-text-tertiary truncate">
-          {{ tool.version }} · {{ tool.category }}
-        </p>
+        <p class="text-xs text-text-tertiary truncate">{{ tool.version }} · {{ tool.category }}</p>
       </div>
     </div>
 
@@ -32,17 +33,17 @@
     <!-- 工具标签 -->
     <div class="flex flex-wrap gap-1.5 mb-3 flex-shrink-0">
       <span
-        v-for="tag in tool.tags.slice(0, 3)"
+        v-for="tag in displayTags.slice(0, 3)"
         :key="tag"
         class="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-primary-light text-primary"
       >
         {{ tag }}
       </span>
       <span
-        v-if="tool.tags.length > 3"
+        v-if="displayTags.length > 3"
         class="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-bg-tertiary text-text-secondary"
       >
-        +{{ tool.tags.length - 3 }}
+        +{{ displayTags.length - 3 }}
       </span>
     </div>
 
@@ -64,7 +65,8 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
-import { Globe, Mail, HeartPulse, ChevronRight } from 'lucide-vue-next'
+import { ChevronRight } from 'lucide-vue-next'
+import { getToolConfig, getToolIcon, getToolIconBg } from '@/config/tools'
 
 interface Tool {
   code: string
@@ -87,24 +89,39 @@ defineEmits<{
   click: []
 }>()
 
-// 根据工具代码获取图标
-const iconComponent = computed(() => {
-  const iconMap: Record<string, any> = {
-    'http_request': Globe,
-    'email_sender': Mail,
-    'health_checker': HeartPulse
-  }
-  return iconMap[props.tool.code] || Globe
+const toolConfig = computed(() => {
+  return getToolConfig(props.tool.code)
 })
 
-// 根据工具代码获取图标背景色
-const iconBgClass = computed(() => {
-  const colorMap: Record<string, string> = {
-    'http_request': 'bg-gradient-to-br from-primary to-accent',
-    'email_sender': 'bg-gradient-to-br from-purple-500 to-pink-600',
-    'health_checker': 'bg-gradient-to-br from-primary to-accent'
+const toolIcon = computed(() => {
+  return getToolIcon(props.tool.code)
+})
+
+const toolIconBg = computed(() => {
+  return getToolIconBg(props.tool.code)
+})
+
+const isLucideIcon = computed(() => {
+  return typeof toolIcon.value !== 'string'
+})
+
+const displayTags = computed(() => {
+  if (toolConfig.value?.tags && toolConfig.value.tags.length > 0) {
+    return toolConfig.value.tags
   }
-  return colorMap[props.tool.code] || 'bg-gradient-to-br from-primary to-accent'
+
+  if (Array.isArray(props.tool.tags)) {
+    return props.tool.tags
+  }
+
+  if (typeof props.tool.tags === 'string') {
+    return props.tool.tags
+      .split(',')
+      .map((tag) => tag.trim())
+      .filter(Boolean)
+  }
+
+  return []
 })
 </script>
 

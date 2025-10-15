@@ -45,7 +45,7 @@ const router = useRouter()
 const USER_ROLE = {
   SUPER_ADMIN: 1,
   ADMIN: 2,
-  USER: 3
+  USER: 3,
 }
 
 // 当前激活的标签

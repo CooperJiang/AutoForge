@@ -2,7 +2,7 @@
   <Dialog
     :model-value="modelValue"
     :title="mode === 'import' ? '导入工作流' : '导出工作流'"
-    :width="700"
+    max-width="max-w-2xl"
     @update:model-value="$emit('update:modelValue', $event)"
     @confirm="handleConfirm"
     @cancel="handleCancel"
@@ -41,9 +41,7 @@
 
       <!-- 导入提示 -->
       <div class="bg-amber-50 border border-amber-200 rounded-lg p-3">
-        <p class="text-xs text-amber-800">
-          ⚠️ 导入将覆盖当前工作流内容，请确保已保存重要数据
-        </p>
+        <p class="text-xs text-amber-800">⚠️ 导入将覆盖当前工作流内容，请确保已保存重要数据</p>
       </div>
     </div>
 
@@ -77,9 +75,7 @@
 
       <!-- 导出提示 -->
       <div class="bg-primary-light border border-primary rounded-lg p-3">
-        <p class="text-xs text-primary mb-2">
-          💡 <strong>提示：</strong>
-        </p>
+        <p class="text-xs text-primary mb-2">💡 <strong>提示：</strong></p>
         <ul class="text-xs text-primary space-y-1 ml-4">
           <li>• 你可以直接编辑JSON内容，删除敏感信息（如token、邮箱等）</li>
           <li>• 编辑后点击"复制"或"下载"按钮即可分享</li>
@@ -93,9 +89,7 @@
         <BaseButton variant="ghost" @click="handleCancel">
           {{ mode === 'export' ? '关闭' : '取消' }}
         </BaseButton>
-        <BaseButton v-if="mode === 'import'" @click="handleConfirm">
-          导入
-        </BaseButton>
+        <BaseButton v-if="mode === 'import'" @click="handleConfirm"> 导入 </BaseButton>
       </div>
     </template>
   </Dialog>
@@ -118,7 +112,7 @@ const props = defineProps<Props>()
 
 const emit = defineEmits<{
   'update:modelValue': [value: boolean]
-  'import': [data: any]
+  import: [data: any]
 }>()
 
 // 导入相关
@@ -227,18 +221,19 @@ const handleCancel = () => {
 }
 
 // 监听modelValue变化，初始化数据
-watch(() => props.modelValue, (newVal) => {
-  if (newVal) {
-    if (props.mode === 'import') {
-      jsonText.value = ''
-      jsonError.value = ''
-    } else {
-      // 导出模式：初始化可编辑的JSON
-      editableJson.value = props.workflowData
-        ? JSON.stringify(props.workflowData, null, 2)
-        : ''
-      exportError.value = ''
+watch(
+  () => props.modelValue,
+  (newVal) => {
+    if (newVal) {
+      if (props.mode === 'import') {
+        jsonText.value = ''
+        jsonError.value = ''
+      } else {
+        // 导出模式：初始化可编辑的JSON
+        editableJson.value = props.workflowData ? JSON.stringify(props.workflowData, null, 2) : ''
+        exportError.value = ''
+      }
     }
   }
-})
+)
 </script>

@@ -15,7 +15,7 @@
 </template>
 
 <script setup lang="ts">
-import Breadcrumb from '@/components/Breadcrumb.vue'
+import Breadcrumb from '@/components/Breadcrumb'
 import ThemeToggle from '@/components/ThemeToggle/index.vue'
 import { useBreadcrumb } from '@/composables/useBreadcrumb'
 

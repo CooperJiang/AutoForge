@@ -1,11 +1,13 @@
 <template>
   <Teleport to="body">
-    <div class="fixed top-4 left-1/2 transform -translate-x-1/2 z-50 flex flex-col gap-2 pointer-events-none">
+    <div
+      class="fixed top-4 left-1/2 transform -translate-x-1/2 z-50 flex flex-col gap-2 pointer-events-none"
+    >
       <TransitionGroup name="message">
         <div
           v-for="msg in messages"
           :key="msg.id"
-          class="message-item px-4 py-2.5 rounded-lg shadow-lg border-2 flex items-center gap-2 min-w-[300px] max-w-[500px] pointer-events-auto"
+          class="message-item px-4 py-2.5 rounded-lg shadow-lg border flex items-center gap-2 min-w-[300px] max-w-[500px] pointer-events-auto backdrop-blur-sm"
           :class="getMessageClass(msg.type)"
         >
           <!-- Icon -->
@@ -49,13 +51,13 @@ let messageId = 0
 const getMessageClass = (type: string) => {
   switch (type) {
     case 'success':
-      return 'bg-emerald-50 border-emerald-400 text-emerald-700'
+      return 'bg-bg-elevated border-green-500/30 text-green-600 dark:text-green-400 shadow-green-500/10'
     case 'error':
-      return 'bg-rose-50 border-rose-400 text-rose-700'
+      return 'bg-bg-elevated border-red-500/30 text-red-600 dark:text-red-400 shadow-red-500/10'
     case 'warning':
-      return 'bg-amber-50 border-amber-400 text-amber-700'
+      return 'bg-bg-elevated border-yellow-500/30 text-yellow-600 dark:text-yellow-400 shadow-yellow-500/10'
     default:
-      return 'bg-primary-light border-border-focus text-primary'
+      return 'bg-bg-elevated border-blue-500/30 text-blue-600 dark:text-blue-400 shadow-blue-500/10'
   }
 }
 
@@ -80,7 +82,7 @@ const addMessage = (msg: Omit<MessageItem, 'id'>) => {
 
 const removeMessage = (id: number) => {
   if (!messages.value) return
-  const index = messages.value.findIndex(m => m.id === id)
+  const index = messages.value.findIndex((m) => m.id === id)
   if (index > -1) {
     messages.value.splice(index, 1)
   }
@@ -88,7 +90,7 @@ const removeMessage = (id: number) => {
 
 defineExpose({
   addMessage,
-  removeMessage
+  removeMessage,
 })
 </script>
 

@@ -7,15 +7,15 @@
     @cancel="close"
   >
     <div v-if="tool" class="space-y-6">
-      <!-- 工具头部 -->
       <div class="flex items-start gap-4">
         <div
           :class="[
             'flex-shrink-0 w-16 h-16 rounded-xl flex items-center justify-center text-white shadow-lg',
-            iconBgClass
+            toolIconBg,
           ]"
         >
-          <component :is="iconComponent" class="w-8 h-8" />
+          <component v-if="isLucideIcon" :is="toolIcon" class="w-8 h-8" />
+          <img v-else :src="toolIcon" alt="Tool Icon" class="w-8 h-8 object-contain" />
         </div>
         <div class="flex-1">
           <p class="text-text-secondary mb-2">
@@ -39,11 +39,11 @@
       </div>
 
       <!-- 工具标签 -->
-      <div>
+      <div v-if="displayTags.length > 0">
         <h3 class="text-sm font-semibold text-text-secondary mb-2">标签</h3>
         <div class="flex flex-wrap gap-2">
           <span
-            v-for="tag in tool.tags"
+            v-for="tag in displayTags"
             :key="tag"
             class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-primary-light text-primary border border-primary"
           >
@@ -53,104 +53,47 @@
       </div>
 
       <!-- 使用说明 -->
-      <div>
+      <div v-if="toolConfig">
         <h3 class="text-sm font-semibold text-text-primary mb-2 flex items-center gap-2">
           <BookOpen class="w-4 h-4" />
           使用说明
         </h3>
         <div class="bg-bg-hover rounded-lg p-4 space-y-3">
-          <div v-if="tool.code === 'http_request'">
-            <h4 class="font-semibold text-text-primary mb-2 text-sm">📡 HTTP 请求工具</h4>
-            <p class="text-xs text-text-secondary mb-2">
-              发送 HTTP 请求到指定的 URL，支持所有常见的 HTTP 方法。
+          <div>
+            <h4 class="font-semibold text-text-primary mb-2 text-sm">{{ toolConfig.title }}</h4>
+            <p v-if="toolConfig.usageDescription" class="text-xs text-text-secondary mb-2">
+              {{ toolConfig.usageDescription }}
             </p>
-            <ul class="space-y-1.5 text-xs text-text-secondary">
-              <li class="flex items-start gap-2">
+            <ul
+              v-if="toolConfig.usageItems.length > 0"
+              class="space-y-1.5 text-xs text-text-secondary"
+            >
+              <li
+                v-for="(item, index) in toolConfig.usageItems"
+                :key="index"
+                class="flex items-start gap-2"
+              >
                 <Check class="w-3.5 h-3.5 text-green-600 mt-0.5 flex-shrink-0" />
-                <span>支持 GET、POST、PUT、DELETE、PATCH 等方法</span>
-              </li>
-              <li class="flex items-start gap-2">
-                <Check class="w-3.5 h-3.5 text-green-600 mt-0.5 flex-shrink-0" />
-                <span>自定义请求头（Headers）、参数（Params）、请求体（Body）</span>
-              </li>
-              <li class="flex items-start gap-2">
-                <Check class="w-3.5 h-3.5 text-green-600 mt-0.5 flex-shrink-0" />
-                <span>支持粘贴 cURL 命令自动解析配置</span>
-              </li>
-              <li class="flex items-start gap-2">
-                <Check class="w-3.5 h-3.5 text-green-600 mt-0.5 flex-shrink-0" />
-                <span>适用场景：API 调用、数据抓取、Webhook 触发等</span>
+                <span>{{ item.text }}</span>
               </li>
             </ul>
           </div>
+        </div>
+      </div>
 
-          <div v-else-if="tool.code === 'email_sender'">
-            <h4 class="font-semibold text-text-primary mb-2 text-sm">📧 邮件发送工具</h4>
-            <p class="text-xs text-text-secondary mb-2">
-              通过 SMTP 协议发送邮件通知，支持多收件人和 HTML 格式。
-            </p>
-            <ul class="space-y-1.5 text-xs text-text-secondary">
-              <li class="flex items-start gap-2">
-                <Check class="w-3.5 h-3.5 text-green-600 mt-0.5 flex-shrink-0" />
-                <span>系统自动使用配置的 SMTP 服务器，无需用户提供</span>
-              </li>
-              <li class="flex items-start gap-2">
-                <Check class="w-3.5 h-3.5 text-green-600 mt-0.5 flex-shrink-0" />
-                <span>支持多个收件人、抄送（CC）</span>
-              </li>
-              <li class="flex items-start gap-2">
-                <Check class="w-3.5 h-3.5 text-green-600 mt-0.5 flex-shrink-0" />
-                <span>支持纯文本和 HTML 格式</span>
-              </li>
-              <li class="flex items-start gap-2">
-                <Check class="w-3.5 h-3.5 text-green-600 mt-0.5 flex-shrink-0" />
-                <span>适用场景：告警通知、报表发送、验证码邮件等</span>
-              </li>
-            </ul>
-          </div>
-
-          <div v-else-if="tool.code === 'health_checker'">
-            <h4 class="font-semibold text-text-primary mb-2 text-sm">🏥 健康检查工具</h4>
-            <p class="text-xs text-text-secondary mb-2">
-              监控网站或 API 的可用性，检查 SSL 证书有效期。
-            </p>
-            <ul class="space-y-1.5 text-xs text-text-secondary">
-              <li class="flex items-start gap-2">
-                <Check class="w-3.5 h-3.5 text-green-600 mt-0.5 flex-shrink-0" />
-                <span>检查网站状态码和响应时间</span>
-              </li>
-              <li class="flex items-start gap-2">
-                <Check class="w-3.5 h-3.5 text-green-600 mt-0.5 flex-shrink-0" />
-                <span>SSL 证书到期检查和告警（可设置警戒天数）</span>
-              </li>
-              <li class="flex items-start gap-2">
-                <Check class="w-3.5 h-3.5 text-green-600 mt-0.5 flex-shrink-0" />
-                <span>支持正则表达式匹配响应内容</span>
-              </li>
-              <li class="flex items-start gap-2">
-                <Check class="w-3.5 h-3.5 text-green-600 mt-0.5 flex-shrink-0" />
-                <span>支持复杂鉴权（自定义 Headers 和 Body）</span>
-              </li>
-              <li class="flex items-start gap-2">
-                <Check class="w-3.5 h-3.5 text-green-600 mt-0.5 flex-shrink-0" />
-                <span>适用场景：网站监控、API 健康检查、SSL 证书管理等</span>
-              </li>
-            </ul>
-          </div>
-
-          <div v-else>
-            <p class="text-xs text-text-secondary">
-              暂无详细说明，请直接使用该工具。
-            </p>
-          </div>
+      <div v-else>
+        <h3 class="text-sm font-semibold text-text-primary mb-2 flex items-center gap-2">
+          <BookOpen class="w-4 h-4" />
+          使用说明
+        </h3>
+        <div class="bg-bg-hover rounded-lg p-4">
+          <p class="text-xs text-text-secondary">暂无详细说明，请直接使用该工具。</p>
         </div>
       </div>
 
       <!-- 使用按钮 -->
       <div class="flex items-center justify-end gap-2 pt-2">
-        <BaseButton variant="ghost" size="md" @click="close">
-          取消
-        </BaseButton>
+        <BaseButton variant="ghost" size="md" @click="close"> 取消 </BaseButton>
         <BaseButton variant="primary" size="md" @click="handleUseTool" class="whitespace-nowrap">
           <Rocket class="w-4 h-4 mr-1.5 inline-block flex-shrink-0" />
           <span>立即使用</span>
@@ -162,12 +105,10 @@
 
 <script setup lang="ts">
 import { computed, watch, ref } from 'vue'
-import {
-  Package, User, Tag, BookOpen, Check, Rocket,
-  Globe, Mail, HeartPulse
-} from 'lucide-vue-next'
+import { Package, User, Tag, BookOpen, Check, Rocket } from 'lucide-vue-next'
 import Dialog from '@/components/Dialog'
 import BaseButton from '@/components/BaseButton'
+import { getToolConfig, getToolIcon, getToolIconBg } from '@/config/tools'
 
 interface Tool {
   code: string
@@ -194,34 +135,57 @@ const emit = defineEmits<{
 
 const isOpen = ref(props.modelValue)
 
-watch(() => props.modelValue, (val) => {
-  isOpen.value = val
-})
+watch(
+  () => props.modelValue,
+  (val) => {
+    isOpen.value = val
+  }
+)
 
 watch(isOpen, (val) => {
   emit('update:modelValue', val)
 })
 
-// 根据工具代码获取图标
-const iconComponent = computed(() => {
-  if (!props.tool) return Globe
-  const iconMap: Record<string, any> = {
-    'http_request': Globe,
-    'email_sender': Mail,
-    'health_checker': HeartPulse
-  }
-  return iconMap[props.tool.code] || Globe
+const toolConfig = computed(() => {
+  if (!props.tool) return null
+  return getToolConfig(props.tool.code)
 })
 
-// 根据工具代码获取图标背景色
-const iconBgClass = computed(() => {
-  if (!props.tool) return 'bg-gradient-to-br from-primary to-accent'
-  const colorMap: Record<string, string> = {
-    'http_request': 'bg-gradient-to-br from-primary to-accent',
-    'email_sender': 'bg-gradient-to-br from-purple-500 to-pink-600',
-    'health_checker': 'bg-gradient-to-br from-primary to-accent'
+const toolIcon = computed(() => {
+  if (!props.tool) return null
+  return getToolIcon(props.tool.code)
+})
+
+const toolIconBg = computed(() => {
+  if (!props.tool) return 'bg-gradient-to-br from-gray-500 to-gray-600'
+  return getToolIconBg(props.tool.code)
+})
+
+const isLucideIcon = computed(() => {
+  return typeof toolIcon.value !== 'string'
+})
+
+const displayTags = computed(() => {
+  if (!props.tool) return []
+
+  // Prefer tags from config, fallback to backend tags
+  if (toolConfig.value?.tags && toolConfig.value.tags.length > 0) {
+    return toolConfig.value.tags
   }
-  return colorMap[props.tool.code] || 'bg-gradient-to-br from-primary to-accent'
+
+  // Parse backend tags (assuming it's a comma-separated string or array)
+  if (Array.isArray(props.tool.tags)) {
+    return props.tool.tags
+  }
+
+  if (typeof props.tool.tags === 'string') {
+    return props.tool.tags
+      .split(',')
+      .map((tag) => tag.trim())
+      .filter(Boolean)
+  }
+
+  return []
 })
 
 const close = () => {
@@ -231,7 +195,7 @@ const close = () => {
 const handleUseTool = () => {
   if (props.tool) {
     emit('use-tool', props.tool.code)
-    close()
   }
+  close()
 }
 </script>

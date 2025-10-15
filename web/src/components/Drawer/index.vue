@@ -10,11 +10,13 @@
           :class="[
             'relative bg-bg-elevated shadow-2xl flex flex-col transition-all duration-300',
             positionClass,
-            sizeClass
+            sizeClass,
           ]"
         >
           <!-- 标题栏 -->
-          <div class="px-6 py-4 border-b-2 border-border-primary flex items-center justify-between flex-shrink-0">
+          <div
+            class="px-6 py-4 border-b-2 border-border-primary flex items-center justify-between flex-shrink-0"
+          >
             <h3 class="text-lg font-semibold text-text-primary">{{ title }}</h3>
             <button
               @click="onClose"
@@ -30,7 +32,10 @@
           </div>
 
           <!-- 底部按钮栏 -->
-          <div v-if="showFooter" class="px-6 py-4 border-t-2 border-border-primary flex gap-3 justify-end flex-shrink-0">
+          <div
+            v-if="showFooter"
+            class="px-6 py-4 border-t-2 border-border-primary flex gap-3 justify-end flex-shrink-0"
+          >
             <BaseButton v-if="cancelText" variant="secondary" @click="onCancel">
               {{ cancelText }}
             </BaseButton>
@@ -67,7 +72,7 @@ const props = withDefaults(defineProps<Props>(), {
   confirmText: '',
   cancelText: '',
   confirmVariant: 'primary',
-  showFooter: true
+  showFooter: true,
 })
 
 const emit = defineEmits<{
@@ -86,7 +91,7 @@ const sizeClass = computed(() => {
     sm: 'w-80',
     md: 'w-96',
     lg: 'w-[32rem]',
-    xl: 'w-[40rem]'
+    xl: 'w-[40rem]',
   }
   return sizes[props.size]
 })
@@ -114,13 +119,16 @@ const handleEscapeKey = (event: KeyboardEvent) => {
 }
 
 // 监听 modelValue 变化，动态添加/移除事件监听器
-watch(() => props.modelValue, (isOpen) => {
-  if (isOpen) {
-    document.addEventListener('keydown', handleEscapeKey)
-  } else {
-    document.removeEventListener('keydown', handleEscapeKey)
+watch(
+  () => props.modelValue,
+  (isOpen) => {
+    if (isOpen) {
+      document.addEventListener('keydown', handleEscapeKey)
+    } else {
+      document.removeEventListener('keydown', handleEscapeKey)
+    }
   }
-})
+)
 
 // 组件挂载时，如果抽屉已打开，添加监听器
 onMounted(() => {

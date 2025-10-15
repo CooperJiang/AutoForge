@@ -3,9 +3,7 @@
     <div class="max-w-4xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
       <div class="text-center mb-12">
         <h1 class="text-4xl font-bold text-gray-900 mb-4">关于我们</h1>
-        <p class="text-xl text-gray-600">
-          了解更多关于这个用户端模板的信息
-        </p>
+        <p class="text-xl text-gray-600">了解更多关于这个用户端模板的信息</p>
       </div>
 
       <div class="bg-bg-elevated rounded-lg shadow-md p-8 mb-8">

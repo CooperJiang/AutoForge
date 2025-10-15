@@ -24,7 +24,6 @@ func NewHTTPTool() *HTTPTool {
 		Category:    "network",
 		Version:     "1.0.0",
 		Author:      "AutoForge",
-		Icon:        "globe",
 		AICallable:  true,
 		Tags:        []string{"http", "api", "request", "network"},
 	}

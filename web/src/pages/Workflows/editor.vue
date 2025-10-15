@@ -1,19 +1,23 @@
 <template>
   <div class="fixed inset-0 bg-bg-hover flex flex-col">
     <!-- 顶部工具栏 -->
-    <div class="bg-bg-elevated border-b border-border-primary px-6 py-3 flex items-center justify-between flex-shrink-0">
+    <div
+      class="bg-bg-elevated border-b border-border-primary px-6 py-3 flex items-center justify-between flex-shrink-0"
+    >
       <div class="flex items-center gap-4">
         <BaseButton size="sm" variant="ghost" @click="handleBack" class="shrink-0">
           <ArrowLeft class="w-4 h-4" />
         </BaseButton>
-        <div class="input-wrapper flex items-center gap-2 px-2.5 py-1 rounded-md bg-bg-hover border border-border-primary hover:border-slate-300 transition-all duration-200">
+        <div
+          class="input-wrapper flex items-center gap-2 px-2.5 py-1 rounded-md bg-bg-hover border border-border-primary hover:border-slate-300 transition-all duration-200"
+        >
           <Workflow class="w-3.5 h-3.5 text-text-placeholder shrink-0" />
           <input
             v-model="workflow.name"
             type="text"
             placeholder="工作流名称"
             class="w-32 bg-transparent text-xs font-medium text-text-primary placeholder:text-text-placeholder"
-            style="border: none; outline: none; box-shadow: none;"
+            style="border: none; outline: none; box-shadow: none"
             @focus="$event.target.parentElement.classList.add('input-focused')"
             @blur="$event.target.parentElement.classList.remove('input-focused')"
           />
@@ -23,12 +27,15 @@
         <!-- 状态指示 -->
         <div
           :class="[
-            'px-3 py-1.5 rounded-full text-xs font-medium flex items-center gap-1.5 cursor-pointer transition-colors',
-            workflow.enabled
-              ? 'bg-green-50 text-green-700 hover:bg-green-100'
-              : 'bg-bg-tertiary text-text-secondary hover:bg-bg-tertiary'
+            'px-3 py-1.5 rounded-full text-xs font-medium flex items-center gap-1.5 transition-colors border',
+            !workflow.id
+              ? 'bg-slate-500/10 text-slate-600 dark:text-slate-400 border-slate-500/20 opacity-50 cursor-not-allowed'
+              : workflow.enabled
+                ? 'bg-green-500/10 text-green-600 dark:text-green-400 border-green-500/20 hover:bg-green-500/20 cursor-pointer'
+                : 'bg-slate-500/10 text-slate-600 dark:text-slate-400 border-slate-500/20 hover:bg-slate-500/20 cursor-pointer',
           ]"
-          @click="handleToggleEnabled"
+          @click="workflow.id && handleToggleEnabled()"
+          :title="!workflow.id ? '请先保存工作流后才能启用/禁用' : ''"
         >
           <Power :class="['w-3.5 h-3.5', workflow.enabled && 'animate-pulse']" />
           {{ workflow.enabled ? '已启用' : '已禁用' }}
@@ -37,6 +44,11 @@
         <div class="h-6 w-px bg-bg-tertiary"></div>
 
         <!-- 次要操作 -->
+        <Tooltip text="API 设置" position="bottom">
+          <BaseButton size="sm" variant="ghost" @click="showAPISettings = true">
+            <Globe class="w-4 h-4" />
+          </BaseButton>
+        </Tooltip>
         <Tooltip text="环境变量配置" position="bottom">
           <BaseButton size="sm" variant="ghost" @click="showEnvVarManager = true">
             <Settings class="w-4 h-4" />
@@ -83,12 +95,7 @@
       <ToolPanel @add-node="handleAddNode" />
 
       <!-- 画布区域 -->
-      <div
-        class="flex-1 relative"
-        @drop="handleDrop"
-        @dragover.prevent
-        @dragenter.prevent
-      >
+      <div class="flex-1 relative" @drop="handleDrop" @dragover.prevent @dragenter.prevent>
         <VueFlow
           v-model:nodes="vueFlowNodes"
           v-model:edges="vueFlowEdges"
@@ -103,23 +110,27 @@
           <Controls />
 
           <template #node-tool="{ data }">
-            <ToolNode :data="data" />
+            <ToolNode :data="data" @delete="handleNodeDeleteFromCanvas" />
+          </template>
+
+          <template #node-external_trigger="{ data }">
+            <ExternalTriggerNode :data="data" @delete="handleNodeDeleteFromCanvas" />
           </template>
 
           <template #node-trigger="{ data }">
-            <TriggerNode :data="data" />
+            <TriggerNode :data="data" @delete="handleNodeDeleteFromCanvas" />
           </template>
 
           <template #node-condition="{ data }">
-            <ConditionNode :data="data" />
+            <ConditionNode :data="data" @delete="handleNodeDeleteFromCanvas" />
           </template>
 
           <template #node-delay="{ data }">
-            <DelayNode :data="data" />
+            <DelayNode :data="data" @delete="handleNodeDeleteFromCanvas" />
           </template>
 
           <template #node-switch="{ data }">
-            <SwitchNode :data="data" />
+            <SwitchNode :data="data" @delete="handleNodeDeleteFromCanvas" />
           </template>
         </VueFlow>
 
@@ -147,6 +158,9 @@
       @delete="handleDeleteNode"
     />
 
+    <!-- API 设置 -->
+    <WorkflowAPISettings v-model="showAPISettings" :workflow="workflow" @refresh="loadWorkflow" />
+
     <!-- 环境变量管理 -->
     <EnvVarManager
       v-model="showEnvVarManager"
@@ -155,17 +169,21 @@
     />
 
     <!-- 导入对话框 -->
-    <ImportExportDialog
-      v-model="showImportDialog"
-      mode="import"
-      @import="handleImportData"
-    />
+    <ImportExportDialog v-model="showImportDialog" mode="import" @import="handleImportData" />
 
     <!-- 导出对话框 -->
     <ImportExportDialog
       v-model="showExportDialog"
       mode="export"
       :workflow-data="exportWorkflowData"
+    />
+
+    <!-- 执行参数对话框 -->
+    <ExecuteWithParamsDialog
+      :visible="showExecuteDialog"
+      :workflow="workflow"
+      @close="showExecuteDialog = false"
+      @execute="executeWorkflow"
     />
 
     <!-- 确认对话框 -->
@@ -179,6 +197,22 @@
       @confirm="confirmDialog.resolve?.(true)"
       @cancel="confirmDialog.resolve?.(false)"
     />
+
+    <!-- 画布删除节点确认对话框 -->
+    <Dialog
+      v-model="showDeleteConfirm"
+      title="删除节点"
+      max-width="max-w-md"
+      @confirm="confirmDeleteFromCanvas"
+      @cancel="showDeleteConfirm = false"
+    >
+      <div class="py-2">
+        <p class="text-text-primary">
+          确定要删除节点 <span class="font-semibold text-primary">{{ deleteNodeName }}</span> 吗？
+        </p>
+        <p class="text-text-secondary text-sm mt-1">此操作无法撤销。</p>
+      </div>
+    </Dialog>
   </div>
 </template>
 
@@ -188,20 +222,34 @@ import { useRouter, useRoute, onBeforeRouteLeave } from 'vue-router'
 import { VueFlow, useVueFlow } from '@vue-flow/core'
 import { Background } from '@vue-flow/background'
 import { Controls } from '@vue-flow/controls'
-import { ArrowLeft, Save, Play, Upload, Download, Workflow, Settings, Power, Trash2 } from 'lucide-vue-next'
+import {
+  ArrowLeft,
+  Save,
+  Play,
+  Upload,
+  Download,
+  Workflow,
+  Settings,
+  Power,
+  Trash2,
+  Globe,
+} from 'lucide-vue-next'
 import BaseButton from '@/components/BaseButton'
-import BaseInput from '@/components/BaseInput'
-import ConfirmDialog from '@/components/ConfirmDialog.vue'
-import Tooltip from '@/components/Tooltip.vue'
+import ConfirmDialog from '@/components/ConfirmDialog'
+import Dialog from '@/components/Dialog'
+import Tooltip from '@/components/Tooltip'
 import ToolPanel from './components/ToolPanel.vue'
 import ToolNode from './components/ToolNode.vue'
+import ExternalTriggerNode from './components/ExternalTriggerNode.vue'
 import TriggerNode from './components/TriggerNode.vue'
 import ConditionNode from './components/ConditionNode.vue'
 import DelayNode from './components/DelayNode.vue'
 import SwitchNode from './components/SwitchNode.vue'
 import NodeConfigDrawer from './components/NodeConfigDrawer.vue'
+import WorkflowAPISettings from './components/WorkflowAPISettings.vue'
 import EnvVarManager from './components/EnvVarManager.vue'
 import ImportExportDialog from './components/ImportExportDialog.vue'
+import ExecuteWithParamsDialog from './components/ExecuteWithParamsDialog.vue'
 import { useWorkflow } from '@/composables/useWorkflow'
 import { message } from '@/utils/message'
 import type { WorkflowNode, WorkflowEnvVar } from '@/types/workflow'
@@ -219,7 +267,7 @@ interface ConfirmDialogState {
 
 const confirmDialog = ref<ConfirmDialogState>({
   show: false,
-  message: ''
+  message: '',
 })
 
 // 通用确认函数
@@ -228,7 +276,7 @@ const confirm = (options: Omit<ConfirmDialogState, 'show' | 'resolve'>): Promise
     confirmDialog.value = {
       ...options,
       show: true,
-      resolve
+      resolve,
     }
   })
 }
@@ -241,7 +289,22 @@ import '@vue-flow/controls/dist/style.css'
 const router = useRouter()
 const route = useRoute()
 const workflowId = computed(() => route.params.id as string)
-const { workflow, nodes, edges, envVars, addNode, updateNode, deleteNode, addEdge, deleteEdge, getPreviousNodes, toggleEnabled, validateWorkflow, exportWorkflow, loadWorkflow: loadWorkflowData, clearDraft } = useWorkflow(workflowId.value)
+const {
+  workflow,
+  nodes,
+  edges,
+  envVars,
+  addNode,
+  updateNode,
+  deleteNode,
+  addEdge,
+  deleteEdge,
+  getPreviousNodes,
+  toggleEnabled,
+  validateWorkflow,
+  loadWorkflow: loadWorkflowData,
+  clearDraft,
+} = useWorkflow(workflowId.value)
 const { project } = useVueFlow()
 
 // Vue Flow state
@@ -249,36 +312,45 @@ const vueFlowNodes = ref<any[]>([])
 const vueFlowEdges = ref<any[]>([])
 const showConfigDrawer = ref(false)
 const showEnvVarManager = ref(false)
+const showAPISettings = ref(false)
 const showImportDialog = ref(false)
 const showExportDialog = ref(false)
+const showExecuteDialog = ref(false)
 const selectedNode = ref<WorkflowNode | null>(null)
-const dropZone = ref<HTMLElement | null>(null)
 
 // 追踪是否有未保存的更改
 const hasUnsavedChanges = ref(false)
-const isCreateMode = computed(() => workflowId.value === 'create')
 
 // 监听数据变化，标记为有未保存的更改
-watch([nodes, edges, workflow, envVars], () => {
-  hasUnsavedChanges.value = true
-}, { deep: true })
+watch(
+  [nodes, edges, workflow, envVars],
+  () => {
+    hasUnsavedChanges.value = true
+  },
+  { deep: true }
+)
 
 // 将工作流节点转换为VueFlow节点
 const syncToVueFlow = () => {
-  vueFlowNodes.value = nodes.value.map(node => ({
+  vueFlowNodes.value = nodes.value.map((node) => ({
     id: node.id,
     type: node.type,
     position: node.position,
     data: {
       ...node,
       config: node.config || {},
-      retry: node.retry || { enabled: false, maxRetries: 3, retryInterval: 1000, exponentialBackoff: false }
-    }
+      retry: node.retry || {
+        enabled: false,
+        maxRetries: 3,
+        retryInterval: 1000,
+        exponentialBackoff: false,
+      },
+    },
   }))
 
-  vueFlowEdges.value = edges.value.map(edge => {
+  vueFlowEdges.value = edges.value.map((edge) => {
     // 查找源节点
-    const sourceNode = nodes.value.find(n => n.id === edge.source)
+    const sourceNode = nodes.value.find((n) => n.id === edge.source)
     const isConditionNode = sourceNode?.type === 'condition'
 
     // 根据sourceHandle确定标签和颜色
@@ -306,26 +378,30 @@ const syncToVueFlow = () => {
       label,
       style,
       labelStyle: { fill: style.stroke, fontWeight: 600, fontSize: 12 },
-      labelBgStyle: { fill: 'white', fillOpacity: 0.9 }
+      labelBgStyle: { fill: 'white', fillOpacity: 0.9 },
     }
   })
 }
 
 // 将VueFlow节点转换回工作流节点
-watch([vueFlowNodes, vueFlowEdges], () => {
-  nodes.value = vueFlowNodes.value.map(node => ({
-    ...node.data,
-    position: node.position
-  }))
+watch(
+  [vueFlowNodes, vueFlowEdges],
+  () => {
+    nodes.value = vueFlowNodes.value.map((node) => ({
+      ...node.data,
+      position: node.position,
+    }))
 
-  edges.value = vueFlowEdges.value.map(edge => ({
-    id: edge.id,
-    source: edge.source,
-    target: edge.target,
-    sourceHandle: edge.sourceHandle,
-    targetHandle: edge.targetHandle
-  }))
-}, { deep: true })
+    edges.value = vueFlowEdges.value.map((edge) => ({
+      id: edge.id,
+      source: edge.source,
+      target: edge.target,
+      sourceHandle: edge.sourceHandle,
+      targetHandle: edge.targetHandle,
+    }))
+  },
+  { deep: true }
+)
 
 // 添加节点
 const handleAddNode = (toolCode: string, toolName: string, nodeType?: string) => {
@@ -347,7 +423,7 @@ const handleAddNode = (toolCode: string, toolName: string, nodeType?: string) =>
     toolCode: type === 'tool' ? toolCode : undefined,
     name: toolName,
     config: {},
-    position: { x: 250, y: 100 + nodes.value.length * 100 }
+    position: { x: 250, y: 100 + nodes.value.length * 100 },
   }
   addNode(newNode)
   syncToVueFlow()
@@ -384,13 +460,13 @@ const handleDrop = (event: DragEvent) => {
       toolCode: type === 'tool' ? toolCode : undefined,
       name: toolName,
       config: {},
-      position
+      position,
     }
 
     addNode(newNode)
     syncToVueFlow()
     message.success(`已添加 ${toolName} 节点`)
-  } catch (error) {
+  } catch (error: any) {
     console.error('Failed to parse drag data:', error)
   }
 }
@@ -406,7 +482,7 @@ const handleEdgeClick = async (event: any) => {
   const confirmed = await confirm({
     title: '删除连接',
     message: '确定要删除这条连接吗？',
-    variant: 'warning'
+    variant: 'warning',
   })
 
   if (confirmed) {
@@ -418,20 +494,23 @@ const handleEdgeClick = async (event: any) => {
 // 连接节点
 const handleConnect = (params: any) => {
   // 检查源节点是否是条件节点
-  const sourceNode = nodes.value.find(n => n.id === params.source)
+  const sourceNode = nodes.value.find((n) => n.id === params.source)
   const isConditionNode = sourceNode?.type === 'condition'
 
   // 如果是条件节点，需要记录是从哪个分支出来的（true或false）
-  const edgeLabel = isConditionNode && params.sourceHandle ?
-    (params.sourceHandle === 'true' ? 'True' : 'False') :
-    undefined
+  const edgeLabel =
+    isConditionNode && params.sourceHandle
+      ? params.sourceHandle === 'true'
+        ? 'True'
+        : 'False'
+      : undefined
 
   addEdge({
     id: `edge_${Date.now()}`,
     source: params.source,
     target: params.target,
     sourceHandle: params.sourceHandle,
-    targetHandle: params.targetHandle
+    targetHandle: params.targetHandle,
   })
   syncToVueFlow()
   message.success(`节点已连接${edgeLabel ? ` (${edgeLabel} 分支)` : ''}`)
@@ -450,6 +529,29 @@ const handleDeleteNode = (nodeId: string) => {
   syncToVueFlow()
   showConfigDrawer.value = false
   message.success('节点已删除')
+}
+
+// 从画布删除节点（带确认对话框）
+const deleteNodeId = ref<string | null>(null)
+const deleteNodeName = ref<string>('')
+const showDeleteConfirm = ref(false)
+
+const handleNodeDeleteFromCanvas = (nodeId: string) => {
+  const node = nodes.value.find((n) => n.id === nodeId)
+  deleteNodeId.value = nodeId
+  deleteNodeName.value = node?.name || '未命名节点'
+  showDeleteConfirm.value = true
+}
+
+const confirmDeleteFromCanvas = () => {
+  if (deleteNodeId.value) {
+    deleteNode(deleteNodeId.value)
+    syncToVueFlow()
+    message.success('节点已删除')
+    deleteNodeId.value = null
+    deleteNodeName.value = ''
+    showDeleteConfirm.value = false
+  }
 }
 
 // 更新环境变量
@@ -474,45 +576,47 @@ const handleSave = async () => {
     const currentWorkflowId = workflowId.value
 
     // 从触发器节点中提取调度配置
-    const triggerNode = nodes.value.find(n => n.type === 'trigger')
+    const triggerNode = nodes.value.find((n) => n.type === 'trigger')
     let scheduleType = ''
     let scheduleValue = ''
 
     if (triggerNode && triggerNode.config) {
       const config = triggerNode.config
 
-      console.log('触发器节点配置:', config)
-
       // 根据触发器配置构建调度信息
       if (config.scheduleType === 'interval' && config.scheduleValue) {
         scheduleType = 'interval'
         scheduleValue = String(config.scheduleValue) // 秒数
-      } else if (config.scheduleType === 'daily' && config.time) {
+      } else if (config.scheduleType === 'daily' && config.scheduleValue) {
         scheduleType = 'daily'
-        scheduleValue = config.time + ':00' // HH:MM:SS
-      } else if (config.scheduleType === 'weekly' && config.weekDays && config.time) {
+        scheduleValue = config.scheduleValue // 直接使用 scheduleValue (HH:MM:SS)
+      } else if (config.scheduleType === 'weekly' && config.scheduleValue) {
         scheduleType = 'weekly'
-        scheduleValue = config.weekDays.join(',') + ':' + config.time.replace(':', ':') + ':00'
-      } else if (config.scheduleType === 'monthly' && config.monthDay && config.time) {
+        scheduleValue = config.scheduleValue // 格式：day1,day2:HH:MM:SS
+      } else if (config.scheduleType === 'monthly' && config.scheduleValue) {
         scheduleType = 'monthly'
-        scheduleValue = config.monthDay + ':' + config.time.replace(':', ':') + ':00'
-      } else if (config.scheduleType === 'cron' && config.cronExpr) {
+        scheduleValue = config.scheduleValue // 格式：day:HH:MM:SS
+      } else if (config.scheduleType === 'cron' && config.scheduleValue) {
         scheduleType = 'cron'
-        scheduleValue = config.cronExpr
+        scheduleValue = config.scheduleValue // cron 表达式
       }
-
-      console.log('提取的调度配置:', { scheduleType, scheduleValue })
     }
+
+    // 去重 edges：根据 source 和 target 组合去重
+    const uniqueEdges = edges.value.filter(
+      (edge, index, self) =>
+        index === self.findIndex((e) => e.source === edge.source && e.target === edge.target)
+    )
 
     const workflowData = {
       name: workflow.value.name,
       description: workflow.value.description,
       nodes: nodes.value,
-      edges: edges.value,
+      edges: uniqueEdges,
       env_vars: envVars.value,
       schedule_type: scheduleType,
       schedule_value: scheduleValue,
-      enabled: workflow.value.enabled
+      enabled: workflow.value.enabled,
     }
 
     if (currentWorkflowId && currentWorkflowId !== 'create') {
@@ -541,10 +645,32 @@ const handleSave = async () => {
 }
 
 // 切换启用/禁用
-const handleToggleEnabled = () => {
-  toggleEnabled()
-  const status = workflow.value.enabled ? '已启用' : '已禁用'
-  message.success(`工作流${status}`)
+const handleToggleEnabled = async () => {
+  if (!workflow.value.id) {
+    message.warning('请先保存工作流后才能启用/禁用')
+    return
+  }
+
+  try {
+    const newStatus = !workflow.value.enabled
+    await workflowApi.toggleEnabled(workflow.value.id, newStatus)
+    toggleEnabled()
+    message.success(`工作流已${newStatus ? '启用' : '禁用'}`)
+  } catch (error: any) {
+    message.error(error.response?.data?.message || '操作失败')
+  }
+}
+
+// 检查工作流是否需要外部参数
+const needsExternalParams = () => {
+  // 找到第一个节点（没有入边的节点）
+  const firstNode = nodes.value.find((node) => {
+    const hasIncomingEdge = edges.value.some((edge) => edge.target === node.id)
+    return !hasIncomingEdge
+  })
+
+  // 如果第一个节点是 external_trigger 且有参数配置
+  return firstNode?.type === 'external_trigger' && firstNode.config?.params?.length > 0
 }
 
 // 执行工作流
@@ -566,11 +692,26 @@ const handleExecute = async () => {
     return
   }
 
+  // 如果需要参数，显示参数输入对话框
+  if (needsExternalParams()) {
+    showExecuteDialog.value = true
+    return
+  }
+
+  // 直接执行
+  await executeWorkflow({})
+}
+
+// 执行工作流（带参数）
+const executeWorkflow = async (params: Record<string, any>) => {
+  const workflowId = route.params.id as string
+
   try {
     message.info('正在执行工作流...')
     const { workflowApi } = await import('@/api/workflow')
-    const data = await workflowApi.execute(workflowId)
+    const data = await workflowApi.execute(workflowId, { params })
     message.success('工作流已开始执行')
+    showExecuteDialog.value = false
     // 跳转到执行详情
     router.push(`/workflows/${workflowId}/executions/${data.execution_id}`)
   } catch (error: any) {
@@ -586,7 +727,7 @@ const handleClearDraft = async () => {
     message: '确定要清除本地草稿吗？此操作不可恢复',
     variant: 'danger',
     confirmText: '清除',
-    cancelText: '取消'
+    cancelText: '取消',
   })
 
   if (confirmed) {
@@ -602,7 +743,7 @@ const handleClearDraft = async () => {
       workflow.value = {
         name: '',
         description: '',
-        enabled: false
+        enabled: false,
       }
       syncToVueFlow()
     }
@@ -618,7 +759,7 @@ const exportWorkflowData = computed(() => {
     enabled: workflow.value.enabled,
     nodes: nodes.value,
     edges: edges.value,
-    envVars: envVars.value
+    envVars: envVars.value,
   }
 })
 
@@ -628,7 +769,7 @@ const handleImportData = (data: any) => {
   workflow.value = {
     name: data.name || '导入的工作流',
     description: data.description || '',
-    enabled: data.enabled !== undefined ? data.enabled : false
+    enabled: data.enabled !== undefined ? data.enabled : false,
   }
   nodes.value = data.nodes || []
   edges.value = data.edges || []
@@ -667,12 +808,6 @@ const loadWorkflow = async () => {
 
     // 加载完成后重置未保存标记
     hasUnsavedChanges.value = false
-
-    console.log('工作流已加载:', {
-      name: workflow.value.name,
-      nodes: nodes.value.length,
-      edges: edges.value.length
-    })
   } catch (error: any) {
     console.error('Load workflow failed:', error)
     message.error('加载工作流失败')
@@ -687,7 +822,7 @@ onBeforeRouteLeave(async (to, from, next) => {
       message: '有未保存的更改，确定要离开吗？（草稿将保留）',
       variant: 'warning',
       confirmText: '离开',
-      cancelText: '继续编辑'
+      cancelText: '继续编辑',
     })
 
     next(confirmed)
@@ -750,7 +885,7 @@ syncToVueFlow()
 }
 
 :deep(.vue-flow__controls-button) {
-  @apply bg-bg-primary border-border-primary text-text-primary;
+  @apply bg-bg-elevated border border-border-primary;
   @apply hover:bg-bg-hover transition-colors duration-200;
 }
 
@@ -759,6 +894,9 @@ syncToVueFlow()
 }
 
 :deep(.vue-flow__controls-button) svg {
-  @apply text-text-primary;
+  @apply fill-text-primary stroke-text-primary;
+  fill: currentColor !important;
+  stroke: currentColor !important;
+  color: var(--color-text-primary) !important;
 }
 </style>

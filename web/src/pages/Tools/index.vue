@@ -1,41 +1,36 @@
 <template>
   <div>
-      <!-- 页面标题 -->
-      <div class="text-center mb-12">
-        <h1 class="text-4xl font-bold text-text-primary mb-3">
-          🔧 工具箱
-        </h1>
-        <p class="text-lg text-text-secondary">
-          选择合适的工具，创建自动化任务
-        </p>
-      </div>
+    <!-- 页面标题 -->
+    <div class="text-center mb-12">
+      <h1 class="text-4xl font-bold text-text-primary mb-3">🔧 工具箱</h1>
+      <p class="text-lg text-text-secondary">选择合适的工具，创建自动化任务</p>
+    </div>
 
-      <!-- 工具卡片网格 -->
-      <div v-if="!loading" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6 mb-8">
-        <ToolCard
-          v-for="tool in tools"
-          :key="tool.code"
-          :tool="tool"
-          @click="handleToolClick(tool)"
-        />
-      </div>
+    <!-- 工具卡片网格 -->
+    <div
+      v-if="!loading"
+      class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6 mb-8"
+    >
+      <ToolCard
+        v-for="tool in tools"
+        :key="tool.code"
+        :tool="tool"
+        @click="handleToolClick(tool)"
+      />
+    </div>
 
-      <!-- 加载状态 -->
-      <div v-else class="flex justify-center items-center py-20">
-        <div class="text-text-tertiary">加载工具中...</div>
-      </div>
+    <!-- 加载状态 -->
+    <div v-else class="flex justify-center items-center py-20">
+      <div class="text-text-tertiary">加载工具中...</div>
+    </div>
 
-      <!-- 空状态 -->
-      <div v-if="!loading && tools.length === 0" class="text-center py-20">
-        <div class="text-text-placeholder text-lg">暂无可用工具</div>
-      </div>
+    <!-- 空状态 -->
+    <div v-if="!loading && tools.length === 0" class="text-center py-20">
+      <div class="text-text-placeholder text-lg">暂无可用工具</div>
+    </div>
 
     <!-- 工具详情弹窗 -->
-    <ToolDetailDialog
-      v-model="showDetailDialog"
-      :tool="selectedTool"
-      @use-tool="handleUseTool"
-    />
+    <ToolDetailDialog v-model="showDetailDialog" :tool="selectedTool" @use-tool="handleUseTool" />
   </div>
 </template>
 
@@ -70,9 +65,9 @@ const loadTools = async () => {
     loading.value = true
     const response = await toolApi.getToolList()
     // Parse tags from string to array
-    tools.value = response.map(tool => ({
+    tools.value = response.map((tool) => ({
       ...tool,
-      tags: typeof tool.tags === 'string' ? JSON.parse(tool.tags) : tool.tags
+      tags: typeof tool.tags === 'string' ? JSON.parse(tool.tags) : tool.tags,
     }))
   } catch (error: any) {
     message.error('加载工具列表失败: ' + (error.message || '未知错误'))
@@ -93,7 +88,7 @@ const handleUseTool = (toolCode: string) => {
   // 跳转到任务页面并选中该工具
   router.push({
     path: '/',
-    query: { tool: toolCode }
+    query: { tool: toolCode },
   })
 }
 

@@ -20,11 +20,13 @@
           @click="page !== '...' && handlePageChange(page as number)"
           :disabled="page === '...'"
           class="px-3 py-1 text-sm border-2 rounded-md transition-colors"
-          :class="page === currentPage
-            ? 'bg-success-light0 text-white border-green-500'
-            : page === '...'
-            ? 'border-transparent text-text-tertiary cursor-default'
-            : 'border-border-primary text-text-secondary hover:border-green-500 hover:text-green-600'"
+          :class="
+            page === currentPage
+              ? 'bg-success-light0 text-white border-green-500'
+              : page === '...'
+                ? 'border-transparent text-text-tertiary cursor-default'
+                : 'border-border-primary text-text-secondary hover:border-green-500 hover:text-green-600'
+          "
         >
           {{ page }}
         </button>
@@ -56,7 +58,7 @@ const props = defineProps<Props>()
 
 const emit = defineEmits<{
   'update:currentPage': [page: number]
-  'change': [page: number]
+  change: [page: number]
 }>()
 
 const totalPages = computed(() => Math.ceil(props.total / props.pageSize))

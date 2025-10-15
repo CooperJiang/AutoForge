@@ -1,10 +1,5 @@
 <template>
-  <button
-    type="button"
-    @click="handleToggle"
-    :title="getTooltipText()"
-    class="theme-toggle-btn"
-  >
+  <button type="button" @click="handleToggle" :title="getTooltipText()" class="theme-toggle-btn">
     <!-- 亮色图标 -->
     <Sun v-if="appliedTheme === 'light'" class="w-5 h-5" />
 
@@ -29,7 +24,7 @@ const getTooltipText = () => {
   const themeNames = {
     light: '亮色模式',
     dark: '暗色模式',
-    auto: '跟随系统'
+    auto: '跟随系统',
   }
   return `当前：${themeNames[currentTheme.value]} | 点击切换`
 }

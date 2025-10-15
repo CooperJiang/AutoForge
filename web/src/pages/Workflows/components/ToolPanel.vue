@@ -11,20 +11,43 @@
       <!-- 触发器分类 -->
       <div class="mb-4">
         <div class="text-xs font-semibold text-text-secondary mb-2 px-2">触发器</div>
-        <button
-          @click="handleAddTrigger"
-          draggable="true"
-          @dragstart="handleDragStartTrigger($event)"
-          class="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg border border-border-primary hover:border-primary hover:bg-primary-light transition-all group cursor-move"
-        >
-          <div class="flex-shrink-0 w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-accent flex items-center justify-center text-white shadow-sm">
-            <Clock class="w-4 h-4" />
-          </div>
-          <div class="flex-1 text-left min-w-0">
-            <div class="text-sm font-medium text-text-primary truncate">定时触发</div>
-            <div class="text-xs text-text-tertiary truncate">按计划执行</div>
-          </div>
-        </button>
+        <div class="space-y-2">
+          <!-- 外部 API 触发 -->
+          <button
+            @click="handleAddExternalTrigger"
+            draggable="true"
+            @dragstart="handleDragStartExternalTrigger($event)"
+            class="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg border border-border-primary hover:border-blue-500 hover:bg-blue-50 transition-all group cursor-move"
+          >
+            <div
+              class="flex-shrink-0 w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center text-white shadow-sm"
+            >
+              <Globe class="w-4 h-4" />
+            </div>
+            <div class="flex-1 text-left min-w-0">
+              <div class="text-sm font-medium text-text-primary truncate">外部 API 触发</div>
+              <div class="text-xs text-text-tertiary truncate">接收外部参数</div>
+            </div>
+          </button>
+
+          <!-- 定时触发 -->
+          <button
+            @click="handleAddTrigger"
+            draggable="true"
+            @dragstart="handleDragStartTrigger($event)"
+            class="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg border border-border-primary hover:border-primary hover:bg-primary-light transition-all group cursor-move"
+          >
+            <div
+              class="flex-shrink-0 w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-accent flex items-center justify-center text-white shadow-sm"
+            >
+              <Clock class="w-4 h-4" />
+            </div>
+            <div class="flex-1 text-left min-w-0">
+              <div class="text-sm font-medium text-text-primary truncate">定时触发</div>
+              <div class="text-xs text-text-tertiary truncate">按计划执行</div>
+            </div>
+          </button>
+        </div>
       </div>
 
       <!-- 流程控制 -->
@@ -38,7 +61,9 @@
             @dragstart="handleDragStartCondition($event)"
             class="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg border border-border-primary hover:border-warning hover:bg-warning-light transition-all group cursor-move"
           >
-            <div class="flex-shrink-0 w-8 h-8 rounded-lg bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center text-white shadow-sm">
+            <div
+              class="flex-shrink-0 w-8 h-8 rounded-lg bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center text-white shadow-sm"
+            >
               <GitBranch class="w-4 h-4" />
             </div>
             <div class="flex-1 text-left min-w-0">
@@ -54,7 +79,9 @@
             @dragstart="handleDragStartSwitch($event)"
             class="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg border border-border-primary hover:border-accent hover:bg-accent/10 transition-all group cursor-move"
           >
-            <div class="flex-shrink-0 w-8 h-8 rounded-lg bg-gradient-to-br from-accent to-accent-hover flex items-center justify-center text-white shadow-sm">
+            <div
+              class="flex-shrink-0 w-8 h-8 rounded-lg bg-gradient-to-br from-accent to-accent-hover flex items-center justify-center text-white shadow-sm"
+            >
               <Split class="w-4 h-4" />
             </div>
             <div class="flex-1 text-left min-w-0">
@@ -70,7 +97,9 @@
             @dragstart="handleDragStartDelay($event)"
             class="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg border border-border-primary hover:border-accent hover:bg-accent-light transition-all group cursor-move"
           >
-            <div class="flex-shrink-0 w-8 h-8 rounded-lg bg-gradient-to-br from-accent to-accent-hover flex items-center justify-center text-white shadow-sm">
+            <div
+              class="flex-shrink-0 w-8 h-8 rounded-lg bg-gradient-to-br from-accent to-accent-hover flex items-center justify-center text-white shadow-sm"
+            >
               <Timer class="w-4 h-4" />
             </div>
             <div class="flex-1 text-left min-w-0">
@@ -96,10 +125,15 @@
             <div
               :class="[
                 'flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center text-white shadow-sm',
-                getToolBgClass(tool.code)
+                getToolIconBg(tool.code),
               ]"
             >
-              <component :is="getToolIcon(tool.code)" class="w-4 h-4" />
+              <component
+                v-if="isLucideIcon(tool.code)"
+                :is="getToolIcon(tool.code)"
+                class="w-4 h-4"
+              />
+              <img v-else :src="getToolIcon(tool.code)" alt="" class="w-4 h-4 object-contain" />
             </div>
             <div class="flex-1 text-left min-w-0">
               <div class="text-sm font-medium text-text-primary truncate">{{ tool.name }}</div>
@@ -114,8 +148,9 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import { Clock, Globe, Mail, HeartPulse, GitBranch, Split, Timer } from 'lucide-vue-next'
+import { Clock, Globe, GitBranch, Split, Timer } from 'lucide-vue-next'
 import * as toolApi from '@/api/tool'
+import { getToolIcon, getToolIconBg } from '@/config/tools'
 
 const emit = defineEmits<{
   addNode: [toolCode: string, toolName: string, nodeType?: string]
@@ -127,9 +162,14 @@ const tools = ref<any[]>([])
 const loadTools = async () => {
   try {
     tools.value = await toolApi.getToolList()
-  } catch (error) {
+  } catch {
     console.error('Failed to load tools:', error)
   }
+}
+
+// 添加外部 API 触发器
+const handleAddExternalTrigger = () => {
+  emit('addNode', 'external_trigger', '外部 API 触发', 'external_trigger')
 }
 
 // 添加触发器
@@ -157,15 +197,33 @@ const handleAddTool = (tool: any) => {
   emit('addNode', tool.code, tool.name, 'tool')
 }
 
+// 拖拽开始 - 外部 API 触发器
+const handleDragStartExternalTrigger = (event: DragEvent) => {
+  if (event.dataTransfer) {
+    event.dataTransfer.effectAllowed = 'copy'
+    event.dataTransfer.setData(
+      'application/vueflow',
+      JSON.stringify({
+        toolCode: 'external_trigger',
+        toolName: '外部 API 触发',
+        nodeType: 'external_trigger',
+      })
+    )
+  }
+}
+
 // 拖拽开始 - 触发器
 const handleDragStartTrigger = (event: DragEvent) => {
   if (event.dataTransfer) {
     event.dataTransfer.effectAllowed = 'copy'
-    event.dataTransfer.setData('application/vueflow', JSON.stringify({
-      toolCode: 'trigger',
-      toolName: '定时触发',
-      nodeType: 'trigger'
-    }))
+    event.dataTransfer.setData(
+      'application/vueflow',
+      JSON.stringify({
+        toolCode: 'trigger',
+        toolName: '定时触发',
+        nodeType: 'trigger',
+      })
+    )
   }
 }
 
@@ -173,11 +231,14 @@ const handleDragStartTrigger = (event: DragEvent) => {
 const handleDragStartCondition = (event: DragEvent) => {
   if (event.dataTransfer) {
     event.dataTransfer.effectAllowed = 'copy'
-    event.dataTransfer.setData('application/vueflow', JSON.stringify({
-      toolCode: 'condition',
-      toolName: '条件判断',
-      nodeType: 'condition'
-    }))
+    event.dataTransfer.setData(
+      'application/vueflow',
+      JSON.stringify({
+        toolCode: 'condition',
+        toolName: '条件判断',
+        nodeType: 'condition',
+      })
+    )
   }
 }
 
@@ -185,11 +246,14 @@ const handleDragStartCondition = (event: DragEvent) => {
 const handleDragStartSwitch = (event: DragEvent) => {
   if (event.dataTransfer) {
     event.dataTransfer.effectAllowed = 'copy'
-    event.dataTransfer.setData('application/vueflow', JSON.stringify({
-      toolCode: 'switch',
-      toolName: '开关分支',
-      nodeType: 'switch'
-    }))
+    event.dataTransfer.setData(
+      'application/vueflow',
+      JSON.stringify({
+        toolCode: 'switch',
+        toolName: '开关分支',
+        nodeType: 'switch',
+      })
+    )
   }
 }
 
@@ -197,11 +261,14 @@ const handleDragStartSwitch = (event: DragEvent) => {
 const handleDragStartDelay = (event: DragEvent) => {
   if (event.dataTransfer) {
     event.dataTransfer.effectAllowed = 'copy'
-    event.dataTransfer.setData('application/vueflow', JSON.stringify({
-      toolCode: 'delay',
-      toolName: '延迟等待',
-      nodeType: 'delay'
-    }))
+    event.dataTransfer.setData(
+      'application/vueflow',
+      JSON.stringify({
+        toolCode: 'delay',
+        toolName: '延迟等待',
+        nodeType: 'delay',
+      })
+    )
   }
 }
 
@@ -209,32 +276,21 @@ const handleDragStartDelay = (event: DragEvent) => {
 const handleDragStart = (event: DragEvent, tool: any) => {
   if (event.dataTransfer) {
     event.dataTransfer.effectAllowed = 'copy'
-    event.dataTransfer.setData('application/vueflow', JSON.stringify({
-      toolCode: tool.code,
-      toolName: tool.name,
-      nodeType: 'tool'
-    }))
+    event.dataTransfer.setData(
+      'application/vueflow',
+      JSON.stringify({
+        toolCode: tool.code,
+        toolName: tool.name,
+        nodeType: 'tool',
+      })
+    )
   }
 }
 
-// 获取工具图标
-const getToolIcon = (code: string) => {
-  const iconMap: Record<string, any> = {
-    'http_request': Globe,
-    'email_sender': Mail,
-    'health_checker': HeartPulse
-  }
-  return iconMap[code] || Globe
-}
-
-// 获取工具背景色
-const getToolBgClass = (code: string) => {
-  const colorMap: Record<string, string> = {
-    'http_request': 'bg-gradient-to-br from-primary to-accent',
-    'email_sender': 'bg-gradient-to-br from-purple-500 to-pink-600',
-    'health_checker': 'bg-gradient-to-br from-primary to-accent'
-  }
-  return colorMap[code] || 'bg-gradient-to-br from-primary to-accent'
+// 判断是否为 Lucide 图标
+const isLucideIcon = (code: string) => {
+  const icon = getToolIcon(code)
+  return typeof icon !== 'string'
 }
 
 onMounted(() => {

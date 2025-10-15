@@ -12,7 +12,7 @@ export const getScheduleTypeName = (type: string): string => {
     monthly: '每月',
     hourly: '每小时',
     interval: '间隔',
-    cron: 'Cron'
+    cron: 'Cron',
   }
   return typeMap[type] || type
 }
@@ -28,10 +28,10 @@ export const formatScheduleValue = (type: string, value: string): string => {
     case 'weekly': {
       const parts = value.split(':')
       if (parts.length >= 4) {
-        const days = parts[0].split(',').map(d => parseInt(d))
+        const days = parts[0].split(',').map((d) => parseInt(d))
         const time = `${parts[1]}:${parts[2]}:${parts[3]}`
         const dayNames = ['周日', '周一', '周二', '周三', '周四', '周五', '周六']
-        const dayText = days.map(d => dayNames[d] || d).join('、')
+        const dayText = days.map((d) => dayNames[d] || d).join('、')
         return `每周${dayText} ${time}`
       }
       return value
@@ -80,7 +80,6 @@ export const formatNextRunTime = (timestamp: number): string => {
   const seconds = Math.floor(diff / 1000)
   const minutes = Math.floor(seconds / 60)
   const hours = Math.floor(minutes / 60)
-  const days = Math.floor(hours / 24)
 
   // 小于1分钟
   if (seconds < 60) {
@@ -127,7 +126,7 @@ export const getDefaultScheduleValue = (type: string): string => {
     monthly: '1:09:00:00',
     hourly: '05:00',
     interval: '300',
-    cron: '0 0 * * * *'
+    cron: '0 0 * * * *',
   }
   return defaultValues[type] || ''
 }

@@ -70,6 +70,6 @@ export function useBreadcrumb() {
   })
 
   return {
-    breadcrumbItems
+    breadcrumbItems,
   }
 }

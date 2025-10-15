@@ -14,7 +14,7 @@ export function calculateMD5(file: File | Blob): Promise<string> {
         const wordArray = CryptoJS.lib.WordArray.create(arrayBuffer)
         const hash = CryptoJS.MD5(wordArray)
         resolve(hash.toString(CryptoJS.enc.Hex))
-      } catch (error) {
+      } catch {
         reject(new Error('计算MD5失败'))
       }
     }
@@ -28,24 +28,6 @@ export function calculateMD5(file: File | Blob): Promise<string> {
 }
 
 /**
- * 简单的字符串哈希函数（作为降级方案）
- * @param buffer ArrayBuffer
- */
-function simpleStringHash(buffer: ArrayBuffer): string {
-  const uint8Array = new Uint8Array(buffer)
-  let hash = 0
-
-  for (let i = 0; i < uint8Array.length; i++) {
-    const char = uint8Array[i]
-    hash = ((hash << 5) - hash) + char
-    hash = hash & hash // 转换为32位整数
-  }
-
-  // 转换为16进制字符串并确保长度为32位
-  return Math.abs(hash).toString(16).padStart(8, '0').repeat(4)
-}
-
-/**
  * 计算字符串的SHA-256哈希值
  * @param text 要哈希的文本
  */
@@ -54,7 +36,7 @@ export async function calculateSHA256(text: string): Promise<string> {
   const data = encoder.encode(text)
   const hashBuffer = await crypto.subtle.digest('SHA-256', data)
   const hashArray = Array.from(new Uint8Array(hashBuffer))
-  return hashArray.map(b => b.toString(16).padStart(2, '0')).join('')
+  return hashArray.map((b) => b.toString(16).padStart(2, '0')).join('')
 }
 
 /**

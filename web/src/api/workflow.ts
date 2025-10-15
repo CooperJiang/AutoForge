@@ -8,7 +8,6 @@ import type {
   WorkflowNode,
   WorkflowEdge,
   WorkflowExecution,
-  WorkflowExecutionDetail,
   CreateWorkflowDto,
   UpdateWorkflowDto,
   ExecuteWorkflowDto,
@@ -150,9 +149,7 @@ export const workflowApi = {
    * 导出工作流为 JSON
    */
   export: async (id: string) => {
-    const response = await request.get<Workflow>(
-      `/api/v1/workflows/${id}/export`
-    )
+    const response = await request.get<Workflow>(`/api/v1/workflows/${id}/export`)
     return response.data
   },
 
@@ -176,9 +173,7 @@ export const workflowApi = {
    * 获取工作流模板列表
    */
   getTemplates: async () => {
-    const response = await request.get<Workflow[]>(
-      '/api/v1/workflows/templates'
-    )
+    const response = await request.get<Workflow[]>('/api/v1/workflows/templates')
     return response.data
   },
 
@@ -196,11 +191,7 @@ export const workflowApi = {
   /**
    * 验证工作流配置
    */
-  validate: async (data: {
-    nodes: WorkflowNode[]
-    edges: WorkflowEdge[]
-    env_vars?: any[]
-  }) => {
+  validate: async (data: { nodes: WorkflowNode[]; edges: WorkflowEdge[]; env_vars?: any[] }) => {
     const response = await request.post<{
       valid: boolean
       errors?: string[]
@@ -231,6 +222,60 @@ export const workflowApi = {
     )
     return response.data
   },
+
+  /**
+   * 启用工作流 API
+   */
+  enableAPI: async (id: string) => {
+    const response = await request.post<{ api_key: string }>(`/api/v1/workflows/${id}/api/enable`)
+    return response.data
+  },
+
+  /**
+   * 禁用工作流 API
+   */
+  disableAPI: async (id: string) => {
+    const response = await request.post<void>(`/api/v1/workflows/${id}/api/disable`)
+    return response.data
+  },
+
+  /**
+   * 重新生成 API Key
+   */
+  regenerateAPIKey: async (id: string) => {
+    const response = await request.post<{ api_key: string }>(
+      `/api/v1/workflows/${id}/api/regenerate`
+    )
+    return response.data
+  },
+
+  /**
+   * 更新 API 超时时间
+   */
+  updateAPITimeout: async (id: string, timeout: number) => {
+    const response = await request.put<void>(`/api/v1/workflows/${id}/api/timeout`, { timeout })
+    return response.data
+  },
+
+  /**
+   * 更新 Webhook URL
+   */
+  updateAPIWebhook: async (id: string, webhookURL: string) => {
+    const response = await request.put<void>(`/api/v1/workflows/${id}/api/webhook`, {
+      webhook_url: webhookURL,
+    })
+    return response.data
+  },
+}
+
+/**
+ * 创建 HTML 预览
+ */
+export const createHtmlPreview = async (htmlContent: string) => {
+  const response = await request.post<{ id: string }>('/api/v1/html-preview', {
+    content: htmlContent,
+  })
+  return response
 }
 
 export default workflowApi

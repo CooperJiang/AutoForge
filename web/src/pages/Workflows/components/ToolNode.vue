@@ -1,5 +1,16 @@
 <template>
-  <div class="tool-node bg-bg-elevated rounded-lg shadow-lg border-2 border-border-primary hover:border-primary transition-all">
+  <div
+    class="tool-node bg-bg-elevated rounded-lg shadow-lg border-2 border-border-primary hover:border-primary transition-all group relative"
+  >
+    <!-- 删除按钮 (hover 显示) -->
+    <button
+      class="absolute -top-2 -right-2 w-6 h-6 bg-red-500 hover:bg-red-600 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center z-10 shadow-lg"
+      @click.stop="handleDelete"
+      title="删除节点"
+    >
+      <X class="w-4 h-4" />
+    </button>
+
     <!-- 节点头部 -->
     <div :class="['px-3 py-2 rounded-t-lg flex items-center gap-2', getToolBgClass(data.toolCode)]">
       <component :is="getToolIcon(data.toolCode)" class="w-4 h-4 text-white flex-shrink-0" />
@@ -27,7 +38,16 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { Handle, Position } from '@vue-flow/core'
-import { Globe, Mail, HeartPulse, CheckCircle2, AlertCircle } from 'lucide-vue-next'
+import {
+  Globe,
+  Mail,
+  HeartPulse,
+  Braces,
+  Database,
+  CheckCircle2,
+  AlertCircle,
+  X,
+} from 'lucide-vue-next'
 import type { WorkflowNode } from '@/types/workflow'
 
 interface Props {
@@ -35,6 +55,15 @@ interface Props {
 }
 
 const props = defineProps<Props>()
+
+const emit = defineEmits<{
+  delete: [id: string]
+}>()
+
+const handleDelete = (e: Event) => {
+  e.stopPropagation()
+  emit('delete', props.data.id)
+}
 
 // 是否已配置
 const hasConfig = computed(() => {
@@ -44,9 +73,11 @@ const hasConfig = computed(() => {
 // 获取工具图标
 const getToolIcon = (code?: string) => {
   const iconMap: Record<string, any> = {
-    'http_request': Globe,
-    'email_sender': Mail,
-    'health_checker': HeartPulse
+    http_request: Globe,
+    email_sender: Mail,
+    health_checker: HeartPulse,
+    json_transform: Braces,
+    redis_context: Database,
   }
   return iconMap[code || ''] || Globe
 }
@@ -54,9 +85,11 @@ const getToolIcon = (code?: string) => {
 // 获取工具背景色
 const getToolBgClass = (code?: string) => {
   const colorMap: Record<string, string> = {
-    'http_request': 'bg-gradient-to-r from-primary to-accent',
-    'email_sender': 'bg-gradient-to-r from-purple-500 to-pink-600',
-    'health_checker': 'bg-gradient-to-r from-primary to-accent'
+    http_request: 'bg-gradient-to-r from-primary to-accent',
+    email_sender: 'bg-gradient-to-r from-purple-500 to-pink-600',
+    health_checker: 'bg-gradient-to-r from-primary to-accent',
+    json_transform: 'bg-gradient-to-r from-emerald-500 to-teal-600',
+    redis_context: 'bg-gradient-to-r from-slate-500 to-slate-700',
   }
   return colorMap[code || ''] || 'bg-gradient-to-r from-primary to-accent'
 }

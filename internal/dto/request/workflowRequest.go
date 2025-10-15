@@ -28,7 +28,8 @@ type UpdateWorkflowRequest struct {
 
 // ExecuteWorkflowRequest 执行工作流请求
 type ExecuteWorkflowRequest struct {
-	EnvVars map[string]string `json:"env_vars"` // 临时环境变量
+	EnvVars map[string]string      `json:"env_vars"` // 临时环境变量
+	Params  map[string]interface{} `json:"params"`   // 外部触发器参数
 }
 
 // WorkflowListQuery 工作流列表查询参数
@@ -64,4 +65,36 @@ type ValidateWorkflowRequest struct {
 	Nodes   []models.WorkflowNode   `json:"nodes" binding:"required"`
 	Edges   []models.WorkflowEdge   `json:"edges" binding:"required"`
 	EnvVars []models.WorkflowEnvVar `json:"env_vars"`
+}
+
+// UpdateAPIParamsRequest 更新 API 参数请求
+type UpdateAPIParamsRequest struct {
+	Params []APIParamConfig `json:"params" binding:"required"`
+}
+
+// APIParamConfig API 参数配置
+type APIParamConfig struct {
+	Key          string      `json:"key" binding:"required"`
+	Type         string      `json:"type" binding:"required"`
+	Required     bool        `json:"required"`
+	DefaultValue interface{} `json:"defaultValue"`
+	Description  string      `json:"description"`
+	Example      interface{} `json:"example"`
+	MappingPath  string      `json:"mappingPath" binding:"required"`
+}
+
+// UpdateAPITimeoutRequest 更新 API 超时请求
+type UpdateAPITimeoutRequest struct {
+	Timeout int `json:"timeout" binding:"required,min=1,max=3600"`
+}
+
+// UpdateAPIWebhookRequest 更新 Webhook URL 请求
+type UpdateAPIWebhookRequest struct {
+	WebhookURL string `json:"webhook_url" binding:"omitempty,url"`
+}
+
+// InvokeWorkflowRequest 调用工作流请求（公开 API）
+type InvokeWorkflowRequest struct {
+	Params     map[string]interface{} `json:"params"`               // 用户参数
+	WebhookURL string                 `json:"webhook_url,omitempty"` // Webhook 回调地址（异步模式）
 }

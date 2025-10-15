@@ -14,7 +14,10 @@
           <slot name="body"></slot>
         </tbody>
       </table>
-      <div v-if="(!data || data.length === 0) && !loading" class="text-center py-10 text-text-tertiary">
+      <div
+        v-if="(!data || data.length === 0) && !loading"
+        class="text-center py-10 text-text-tertiary"
+      >
         暂无数据
       </div>
     </div>
@@ -28,7 +31,7 @@ interface Props {
 }
 
 withDefaults(defineProps<Props>(), {
-  loading: false
+  loading: false,
 })
 </script>
 

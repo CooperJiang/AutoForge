@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"auto-forge/internal/cron"
 	"auto-forge/internal/middleware"
 	"auto-forge/internal/routes"
@@ -15,14 +14,20 @@ import (
 	"auto-forge/pkg/email"
 	"auto-forge/pkg/errors"
 	"auto-forge/pkg/logger"
+	"fmt"
 	"time"
 
 	"github.com/gin-gonic/gin"
 
 	// 导入工具包以触发工具注册
-	_ "auto-forge/pkg/utools/http"
 	_ "auto-forge/pkg/utools/email"
+	_ "auto-forge/pkg/utools/feishu"
+	_ "auto-forge/pkg/utools/formatter"
 	_ "auto-forge/pkg/utools/health"
+	_ "auto-forge/pkg/utools/http"
+	_ "auto-forge/pkg/utools/jsontransform"
+	_ "auto-forge/pkg/utools/openai"
+	_ "auto-forge/pkg/utools/web"
 )
 
 // 应用版本号

@@ -1,4 +1,4 @@
-import { ref, computed, watch } from 'vue'
+import { ref, watch } from 'vue'
 import type { Workflow, WorkflowNode, WorkflowEdge, WorkflowEnvVar } from '@/types/workflow'
 import SecureStorage from '@/utils/storage'
 
@@ -20,14 +20,16 @@ export function useWorkflow(workflowId?: string) {
 
   const draft = loadDraft()
 
-  const workflow = ref<Partial<Workflow>>(draft?.workflow || {
-    name: '',
-    description: '',
-    nodes: [],
-    edges: [],
-    env_vars: [],
-    enabled: false
-  })
+  const workflow = ref<Partial<Workflow>>(
+    draft?.workflow || {
+      name: '',
+      description: '',
+      nodes: [],
+      edges: [],
+      env_vars: [],
+      enabled: false,
+    }
+  )
 
   const nodes = ref<WorkflowNode[]>(draft?.nodes || [])
   const edges = ref<WorkflowEdge[]>(draft?.edges || [])
@@ -35,18 +37,26 @@ export function useWorkflow(workflowId?: string) {
 
   // 自动保存到本地存储
   const saveDraft = () => {
-    SecureStorage.setItem(storageKey, {
-      workflow: workflow.value,
-      nodes: nodes.value,
-      edges: edges.value,
-      envVars: envVars.value
-    }, { encrypt: true })
+    SecureStorage.setItem(
+      storageKey,
+      {
+        workflow: workflow.value,
+        nodes: nodes.value,
+        edges: edges.value,
+        envVars: envVars.value,
+      },
+      { encrypt: true }
+    )
   }
 
   // 监听变化自动保存
-  watch([workflow, nodes, edges, envVars], () => {
-    saveDraft()
-  }, { deep: true })
+  watch(
+    [workflow, nodes, edges, envVars],
+    () => {
+      saveDraft()
+    },
+    { deep: true }
+  )
 
   // 添加节点
   const addNode = (node: WorkflowNode) => {
@@ -55,21 +65,19 @@ export function useWorkflow(workflowId?: string) {
 
   // 更新节点
   const updateNode = (nodeId: string, updates: Partial<WorkflowNode>) => {
-    const index = nodes.value.findIndex(n => n.id === nodeId)
+    const index = nodes.value.findIndex((n) => n.id === nodeId)
     if (index !== -1) {
       nodes.value[index] = {
         ...nodes.value[index],
-        ...updates
+        ...updates,
       }
     }
   }
 
   // 删除节点
   const deleteNode = (nodeId: string) => {
-    nodes.value = nodes.value.filter(n => n.id !== nodeId)
-    edges.value = edges.value.filter(
-      e => e.source !== nodeId && e.target !== nodeId
-    )
+    nodes.value = nodes.value.filter((n) => n.id !== nodeId)
+    edges.value = edges.value.filter((e) => e.source !== nodeId && e.target !== nodeId)
   }
 
   // 添加连线
@@ -79,7 +87,7 @@ export function useWorkflow(workflowId?: string) {
 
   // 删除连线
   const deleteEdge = (edgeId: string) => {
-    edges.value = edges.value.filter(e => e.id !== edgeId)
+    edges.value = edges.value.filter((e) => e.id !== edgeId)
   }
 
   // 添加环境变量
@@ -89,18 +97,18 @@ export function useWorkflow(workflowId?: string) {
 
   // 更新环境变量
   const updateEnvVar = (key: string, updates: Partial<WorkflowEnvVar>) => {
-    const index = envVars.value.findIndex(v => v.key === key)
+    const index = envVars.value.findIndex((v) => v.key === key)
     if (index !== -1) {
       envVars.value[index] = {
         ...envVars.value[index],
-        ...updates
+        ...updates,
       }
     }
   }
 
   // 删除环境变量
   const deleteEnvVar = (key: string) => {
-    envVars.value = envVars.value.filter(v => v.key !== key)
+    envVars.value = envVars.value.filter((v) => v.key !== key)
   }
 
   // 获取前置节点（用于变量引用）
@@ -108,12 +116,12 @@ export function useWorkflow(workflowId?: string) {
     const previousNodeIds = new Set<string>()
 
     // 找到所有指向当前节点的边
-    const incomingEdges = edges.value.filter(e => e.target === currentNodeId)
+    const incomingEdges = edges.value.filter((e) => e.target === currentNodeId)
 
     // 递归找到所有前置节点
     const findPrevious = (nodeId: string) => {
-      const edgeList = edges.value.filter(e => e.target === nodeId)
-      edgeList.forEach(edge => {
+      const edgeList = edges.value.filter((e) => e.target === nodeId)
+      edgeList.forEach((edge) => {
         if (!previousNodeIds.has(edge.source)) {
           previousNodeIds.add(edge.source)
           findPrevious(edge.source)
@@ -121,12 +129,12 @@ export function useWorkflow(workflowId?: string) {
       })
     }
 
-    incomingEdges.forEach(edge => {
+    incomingEdges.forEach((edge) => {
       previousNodeIds.add(edge.source)
       findPrevious(edge.source)
     })
 
-    return nodes.value.filter(n => previousNodeIds.has(n.id))
+    return nodes.value.filter((n) => previousNodeIds.has(n.id))
   }
 
   // 重置工作流
@@ -137,7 +145,7 @@ export function useWorkflow(workflowId?: string) {
       nodes: [],
       edges: [],
       env_vars: [],
-      enabled: false
+      enabled: false,
     }
     nodes.value = []
     edges.value = []
@@ -154,12 +162,16 @@ export function useWorkflow(workflowId?: string) {
 
   // 导出工作流JSON
   const exportWorkflow = () => {
-    return JSON.stringify({
-      ...workflow.value,
-      nodes: nodes.value,
-      edges: edges.value,
-      env_vars: envVars.value
-    }, null, 2)
+    return JSON.stringify(
+      {
+        ...workflow.value,
+        nodes: nodes.value,
+        edges: edges.value,
+        env_vars: envVars.value,
+      },
+      null,
+      2
+    )
   }
 
   // 切换启用/禁用状态
@@ -175,6 +187,34 @@ export function useWorkflow(workflowId?: string) {
     if (nodes.value.length === 0) {
       return { valid: false, message: '工作流至少需要一个节点' }
     }
+
+    // 如果有 external_trigger 节点，验证其配置是否正确
+    const externalTriggerNode = nodes.value.find((n) => n.type === 'external_trigger')
+    if (externalTriggerNode) {
+      // 找到没有入边的节点（起始节点）
+      const targetNodes = new Set(edges.value.map((e) => e.target))
+      const startNodes = nodes.value.filter((n) => !targetNodes.has(n.id))
+
+      if (startNodes.length === 0) {
+        return { valid: false, message: '工作流必须有起始节点' }
+      }
+
+      // external_trigger 节点必须是起始节点
+      if (!startNodes.some((n) => n.id === externalTriggerNode.id)) {
+        return { valid: false, message: '外部 API 触发节点必须是工作流的起始节点' }
+      }
+
+      // 验证 external_trigger 节点配置（如果有参数的话）
+      if (externalTriggerNode.config?.params && externalTriggerNode.config.params.length > 0) {
+        // 验证参数名称不能为空
+        for (const param of externalTriggerNode.config.params) {
+          if (!param.key?.trim()) {
+            return { valid: false, message: '外部 API 触发节点的参数名称不能为空' }
+          }
+        }
+      }
+    }
+
     return { valid: true, message: '' }
   }
 
@@ -203,6 +243,6 @@ export function useWorkflow(workflowId?: string) {
     exportWorkflow,
     validateWorkflow,
     saveDraft,
-    clearDraft
+    clearDraft,
   }
 }

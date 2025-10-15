@@ -72,7 +72,9 @@ export function parseCurl(curlCommand: string): ParsedCurl | null {
 
     // 如果没有匹配到带引号的，尝试匹配不带引号的格式
     if (!body) {
-      const unquotedMatch = cleaned.match(/(?:--data-raw|--data-binary|--data|-d|--json)\s+([^\s-][^\s]*?)(?:\s+--|$|\s+-[a-zA-Z])/)
+      const unquotedMatch = cleaned.match(
+        /(?:--data-raw|--data-binary|--data|-d|--json)\s+([^\s-][^\s]*?)(?:\s+--|$|\s+-[a-zA-Z])/
+      )
       if (unquotedMatch) {
         body = unquotedMatch[1]
       }
@@ -85,7 +87,7 @@ export function parseCurl(curlCommand: string): ParsedCurl | null {
         method: 'POST',
         headers,
         params,
-        body
+        body,
       }
     }
 
@@ -94,7 +96,7 @@ export function parseCurl(curlCommand: string): ParsedCurl | null {
       method,
       headers,
       params,
-      body
+      body,
     }
   } catch (error) {
     console.error('解析 curl 失败:', error)

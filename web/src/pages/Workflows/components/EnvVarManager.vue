@@ -6,7 +6,11 @@
         <div class="font-semibold text-text-primary mb-1">💡 什么是环境变量？</div>
         <div class="text-primary text-xs space-y-1">
           <p>环境变量可以在工作流的任何节点中引用，用于存储 API 密钥、配置参数等敏感信息。</p>
-          <p>使用方式：<code class="px-1 py-0.5 bg-primary-light rounded">&#123;&#123;env.VARIABLE_NAME&#125;&#125;</code></p>
+          <p>
+            使用方式：<code class="px-1 py-0.5 bg-primary-light rounded"
+              >&#123;&#123;env.VARIABLE_NAME&#125;&#125;</code
+            >
+          </p>
         </div>
       </div>
 
@@ -20,18 +24,11 @@
           <div class="grid grid-cols-2 gap-2">
             <div>
               <label class="block text-xs font-medium text-text-secondary mb-1">变量名</label>
-              <BaseInput
-                v-model="envVar.key"
-                placeholder="API_KEY"
-                class="font-mono text-sm"
-              />
+              <BaseInput v-model="envVar.key" placeholder="API_KEY" class="font-mono text-sm" />
             </div>
             <div>
               <label class="block text-xs font-medium text-text-secondary mb-1">描述（可选）</label>
-              <BaseInput
-                v-model="envVar.description"
-                placeholder="API密钥"
-              />
+              <BaseInput v-model="envVar.description" placeholder="API密钥" />
             </div>
           </div>
           <div>
@@ -89,21 +86,10 @@
 
       <!-- 操作按钮 -->
       <div class="flex gap-2 pt-4 border-t border-border-primary">
-        <BaseButton
-          size="sm"
-          variant="ghost"
-          class="flex-1"
-          @click="handleClose"
-        >
+        <BaseButton size="sm" variant="ghost" class="flex-1" @click="handleClose">
           取消
         </BaseButton>
-        <BaseButton
-          size="sm"
-          class="flex-1"
-          @click="handleSave"
-        >
-          保存
-        </BaseButton>
+        <BaseButton size="sm" class="flex-1" @click="handleSave"> 保存 </BaseButton>
       </div>
     </div>
   </Drawer>
@@ -134,15 +120,18 @@ const isOpen = ref(props.modelValue)
 const localEnvVars = ref<WorkflowEnvVar[]>([])
 const showPassword = ref<Record<number, boolean>>({})
 
-watch(() => props.modelValue, (val) => {
-  isOpen.value = val
-  if (val) {
-    // 深拷贝环境变量
-    localEnvVars.value = JSON.parse(JSON.stringify(props.envVars))
-    // 重置密码显示状态
-    showPassword.value = {}
+watch(
+  () => props.modelValue,
+  (val) => {
+    isOpen.value = val
+    if (val) {
+      // 深拷贝环境变量
+      localEnvVars.value = JSON.parse(JSON.stringify(props.envVars))
+      // 重置密码显示状态
+      showPassword.value = {}
+    }
   }
-})
+)
 
 watch(isOpen, (val) => {
   emit('update:modelValue', val)
@@ -157,7 +146,7 @@ const addEnvVar = () => {
     key: '',
     value: '',
     description: '',
-    encrypted: false
+    encrypted: false,
   })
 }
 
@@ -190,7 +179,7 @@ const handleSave = () => {
   }
 
   // 检查重复
-  const keys = localEnvVars.value.map(v => v.key)
+  const keys = localEnvVars.value.map((v) => v.key)
   const duplicates = keys.filter((key, index) => keys.indexOf(key) !== index)
   if (duplicates.length > 0) {
     message.error(`变量名重复：${duplicates[0]}`)

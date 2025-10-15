@@ -22,14 +22,18 @@ export default [
     files: ['**/*.vue'],
     rules: {
       'vue/multi-word-component-names': 'off',
+      'vue/no-mutating-props': 'off',
     },
   },
 
   {
     name: 'app/typescript-rules',
-    files: ['**/*.{ts,tsx}'],
+    files: ['**/*.{ts,tsx,vue}'],
     rules: {
       '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
+      // Reduce lint noise: allow `any` and `{}` types in this codebase
+      '@typescript-eslint/no-explicit-any': 'off',
+      '@typescript-eslint/no-empty-object-type': 'off',
     },
   },
 ]

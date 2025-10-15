@@ -29,7 +29,7 @@ const props = withDefaults(defineProps<Props>(), {
   type: 'button',
   disabled: false,
   fullWidth: false,
-  loading: false
+  loading: false,
 })
 
 defineEmits<{
@@ -49,15 +49,17 @@ const buttonClasses = computed(() => {
     xs: 'px-2 py-0.5 text-xs rounded',
     sm: 'px-2.5 py-1 text-xs rounded',
     md: 'px-3 py-1.5 text-sm rounded-md',
-    lg: 'px-4 py-2 text-base rounded-md'
+    lg: 'px-4 py-2 text-base rounded-md',
   }
 
   const variants = {
-    primary: 'bg-[var(--color-primary)] hover:bg-primary-hover text-primary-text focus:ring-primary-light shadow-sm',
+    primary:
+      'bg-[var(--color-primary)] hover:bg-primary-hover text-primary-text focus:ring-primary-light shadow-sm',
     secondary: 'bg-bg-tertiary text-text-primary hover:bg-bg-active focus:ring-primary-light',
     danger: 'bg-error text-white hover:bg-error-hover focus:ring-error-light shadow-sm',
     success: 'bg-success text-white hover:bg-success-hover focus:ring-success-light shadow-sm',
-    ghost: 'bg-transparent text-text-secondary hover:bg-bg-hover focus:ring-primary-light border border-border-primary'
+    ghost:
+      'bg-transparent text-text-secondary hover:bg-bg-hover focus:ring-primary-light border border-border-primary',
   }
 
   return `${base} ${disabled} ${sizes[props.size]} ${variants[props.variant]} font-medium transition-all duration-200 focus:outline-none focus:ring-2 whitespace-nowrap inline-flex items-center justify-center shrink-0`

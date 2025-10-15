@@ -37,7 +37,7 @@ withDefaults(defineProps<Props>(), {
   placeholder: '',
   required: false,
   hint: '',
-  inputClass: ''
+  inputClass: '',
 })
 
 defineEmits<{
@@ -47,13 +47,13 @@ defineEmits<{
 
 <style scoped>
 /* 隐藏 number 类型的上下箭头 */
-input[type="number"]::-webkit-inner-spin-button,
-input[type="number"]::-webkit-outer-spin-button {
+input[type='number']::-webkit-inner-spin-button,
+input[type='number']::-webkit-outer-spin-button {
   -webkit-appearance: none;
   margin: 0;
 }
 
-input[type="number"] {
+input[type='number'] {
   -moz-appearance: textfield;
 }
 </style>

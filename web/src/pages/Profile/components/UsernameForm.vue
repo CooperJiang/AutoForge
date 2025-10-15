@@ -9,7 +9,9 @@
     <form @submit.prevent="handleSubmit" class="space-y-4">
       <div>
         <label class="block text-sm font-medium text-text-secondary mb-2">当前用户名</label>
-        <div class="px-4 py-2.5 bg-bg-hover border border-border-primary rounded-lg text-text-primary">
+        <div
+          class="px-4 py-2.5 bg-bg-hover border border-border-primary rounded-lg text-text-primary"
+        >
           {{ userName }}
         </div>
       </div>
@@ -19,20 +21,10 @@
         placeholder="输入新用户名（2-20个字符）"
       />
       <div class="flex justify-end gap-3">
-        <BaseButton
-          type="button"
-          variant="secondary"
-          @click="handleReset"
-          size="sm"
-        >
+        <BaseButton type="button" variant="secondary" @click="handleReset" size="sm">
           重置
         </BaseButton>
-        <BaseButton
-          type="submit"
-          variant="primary"
-          :disabled="updating"
-          size="sm"
-        >
+        <BaseButton type="submit" variant="primary" :disabled="updating" size="sm">
           {{ updating ? '保存中...' : '保存修改' }}
         </BaseButton>
       </div>
@@ -59,7 +51,7 @@ const emit = defineEmits<{
 }>()
 
 const form = ref({
-  username: ''
+  username: '',
 })
 const updating = ref(false)
 

@@ -1,4 +1,11 @@
-export type NodeType = 'trigger' | 'tool' | 'condition' | 'delay' | 'switch' | 'end'
+export type NodeType =
+  | 'trigger'
+  | 'tool'
+  | 'condition'
+  | 'delay'
+  | 'switch'
+  | 'end'
+  | 'external_trigger'
 
 export interface NodeRetryConfig {
   enabled: boolean
@@ -57,6 +64,10 @@ export interface Workflow {
   success_count?: number
   failed_count?: number
   last_executed_at?: number
+  api_enabled?: boolean
+  api_key?: string
+  api_timeout?: number
+  api_webhook_url?: string
   created_at: number
   updated_at: number
 }
@@ -89,8 +100,24 @@ export interface NodeExecutionLog {
   end_time?: number
   duration_ms: number
   retry_count: number
+  input?: Record<string, any>
   output?: Record<string, any>
+  output_render?: OutputRenderConfig
   error?: string
+  tool_code?: string
+  tool_version?: string
+}
+
+export interface OutputRenderConfig {
+  type: 'image' | 'video' | 'html' | 'markdown' | 'text' | 'gallery' | 'json'
+  primary: string
+  fields: Record<string, FieldRender>
+}
+
+export interface FieldRender {
+  type: 'image' | 'video' | 'url' | 'text' | 'json' | 'code' | 'markdown'
+  label: string
+  display: boolean
 }
 
 // DTO types for API requests
@@ -118,6 +145,7 @@ export interface UpdateWorkflowDto {
 
 export interface ExecuteWorkflowDto {
   env_vars?: Record<string, string>
+  params?: Record<string, any>
 }
 
 // Same as WorkflowExecution for now

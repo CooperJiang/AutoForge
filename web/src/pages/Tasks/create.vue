@@ -18,11 +18,7 @@
             <label class="block text-sm font-medium text-text-secondary mb-2">
               任务名称 <span class="text-red-500">*</span>
             </label>
-            <BaseInput
-              v-model="form.name"
-              placeholder="例如：每日签到"
-              required
-            />
+            <BaseInput v-model="form.name" placeholder="例如：每日签到" required />
           </div>
 
           <!-- 执行规则 -->
@@ -30,11 +26,7 @@
             <label class="block text-sm font-medium text-text-secondary mb-2">
               执行规则 <span class="text-red-500">*</span>
             </label>
-            <BaseSelect
-              v-model="form.schedule_type"
-              :options="scheduleTypeOptions"
-              required
-            />
+            <BaseSelect v-model="form.schedule_type" :options="scheduleTypeOptions" required />
           </div>
 
           <div class="mb-4">
@@ -79,12 +71,7 @@
 
           <!-- 提交按钮 -->
           <div class="flex gap-2 mt-6">
-            <BaseButton
-              type="button"
-              variant="secondary"
-              @click="goBack"
-              class="flex-1"
-            >
+            <BaseButton type="button" variant="secondary" @click="goBack" class="flex-1">
               取消
             </BaseButton>
             <BaseButton
@@ -104,7 +91,7 @@
     <div class="flex-1 p-6 overflow-y-auto">
       <div class="bg-bg-elevated border-2 border-border-primary rounded-lg p-6">
         <h2 class="text-lg font-semibold text-text-primary mb-4">任务预览</h2>
-        
+
         <div v-if="form.name" class="mb-4">
           <div class="text-sm text-text-secondary">任务名称</div>
           <div class="text-base font-medium text-text-primary mt-1">{{ form.name }}</div>
@@ -144,11 +131,7 @@
           <label class="block text-sm font-medium text-text-secondary mb-2">
             请求方式 <span class="text-red-500">*</span>
           </label>
-          <BaseSelect
-            v-model="toolConfig.method"
-            :options="methodOptions"
-            required
-          />
+          <BaseSelect v-model="toolConfig.method" :options="methodOptions" required />
         </div>
 
         <div>
@@ -163,9 +146,7 @@
         </div>
 
         <div>
-          <label class="block text-sm font-medium text-text-secondary mb-2">
-            请求头（可选）
-          </label>
+          <label class="block text-sm font-medium text-text-secondary mb-2"> 请求头（可选） </label>
           <textarea
             v-model="toolConfig.headers"
             class="w-full px-3 py-2 border-2 border-border-primary rounded-lg focus:outline-none focus:border-green-500 font-mono text-sm"
@@ -187,9 +168,7 @@
         </div>
       </div>
 
-      <div v-else class="text-center py-8 text-text-tertiary">
-        该工具暂无需配置参数
-      </div>
+      <div v-else class="text-center py-8 text-text-tertiary">该工具暂无需配置参数</div>
     </Dialog>
   </main>
 </template>
@@ -245,7 +224,9 @@ const scheduleTypeOptions = [
   { label: 'Cron表达式', value: 'cron' },
 ]
 
-const toolOptions = computed(() => tools.value.map((tool) => ({ label: tool.name, value: tool.code })))
+const toolOptions = computed(() =>
+  tools.value.map((tool) => ({ label: tool.name, value: tool.code }))
+)
 const selectedTool = computed(() => tools.value.find((t) => t.code === form.value.tool_code))
 
 onMounted(async () => {
@@ -273,7 +254,7 @@ const loadTask = async () => {
       schedule_type: task.schedule_type,
       schedule_value: task.schedule_value,
     }
-    
+
     // 解析已有配置
     const config = JSON.parse(task.config)
     toolConfig.value = {
@@ -348,7 +329,7 @@ const handleSubmit = async () => {
         headers: JSON.parse(toolConfig.value.headers || '{}'),
         body: JSON.parse(toolConfig.value.body || '{}'),
       }
-    } catch (error) {
+    } catch {
       message.error('Headers 或 Body 不是有效的 JSON 格式')
       return
     }

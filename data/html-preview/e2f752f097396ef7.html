@@ -1,0 +1,197 @@
+ I'll help you create an HTML document explaining Vite's working principles and its advantages over traditional bundlers like Webpack. I'll create a beautiful daily challenge card using Tailwind CSS.
+> 🔍 ***Vite working principle comparison webpack***
+
+> 🔗 [Vite vs. Webpack: A ](https://kinsta.com/blog/vite-vs-webpack/)
+> 🔗 [Vite or Webpack for ](https://pieces.app/blog/vite-vs-webpack-which-build-tool-is-right-for-your-project)
+> 🔗 [Webpack vs Vite: Whi](https://www.syncfusion.com/blogs/post/webpack-vs-vite-bundler-comparison)
+> 🔗 [How Does Vite Work -](https://harlanzw.com/blog/how-the-heck-does-vite-work)
+> 🔗 [Vite vs. Webpack: Wh](https://betterstack.com/community/guides/scaling-nodejs/vite-vs-webpack/)
+> 🔗 [What is Vite? & Vite](https://refine.dev/blog/what-is-vite-vs-webpack/)
+> 🔗 [Webpack vs ViteJS : ](https://radixweb.com/blog/webpack-vs-vitejs-comparison)
+> 🔗 [Vite vs Webpack: A C](https://dev.to/debajit13/vite-vs-webpack-a-comparative-analysis-851)
+> 🔗 [Webpack vs Vite: A D](https://codeparrot.ai/blogs/webpack-vs-vite-a-detailed-comparison-for-modern-web-development)
+> 🔗 [Vite vs Webpack | Vu](https://www.vuemastery.com/blog/vite-vs-webpack/)
+
+
+> 🔍 ***Vite vs webpack principles no bundling ESM***
+
+> 🔗 [Vite vs. Webpack: A ](https://kinsta.com/blog/vite-vs-webpack/)
+> 🔗 [How Bundlers work: W](https://medium.com/@ruchivora16/how-react-code-becomes-production-ready-webpack-vs-vite-576856aed4bd)
+> 🔗 [Vite vs Webpack: A C](https://dev.to/debajit13/vite-vs-webpack-a-comparative-analysis-851)
+> 🔗 [Vite and Webpack A D](https://leapcell.io/blog/vite-and-webpack-a-deep-dive-into-modern-javascript-build-tools)
+> 🔗 [Webpack vs Vite: Whi](https://www.syncfusion.com/blogs/post/webpack-vs-vite-bundler-comparison)
+> 🔗 [Vite or Webpack for ](https://pieces.app/blog/vite-vs-webpack-which-build-tool-is-right-for-your-project)
+> 🔗 [Understand Vite Js: ](https://medium.com/@codewithpinkz/understand-the-basics-of-vite-js-must-use-webpack-87511e891bd8)
+> 🔗 [Vite Vs Webpack: Whi](https://dualite.dev/blog/vite-vs-webpack)
+> 🔗 [Vite Vs. Webpack: Th](https://www.axelerant.com/blog/vite-vs-webpack-the-best-react-bundler)
+> 🔗 [What is Vite? & Vite](https://refine.dev/blog/what-is-vite-vs-webpack/)
+
+
+
+Based on my research, I'll create a beautiful HTML document explaining Vite's working principles and its advantages over Webpack.
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>前端每日一题: Vite 工作原理与优势</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&display=swap');
+        body {
+            font-family: 'Noto Sans SC', sans-serif;
+            background-color: #f9fafb;
+        }
+        .card {
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px -5px rgba(0, 0, 0, 0.1);
+        }
+        .gradient-text {
+            background: linear-gradient(90deg, #4f46e5 0%, #7c3aed 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        code {
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+        }
+    </style>
+</head>
+<body>
+    <div class="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+        <div class="card bg-white rounded-2xl overflow-hidden max-w-4xl w-full p-8 md:p-12">
+            <div class="text-center mb-8">
+                <h1 class="text-3xl md:text-4xl font-bold gradient-text">前端每日一题</h1>
+                <div class="mt-2 text-sm text-gray-500">2025年10月14日</div>
+                <div class="mt-1 inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-indigo-100 text-indigo-800">
+                    构建工具
+                </div>
+            </div>
+
+            <div class="border-t border-gray-200 pt-8">
+                <div class="text-xl md:text-2xl font-bold text-gray-800 mb-6">
+                    Vite 的工作原理及其相比传统打包工具(如 Webpack)的优势
+                </div>
+
+                <div class="prose prose-indigo max-w-none">
+                    <h2 class="text-lg md:text-xl font-semibold text-gray-800 mt-8 mb-4">Vite 工作原理</h2>
+                    
+                    <div class="bg-gray-50 rounded-lg p-4 mb-6">
+                        <p class="text-gray-700 mb-3">
+                            Vite（法语"快速"的意思）是由 Vue.js 的创建者 Evan You 开发的现代前端构建工具，其核心工作原理基于两个主要概念：
+                        </p>
+                        
+                        <ol class="list-decimal list-inside space-y-3 text-gray-700 ml-4">
+                            <li><span class="font-medium text-indigo-700">开发环境：利用浏览器原生 ES 模块（ESM）</span>
+                                <ul class="list-disc list-inside ml-6 mt-2 space-y-2 text-gray-600">
+                                    <li>不同于传统的打包工具，Vite 在开发过程中<strong>不对源代码进行打包</strong></li>
+                                    <li>利用现代浏览器原生支持的 ES 模块，实现按需加载</li>
+                                    <li>当浏览器请求某个模块时，Vite 服务器仅处理并提供该模块及其直接依赖</li>
+                                </ul>
+                            </li>
+                            <li class="mt-3"><span class="font-medium text-indigo-700">生产环境：使用 Rollup 进行优化打包</span>
+                                <ul class="list-disc list-inside ml-6 mt-2 space-y-2 text-gray-600">
+                                    <li>生产构建使用 Rollup 进行静态资源优化和代码分割</li>
+                                    <li>预构建依赖：使用 esbuild 将 CommonJS/UMD 模块转换为 ESM 格式</li>
+                                </ul>
+                            </li>
+                        </ol>
+                    </div>
+
+                    <h2 class="text-lg md:text-xl font-semibold text-gray-800 mt-10 mb-4">相比 Webpack 的开发体验优势</h2>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                        <div class="bg-indigo-50 rounded-lg p-5">
+                            <h3 class="font-medium text-indigo-800 mb-3">1. 极速的服务器启动</h3>
+                            <p class="text-gray-700">
+                                Vite 不需要在开发服务器启动前打包整个应用，因此无论项目大小如何，启动时间都保持极快。相比之下，Webpack 需要提前打包所有模块，导致启动时间随项目增长而延长。
+                            </p>
+                        </div>
+                        
+                        <div class="bg-indigo-50 rounded-lg p-5">
+                            <h3 class="font-medium text-indigo-800 mb-3">2. 快速的模块热更新 (HMR)</h3>
+                            <p class="text-gray-700">
+                                Vite 的 HMR 在原生 ESM 上实现，当修改文件时，Vite 只需要精确替换更改的模块，几乎立即就能在浏览器中反映出变更，而不影响应用状态。Webpack 的 HMR 则需要重新打包受影响的模块，速度相对较慢。
+                            </p>
+                        </div>
+                        
+                        <div class="bg-indigo-50 rounded-lg p-5">
+                            <h3 class="font-medium text-indigo-800 mb-3">3. 简化的配置</h3>
+                            <p class="text-gray-700">
+                                Vite 采用开箱即用的默认配置，大多数项目只需极少的配置即可开始。而 Webpack 通常需要复杂的配置文件和各种 loader 插件，对新手不友好且维护成本高。
+                            </p>
+                        </div>
+                        
+                        <div class="bg-indigo-50 rounded-lg p-5">
+                            <h3 class="font-medium text-indigo-800 mb-3">4. 优化的构建性能</h3>
+                            <p class="text-gray-700">
+                                Vite 在生产构建中使用 esbuild 预构建依赖，esbuild 基于 Go 语言编写，比基于 JavaScript 的打包工具快 10-100 倍。同时利用 Rollup 的高效打包能力，生成更小的包体积。
+                            </p>
+                        </div>
+                    </div>
+
+                    <h2 class="text-lg md:text-xl font-semibold text-gray-800 mt-8 mb-4">核心机制对比</h2>
+                    
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-300 mb-8">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">机制</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Vite</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Webpack</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-gray-200">
+                                <tr>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">开发模式构建方式</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">无打包 (No-Bundle)，基于 ESM 的按需编译</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">预先打包所有模块</td>
+                                </tr>
+                                <tr>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">模块处理方式</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">浏览器请求时按需转换</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">构建时一次性处理所有模块</td>
+                                </tr>
+                                <tr>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">依赖处理</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">使用 esbuild 预构建为 ESM</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">使用各种 loader 处理</td>
+                                </tr>
+                                <tr>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">生产环境构建</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">基于 Rollup 构建, 更专注于库</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">自身实现的打包系统</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <h2 class="text-lg md:text-xl font-semibold text-gray-800 mt-8 mb-4">总结与适用场景</h2>
+                    
+                    <div class="bg-gray-50 rounded-lg p-6 mb-6">
+                        <p class="text-gray-700 mb-4">
+                            Vite 通过利用现代浏览器已原生支持的 ES 模块功能，彻底重新思考了前端构建工具的工作方式。它不再进行全量打包，而是采用按需编译方式，为开发者带来前所未有的开发体验提升。
+                        </p>
+                        <p class="text-gray-700">
+                            <span class="font-medium">Vite 适合：</span> 现代前端项目、快速原型开发、对开发体验有高要求的团队。
+                        </p>
+                        <p class="text-gray-700">
+                            <span class="font-medium">Webpack 适合：</span> 需要支持旧版浏览器的项目、有复杂定制需求的大型应用、依赖大量特殊 loader 的场景。
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-10 text-center text-xs text-gray-500">
+                &copy; 2025 前端每日一题 | 知识拓展 · 技能提升
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+```

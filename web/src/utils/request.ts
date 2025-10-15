@@ -38,7 +38,7 @@ request.interceptors.request.use(
   (error) => {
     console.error('❌ Request Error:', error)
     return Promise.reject(error)
-  },
+  }
 )
 
 // 响应拦截器
@@ -70,9 +70,27 @@ request.interceptors.response.use(
   (error) => {
     // 处理HTTP错误
     let message = '网络错误'
+    let shouldShowError = true
 
     if (error.response) {
       const { status, data } = error.response
+
+      // 处理 HTTP 401 - token 过期
+      if (status === 401) {
+        message = '登录已过期，请重新登录'
+        shouldShowError = false // 不显示错误提示，直接跳转
+        // 清除token并跳转到登录页
+        SecureStorage.removeItem(STORAGE_KEYS.AUTH_TOKEN)
+        SecureStorage.removeItem(STORAGE_KEYS.AUTH_USER)
+        // 使用 setTimeout 确保清除操作完成后再跳转
+        setTimeout(() => {
+          if (window.location.pathname !== '/auth') {
+            window.location.replace('/auth')
+          }
+        }, 100)
+        const customError = new Error(message)
+        return Promise.reject(customError)
+      }
 
       // 优先使用 detail（详细错误），其次 message
       if (data?.detail) {
@@ -81,15 +99,6 @@ request.interceptors.response.use(
         message = data.message
       } else {
         switch (status) {
-          case 401:
-            message = '未授权，请重新登录'
-            // 清除token并跳转到登录页
-            SecureStorage.removeItem(STORAGE_KEYS.AUTH_TOKEN)
-            SecureStorage.removeItem(STORAGE_KEYS.AUTH_USER)
-            if (window.location.pathname !== '/auth') {
-              window.location.replace('/auth')
-            }
-            break
           case 403:
             message = '拒绝访问'
             break
@@ -107,12 +116,14 @@ request.interceptors.response.use(
       message = '网络连接失败，请检查网络连接'
     }
 
-    // 显示错误消息
-    showError(message)
+    // 显示错误消息（401 不显示）
+    if (shouldShowError) {
+      showError(message)
+    }
 
     const customError = new Error(message)
     return Promise.reject(customError)
-  },
+  }
 )
 
 // 封装常用请求方法

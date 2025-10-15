@@ -9,6 +9,8 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"regexp"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -26,7 +28,7 @@ func NewEngineService() *EngineService {
 }
 
 // ExecuteWorkflow 执行工作流
-func (s *EngineService) ExecuteWorkflow(executionID string, envVars map[string]string) error {
+func (s *EngineService) ExecuteWorkflow(executionID string, envVars map[string]string, externalParams map[string]interface{}) error {
 	db := database.GetDB()
 
 	// 获取执行记录
@@ -48,6 +50,13 @@ func (s *EngineService) ExecuteWorkflow(executionID string, envVars map[string]s
 
 	// 构建环境变量映射
 	envMap := s.buildEnvMap(workflow.EnvVars, envVars)
+
+	// 将外部参数注入到环境映射中，使用 "external." 前缀
+	if externalParams != nil {
+		for key, value := range externalParams {
+			envMap["external."+key] = fmt.Sprintf("%v", value)
+		}
+	}
 
 	// 执行工作流
 	success := true
@@ -97,7 +106,7 @@ func (s *EngineService) ExecuteWorkflow(executionID string, envVars map[string]s
 		}
 
 		// 执行节点
-		nodeLog, output, err := s.executeNode(node, envMap, nodeOutputs)
+		nodeLog, output, err := s.executeNode(executionID, node, envMap, nodeOutputs)
 		if err != nil {
 			success = false
 			execError = err
@@ -154,11 +163,32 @@ func (s *EngineService) ExecuteWorkflow(executionID string, envVars map[string]s
 
 // executeNode 执行单个节点
 func (s *EngineService) executeNode(
+	executionID string,
 	node models.WorkflowNode,
 	envMap map[string]string,
 	nodeOutputs map[string]map[string]interface{},
 ) (*models.NodeExecutionLog, map[string]interface{}, error) {
 	startTime := time.Now().Unix()
+
+	// 记录输入数据（配置 + 环境变量）
+	inputData := make(map[string]interface{})
+
+	// 记录节点配置
+	if node.Config != nil && len(node.Config) > 0 {
+		inputData["config"] = node.Config
+	}
+
+	// 记录外部参数（从 envMap 中提取）
+	externalParams := make(map[string]string)
+	for key, value := range envMap {
+		if strings.HasPrefix(key, "external.") {
+			paramName := strings.TrimPrefix(key, "external.")
+			externalParams[paramName] = value
+		}
+	}
+	if len(externalParams) > 0 {
+		inputData["external_params"] = externalParams
+	}
 
 	nodeLog := &models.NodeExecutionLog{
 		NodeID:     node.ID,
@@ -168,16 +198,32 @@ func (s *EngineService) executeNode(
 		StartTime:  &startTime,
 		RetryCount: 0,
 		ToolCode:   node.ToolCode, // 保存工具代码
+		Input:      inputData,     // 记录输入数据
 	}
 
 	// 根据节点类型执行
 	var output map[string]interface{}
+	var outputRender *models.OutputRenderConfig
 	var err error
+
+	// 对于工具节点，记录替换后的配置
+	if node.Type == "tool" {
+		// 替换变量后的配置
+		replacedConfig := s.replaceVariables(node.Config, envMap, nodeOutputs)
+		if len(replacedConfig) > 0 {
+			inputData["resolved_config"] = replacedConfig
+		}
+	}
+
+	// 立即保存 running 状态的日志，让前端可以实时看到节点开始执行
+	if err := s.executionService.AddNodeLog(executionID, *nodeLog); err != nil {
+		log.Error("添加节点开始日志失败: %v", err)
+	}
 
 	switch node.Type {
 	case "tool":
-		output, err = s.executeToolNode(node, envMap, nodeOutputs)
-	case "trigger":
+		output, outputRender, err = s.executeToolNode(node, envMap, nodeOutputs)
+	case "trigger", "external_trigger":
 		output, err = s.executeTriggerNode(node)
 	case "condition":
 		output, err = s.executeConditionNode(node, nodeOutputs)
@@ -193,6 +239,7 @@ func (s *EngineService) executeNode(
 	nodeLog.EndTime = &endTime
 	nodeLog.DurationMs = (endTime - startTime) * 1000
 	nodeLog.Output = output
+	nodeLog.OutputRender = outputRender
 
 	return nodeLog, output, err
 }
@@ -202,7 +249,7 @@ func (s *EngineService) executeToolNode(
 	node models.WorkflowNode,
 	envMap map[string]string,
 	nodeOutputs map[string]map[string]interface{},
-) (map[string]interface{}, error) {
+) (map[string]interface{}, *models.OutputRenderConfig, error) {
 	// 获取工具代码 - 优先从顶级字段读取，兼容旧数据从 Data 中读取
 	toolCode := node.ToolCode
 	if toolCode == "" {
@@ -211,7 +258,7 @@ func (s *EngineService) executeToolNode(
 		}
 	}
 	if toolCode == "" {
-		return nil, errors.New("工具代码未配置")
+		return nil, nil, errors.New("工具代码未配置")
 	}
 
 	// 获取工具配置 - 优先从顶级字段读取，兼容旧数据从 Data 中读取
@@ -222,7 +269,7 @@ func (s *EngineService) executeToolNode(
 		}
 	}
 	if config == nil {
-		return nil, errors.New("工具配置格式错误")
+		return nil, nil, errors.New("工具配置格式错误")
 	}
 
 	// 替换环境变量和节点输出引用
@@ -231,7 +278,7 @@ func (s *EngineService) executeToolNode(
 	// 获取工具实例
 	tool, err := utools.Get(toolCode)
 	if err != nil {
-		return nil, fmt.Errorf("工具不存在: %s, %w", toolCode, err)
+		return nil, nil, fmt.Errorf("工具不存在: %s, %w", toolCode, err)
 	}
 
 	// 执行工具
@@ -243,16 +290,60 @@ func (s *EngineService) executeToolNode(
 		Metadata:  make(map[string]interface{}),
 	}
 
+	nodeVariables := make(map[string]interface{}, len(nodeOutputs))
+	for key, val := range nodeOutputs {
+		nodeVariables[key] = val
+	}
+	ctx.Variables["nodes"] = nodeVariables
+
+	envVars := make(map[string]interface{}, len(envMap))
+	for key, val := range envMap {
+		envVars[key] = val
+	}
+	ctx.Variables["env"] = envVars
+
+	ctx.Metadata["current"] = map[string]interface{}{
+		"nodeId":   node.ID,
+		"nodeType": node.Type,
+		"nodeName": s.getNodeName(node),
+	}
+	ctx.Variables["current"] = ctx.Metadata["current"]
+
 	result, err := tool.Execute(ctx, config)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	if !result.Success {
-		return result.Output, fmt.Errorf("工具执行失败: %s", result.Message)
+		return result.Output, nil, fmt.Errorf("工具执行失败: %s", result.Message)
 	}
 
-	return result.Output, nil
+	// Add Message to Output so it can be referenced by variables
+	output := result.Output
+	if output == nil {
+		output = make(map[string]interface{})
+	}
+	output["message"] = result.Message
+
+	// 转换 OutputRender
+	var outputRender *models.OutputRenderConfig
+	if result.OutputRender != nil {
+		fields := make(map[string]models.FieldRender)
+		for k, v := range result.OutputRender.Fields {
+			fields[k] = models.FieldRender{
+				Type:    v.Type,
+				Label:   v.Label,
+				Display: v.Display,
+			}
+		}
+		outputRender = &models.OutputRenderConfig{
+			Type:    result.OutputRender.Type,
+			Primary: result.OutputRender.Primary,
+			Fields:  fields,
+		}
+	}
+
+	return output, outputRender, nil
 }
 
 // executeTriggerNode 执行触发器节点
@@ -283,7 +374,7 @@ func (s *EngineService) executeConditionNode(
 		return s.evaluateExpressionCondition(config, nodeOutputs)
 	default:
 		return map[string]interface{}{
-			"result": true,
+			"result":  true,
 			"message": "未指定条件类型，默认通过",
 		}, nil
 	}
@@ -577,7 +668,11 @@ func (s *EngineService) replaceVariables(
 	for key, value := range config {
 		switch v := value.(type) {
 		case string:
-			result[key] = s.replaceStringVariables(v, envMap, nodeOutputs)
+			if key == "data_source" {
+				result[key] = v
+			} else {
+				result[key] = s.replaceStringVariables(v, envMap, nodeOutputs)
+			}
 		case map[string]interface{}:
 			result[key] = s.replaceVariables(v, envMap, nodeOutputs)
 		default:
@@ -596,27 +691,97 @@ func (s *EngineService) replaceStringVariables(
 ) string {
 	// 替换环境变量 {{env.VAR_NAME}}
 	for key, value := range envMap {
+		// 支持 {{env.VAR_NAME}} 格式
 		str = strings.ReplaceAll(str, fmt.Sprintf("{{env.%s}}", key), value)
+
+		// 支持 {{external.PARAM_NAME}} 格式（外部触发器参数）
+		if strings.HasPrefix(key, "external.") {
+			paramName := strings.TrimPrefix(key, "external.")
+			str = strings.ReplaceAll(str, fmt.Sprintf("{{external.%s}}", paramName), value)
+		}
 	}
 
-	// 替换节点输出 {{nodes.NODE_ID.field}} 或 {{nodes.NODE_ID.output.field}}
-	for nodeID, output := range nodeOutputs {
-		// 支持 {{nodes.NODE_ID.field}} 格式
-		for field, value := range output {
-			placeholder := fmt.Sprintf("{{nodes.%s.%s}}", nodeID, field)
-			str = strings.ReplaceAll(str, placeholder, fmt.Sprintf("%v", value))
+	// 使用正则表达式查找所有变量引用
+	re := regexp.MustCompile(`\{\{nodes\.([^}]+)\}\}`)
+	str = re.ReplaceAllStringFunc(str, func(match string) string {
+		// 提取路径部分 (去掉 {{nodes. 和 }})
+		path := strings.TrimPrefix(match, "{{nodes.")
+		path = strings.TrimSuffix(path, "}}")
+
+		// 分割路径为节点ID和字段路径
+		parts := strings.SplitN(path, ".", 2)
+		if len(parts) < 2 {
+			return match // 无法解析,保持原样
 		}
 
-		// 支持 {{nodes.NODE_ID.output.field}} 格式（嵌套output对象）
-		if outputObj, ok := output["output"].(map[string]interface{}); ok {
-			for field, value := range outputObj {
-				placeholder := fmt.Sprintf("{{nodes.%s.output.%s}}", nodeID, field)
-				str = strings.ReplaceAll(str, placeholder, fmt.Sprintf("%v", value))
+		nodeID := parts[0]
+		fieldPath := parts[1]
+
+		// 获取节点输出
+		output, ok := nodeOutputs[nodeID]
+		if !ok {
+			return match // 节点不存在,保持原样
+		}
+
+		// 访问嵌套路径
+		value := s.getNestedValue(output, fieldPath)
+		if value == nil {
+			return match // 无法访问,保持原样
+		}
+
+		return fmt.Sprintf("%v", value)
+	})
+
+	return str
+}
+
+// getNestedValue 获取嵌套路径的值,支持数组索引
+// 例如: response.data.0.url
+func (s *EngineService) getNestedValue(data interface{}, path string) interface{} {
+	// 分割路径
+	parts := strings.Split(path, ".")
+
+	current := data
+	for _, part := range parts {
+		if current == nil {
+			return nil
+		}
+
+		// 检查是否是数组索引
+		if idx, err := strconv.Atoi(part); err == nil {
+			// 数组访问
+			switch arr := current.(type) {
+			case []interface{}:
+				if idx >= 0 && idx < len(arr) {
+					current = arr[idx]
+				} else {
+					return nil
+				}
+			case []map[string]interface{}:
+				if idx >= 0 && idx < len(arr) {
+					current = arr[idx]
+				} else {
+					return nil
+				}
+			default:
+				return nil
+			}
+		} else {
+			// 对象属性访问
+			switch obj := current.(type) {
+			case map[string]interface{}:
+				var ok bool
+				current, ok = obj[part]
+				if !ok {
+					return nil
+				}
+			default:
+				return nil
 			}
 		}
 	}
 
-	return str
+	return current
 }
 
 // getNodeName 获取节点名称

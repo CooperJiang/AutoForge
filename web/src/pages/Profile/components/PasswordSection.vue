@@ -30,9 +30,21 @@
         />
         <div class="bg-primary-light border border-primary rounded-lg p-4">
           <div class="flex items-start gap-3">
-            <div class="w-8 h-8 rounded-lg bg-primary-light flex items-center justify-center flex-shrink-0">
-              <svg class="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            <div
+              class="w-8 h-8 rounded-lg bg-primary-light flex items-center justify-center flex-shrink-0"
+            >
+              <svg
+                class="w-5 h-5 text-primary"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
               </svg>
             </div>
             <p class="text-sm text-text-primary flex-1">
@@ -41,18 +53,8 @@
           </div>
         </div>
         <div class="flex justify-end gap-3">
-          <BaseButton
-            type="button"
-            variant="secondary"
-            @click="handleReset"
-          >
-            重置
-          </BaseButton>
-          <BaseButton
-            type="submit"
-            variant="primary"
-            :disabled="changing"
-          >
+          <BaseButton type="button" variant="secondary" @click="handleReset"> 重置 </BaseButton>
+          <BaseButton type="submit" variant="primary" :disabled="changing">
             {{ changing ? '修改中...' : '修改密码' }}
           </BaseButton>
         </div>
@@ -75,7 +77,7 @@ const router = useRouter()
 const form = ref({
   oldPassword: '',
   newPassword: '',
-  confirmPassword: ''
+  confirmPassword: '',
 })
 const changing = ref(false)
 
@@ -83,7 +85,7 @@ const handleReset = () => {
   form.value = {
     oldPassword: '',
     newPassword: '',
-    confirmPassword: ''
+    confirmPassword: '',
   }
 }
 
@@ -107,7 +109,7 @@ const handleSubmit = async () => {
   try {
     await userApi.changePassword({
       oldPassword: form.value.oldPassword,
-      newPassword: form.value.newPassword
+      newPassword: form.value.newPassword,
     })
 
     message.success('密码修改成功，请重新登录')

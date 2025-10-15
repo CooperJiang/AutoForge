@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>前端每日一题 - Vite工作原理</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-gray-100 min-h-screen flex items-center justify-center p-4">
+    <div class="max-w-3xl w-full bg-white rounded-xl shadow-lg overflow-hidden">
+        <!-- 卡片头部 -->
+        <div class="bg-gradient-to-r from-purple-600 to-blue-500 p-6 text-white">
+            <div class="flex items-center justify-between">
+                <h1 class="text-2xl font-bold">前端每日一题</h1>
+                <div class="text-sm bg-white bg-opacity-20 px-3 py-1 rounded-full">
+                    <i class="fas fa-calendar-day mr-1"></i>2025.10.14
+                </div>
+            </div>
+            <p class="mt-4 text-lg">构建工具专题</p>
+        </div>
+        
+        <!-- 问题部分 -->
+        <div class="p-6 border-b">
+            <div class="flex items-center mb-4">
+                <div class="w-8 h-8 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mr-3">
+                    <i class="fas fa-question"></i>
+                </div>
+                <h2 class="text-xl font-bold text-gray-800">问题</h2>
+            </div>
+            <p class="text-gray-700 pl-11">
+                请简述 Vite 的工作原理及其相比传统构建工具（如 webpack）的主要优势，并举例说明如何在一个 Vue 3 项目中使用 Vite 配置环境变量。
+            </p>
+        </div>
+        
+        <!-- 答案部分 -->
+        <div class="p-6">
+            <div class="flex items-center mb-4">
+                <div class="w-8 h-8 bg-green-100 text-green-600 rounded-full flex items-center justify-center mr-3">
+                    <i class="fas fa-lightbulb"></i>
+                </div>
+                <h2 class="text-xl font-bold text-gray-800">解答</h2>
+            </div>
+            
+            <!-- Vite工作原理 -->
+            <div class="mb-6 pl-11">
+                <h3 class="text-lg font-semibold text-gray-800 mb-2">Vite的工作原理</h3>
+                <p class="text-gray-700 mb-4">
+                    Vite（法语中"快速"的意思）是一种新型前端构建工具，其工作原理主要基于以下两个核心概念：
+                </p>
+                <ul class="list-disc pl-5 space-y-2 text-gray-700">
+                    <li><span class="font-semibold">开发环境：</span>利用浏览器原生ES模块导入（ESM）能力，实现按需编译。当浏览器请求某个模块时，Vite才会编译该模块，而不是像Webpack那样提前打包所有模块。</li>
+                    <li><span class="font-semibold">生产环境：</span>使用Rollup进行打包，生成高度优化的静态资源，以获得最佳的加载性能。</li>
+                    <li><span class="font-semibold">依赖预构建：</span>Vite将node_modules中的依赖预先构建为ESM格式，并使用esbuild（基于Go语言的工具）进行转换，这比JavaScript编写的转换器快10-100倍。</li>
+                </ul>
+            </div>
+            
+            <!-- 相比Webpack的优势 -->
+            <div class="mb-6 pl-11">
+                <h3 class="text-lg font-semibold text-gray-800 mb-2">相比Webpack的主要优势</h3>
+                <div class="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                    <ol class="list-decimal pl-5 space-y-2 text-gray-700">
+                        <li><span class="font-semibold">启动速度快：</span>Vite不需要提前打包，因此服务器启动非常快，不会随着应用规模增长而变慢。</li>
+                        <li><span class="font-semibold">热更新快：</span>Vite的HMR在源码级别进行，不受应用规模影响，模块粒度的更新使热更新性能始终保持快速。</li>
+                        <li><span class="font-semibold">构建速度快：</span>使用esbuild预构建依赖，比传统JavaScript构建工具快10-100倍。</li>
+                        <li><span class="font-semibold">开箱即用：</span>内置对TypeScript、JSX、CSS等的支持，无需复杂配置。</li>
+                        <li><span class="font-semibold">优化的构建：</span>生产环境下使用Rollup构建，提供更好的代码分割和优化能力。</li>
+                        <li><span class="font-semibold">更好的开发体验：</span>更清晰的错误提示、更快的响应时间，提升开发效率。</li>
+                    </ol>
+                </div>
+            </div>
+            
+            <!-- Vue3项目中配置环境变量 -->
+            <div class="pl-11">
+                <h3 class="text-lg font-semibold text-gray-800 mb-2">Vue 3项目中使用Vite配置环境变量</h3>
+                <p class="text-gray-700 mb-3">
+                    在Vite项目中配置环境变量非常简单，主要通过创建特定的环境文件实现：
+                </p>
+                
+                <div class="bg-gray-900 text-gray-100 p-4 rounded-lg overflow-x-auto mb-4">
+                    <p class="text-green-400 mb-2">// 1. 在项目根目录创建以下文件：</p>
+                    <p>.env                # 所有环境都会加载</p>
+                    <p>.env.development    # 开发环境加载</p>
+                    <p>.env.production     # 生产环境加载</p>
+                </div>
+                
+                <div class="bg-gray-900 text-gray-100 p-4 rounded-lg overflow-x-auto mb-4">
+                    <p class="text-green-400 mb-2">// 2. 在环境文件中定义变量（必须以VITE_开头）：</p>
+                    <p># .env.development</p>
+                    <p>VITE_API_URL=https://dev-api.example.com</p>
+                    <p>VITE_APP_TITLE=My App (Development)</p>
+                    <p></p>
+                    <p># .env.production</p>
+                    <p>VITE_API_URL=https://api.example.com</p>
+                    <p>VITE_APP_TITLE=My App</p>
+                </div>
+                
+                <div class="bg-gray-900 text-gray-100 p-4 rounded-lg overflow-x-auto mb-4">
+                    <p class="text-green-400 mb-2">// 3. 在Vue组件中使用环境变量：</p>
+                    <p>&lt;script setup&gt;</p>
+                    <p>console.log(import.meta.env.VITE_API_URL)</p>
+                    <p>console.log(import.meta.env.VITE_APP_TITLE)</p>
+                    <p>&lt;/script&gt;</p>
+                    <p></p>
+                    <p>&lt;template&gt;</p>
+                    <p>  &lt;h1&gt;{{ import.meta.env.VITE_APP_TITLE }}&lt;/h1&gt;</p>
+                    <p>&lt;/template&gt;</p>
+                </div>
+                
+                <div class="bg-gray-900 text-gray-100 p-4 rounded-lg overflow-x-auto mb-4">
+                    <p class="text-green-400 mb-2">// 4. 在vite.config.js中访问环境变量：</p>
+                    <p>import { defineConfig, loadEnv } from 'vite'</p>
+                    <p>import vue from '@vitejs/plugin-vue'</p>
+                    <p></p>
+                    <p>export default defineConfig(({ command, mode }) => {</p>
+                    <p>  // 加载特定模式下的.env文件</p>
+                    <p>  const env = loadEnv(mode, process.cwd())</p>
+                    <p>  </p>
+                    <p>  return {</p>
+                    <p>    plugins: [vue()],</p>
+                    <p>    // 使用环境变量</p>
+                    <p>    server: {</p>
+                    <p>      proxy: {</p>
+                    <p>        '/api': {</p>
+                    <p>          target: env.VITE_API_URL,</p>
+                    <p>          changeOrigin: true,</p>
+                    <p>          rewrite: (path) => path.replace(/^\/api/, '')</p>
+                    <p>        }</p>
+                    <p>      }</p>
+                    <p>    }</p>
+                    <p>  }</p>
+                    <p>})</p>
+                </div>
+                
+                <p class="text-gray-700 mb-3">
+                    <span class="font-semibold">注意事项：</span>
+                </p>
+                <ul class="list-disc pl-5 space-y-1 text-gray-700">
+                    <li>只有以 <code class="bg-gray-100 px-1 rounded">VITE_</code> 为前缀的变量才会被暴露给客户端代码</li>
+                    <li>可以通过 <code class="bg-gray-100 px-1 rounded">import.meta.env</code> 访问所有环境变量</li>
+                    <li>可以使用 <code class="bg-gray-100 px-1 rounded">--mode</code> 参数指定使用哪个环境文件，如 <code class="bg-gray-100 px-1 rounded">npm run dev --mode staging</code></li>
+                </ul>
+            </div>
+        </div>
+        
+        <!-- 卡片底部 -->
+        <div class="bg-gray-50 p-4 border-t flex justify-between items-center">
+            <div class="text-gray-500 text-sm">
+                <i class="fas fa-code mr-1"></i>前端技术栈进阶
+            </div>
+            <div class="text-sm">
+                <span class="bg-blue-500 text-white px-3 py-1 rounded-full mr-2">Vite</span>
+                <span class="bg-green-500 text-white px-3 py-1 rounded-full">Vue3</span>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

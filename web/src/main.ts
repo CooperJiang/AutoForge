@@ -13,12 +13,6 @@ import SecureStorage from './utils/storage'
 SecureStorage.migrateFromOldStorage() // 清理旧数据
 SecureStorage.cleanExpiredItems() // 清理过期数据
 
-// 输出存储统计（仅在开发环境）
-if (import.meta.env.DEV) {
-  const stats = SecureStorage.getStorageStats()
-  console.log('📊 存储统计:', stats)
-}
-
 const app = createApp(App)
 
 app.use(createPinia())

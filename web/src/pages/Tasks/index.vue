@@ -10,7 +10,7 @@
       <!-- Task Form Panel -->
       <div class="lg:col-span-1">
         <TaskFormPanel
-          :task-form="taskForm"
+          v-model:task-form="taskForm"
           :tool-options="toolOptions"
           :is-configured="isConfigured"
           :testing="testing"
@@ -65,10 +65,7 @@
     @save="saveConfig"
   />
 
-  <TestResultDialog
-    v-model="showTestDialog"
-    :result="testResult"
-  />
+  <TestResultDialog v-model="showTestDialog" :result="testResult" />
 </template>
 
 <script setup lang="ts">
@@ -167,6 +164,9 @@ const handleSubmitTask = async () => {
         message.error('Headers 或 Body 不是有效的 JSON 格式')
         return
       }
+    } else {
+      // 其他工具直接使用 toolConfig 的值
+      config = { ...toolConfig.value }
     }
 
     if (editingTask.value) {
@@ -255,7 +255,7 @@ const handleTestConfig = async () => {
   testing.value = true
   try {
     let testConfig: any = {
-      tool_code: taskForm.value.tool_code
+      tool_code: taskForm.value.tool_code,
     }
 
     // 根据不同工具类型构建测试配置
@@ -296,7 +296,7 @@ const handleTestConfig = async () => {
       // 其他工具（邮件、健康检查等）使用 config 字段
       testConfig = {
         tool_code: taskForm.value.tool_code,
-        config: toolConfig.value
+        config: toolConfig.value,
       }
     }
 
@@ -310,10 +310,11 @@ const handleTestConfig = async () => {
     } else {
       // 检查是否是反垃圾邮件拦截
       const errorMsg = response.error_message || ''
-      const isSpamBlocked = errorMsg.toLowerCase().includes('spam') ||
-                           errorMsg.includes('垃圾邮件') ||
-                           errorMsg.includes('ANTISPAM') ||
-                           errorMsg.includes('Reject by content')
+      const isSpamBlocked =
+        errorMsg.toLowerCase().includes('spam') ||
+        errorMsg.includes('垃圾邮件') ||
+        errorMsg.includes('ANTISPAM') ||
+        errorMsg.includes('Reject by content')
 
       if (isSpamBlocked) {
         message.warning('邮件发送成功，但被反垃圾邮件系统拦截。建议使用更完整的邮件内容')

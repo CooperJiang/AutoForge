@@ -113,10 +113,11 @@ func (s *ExecutionService) GetExecutionList(workflowID, userID string, query *re
 		return nil, err
 	}
 
-	// 分页查询
+	// 分页查询 - 不加载 node_logs 字段以避免大数据导致排序问题
 	var executions []models.WorkflowExecution
 	offset := (query.Page - 1) * query.PageSize
-	if err := queryDB.Order("created_at DESC").
+	if err := queryDB.Select("id, created_at, updated_at, deleted_at, workflow_id, user_id, status, trigger_type, start_time, end_time, duration_ms, total_nodes, success_nodes, failed_nodes, skipped_nodes, error").
+		Order("created_at DESC").
 		Offset(offset).
 		Limit(query.PageSize).
 		Find(&executions).Error; err != nil {
@@ -173,7 +174,7 @@ func (s *ExecutionService) UpdateExecutionStatus(executionID, status string, err
 	return nil
 }
 
-// AddNodeLog 添加节点执行日志
+// AddNodeLog 添加或更新节点执行日志
 func (s *ExecutionService) AddNodeLog(executionID string, nodeLog models.NodeExecutionLog) error {
 	db := database.GetDB()
 
@@ -182,10 +183,43 @@ func (s *ExecutionService) AddNodeLog(executionID string, nodeLog models.NodeExe
 		return err
 	}
 
-	// 添加日志
-	execution.NodeLogs = append(execution.NodeLogs, nodeLog)
+	// 查找是否已存在该节点的日志
+	nodeIndex := -1
+	for i, log := range execution.NodeLogs {
+		if log.NodeID == nodeLog.NodeID {
+			nodeIndex = i
+			break
+		}
+	}
 
-	// 更新统计
+	// 如果存在，更新日志；否则添加新日志
+	var oldStatus string
+	if nodeIndex >= 0 {
+		oldStatus = execution.NodeLogs[nodeIndex].Status
+		execution.NodeLogs[nodeIndex] = nodeLog
+	} else {
+		execution.NodeLogs = append(execution.NodeLogs, nodeLog)
+	}
+
+	// 更新统计：如果是更新日志，需要先减去旧状态的计数
+	if nodeIndex >= 0 && oldStatus != "" {
+		switch oldStatus {
+		case models.ExecutionStatusSuccess:
+			if execution.SuccessNodes > 0 {
+				execution.SuccessNodes--
+			}
+		case models.ExecutionStatusFailed:
+			if execution.FailedNodes > 0 {
+				execution.FailedNodes--
+			}
+		case "skipped":
+			if execution.SkippedNodes > 0 {
+				execution.SkippedNodes--
+			}
+		}
+	}
+
+	// 添加新状态的计数
 	switch nodeLog.Status {
 	case models.ExecutionStatusSuccess:
 		execution.SuccessNodes++

@@ -1,10 +1,10 @@
 <template>
-  <div class="min-h-screen flex items-center justify-center bg-bg-secondary py-12 px-4 sm:px-6 lg:px-8">
+  <div
+    class="min-h-screen flex items-center justify-center bg-bg-secondary py-12 px-4 sm:px-6 lg:px-8"
+  >
     <div class="max-w-md w-full space-y-8">
       <div>
-        <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">
-          登录您的账户
-        </h2>
+        <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">登录您的账户</h2>
         <p class="mt-2 text-center text-sm text-gray-600">
           或者
           <router-link to="/register" class="font-medium text-primary hover:text-primary-text0">
@@ -64,13 +64,14 @@
               type="checkbox"
               class="h-4 w-4 text-primary focus:ring-primary border-border-secondary rounded"
             />
-            <label for="remember-me" class="ml-2 block text-sm text-gray-900">
-              记住我
-            </label>
+            <label for="remember-me" class="ml-2 block text-sm text-gray-900"> 记住我 </label>
           </div>
 
           <div class="text-sm">
-            <router-link to="/forgot-password" class="font-medium text-primary hover:text-primary-text0">
+            <router-link
+              to="/forgot-password"
+              class="font-medium text-primary hover:text-primary-text0"
+            >
               忘记密码？
             </router-link>
           </div>
@@ -84,9 +85,25 @@
           >
             <span v-if="loading" class="absolute left-0 inset-y-0 flex items-center pl-3">
               <!-- Loading spinner -->
-              <svg class="animate-spin h-5 w-5 text-blue-300" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              <svg
+                class="animate-spin h-5 w-5 text-blue-300"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+              >
+                <circle
+                  class="opacity-25"
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="currentColor"
+                  stroke-width="4"
+                ></circle>
+                <path
+                  class="opacity-75"
+                  fill="currentColor"
+                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                ></path>
               </svg>
             </span>
             {{ loading ? '登录中...' : '登录' }}
@@ -114,7 +131,7 @@ const { success, error: showError } = useMessage()
 const form = ref({
   account: '',
   password: '',
-  remember: false
+  remember: false,
 })
 
 // 错误信息
@@ -149,7 +166,7 @@ const handleSubmit = async () => {
     // 构造登录请求数据
     const loginData: LoginRequest = {
       account: form.value.account.trim(),
-      password: form.value.password.trim()
+      password: form.value.password.trim(),
     }
 
     // 调用登录API
@@ -165,7 +182,6 @@ const handleSubmit = async () => {
     setTimeout(() => {
       router.push(redirectPath)
     }, 500)
-
   } catch (err: unknown) {
     // 处理登录错误
     const errorMessage = err instanceof Error ? err.message : '登录失败，请重试'

@@ -3,12 +3,7 @@ import { useRouter } from 'vue-router'
 import { authApi } from '../../api/auth'
 import { useAuthStorage } from '../common'
 import { STORAGE_KEYS } from '../../utils/storage'
-import type {
-  LoginRequest,
-  RegisterRequest,
-  ResetPasswordRequest,
-  User,
-} from '../../types'
+import type { LoginRequest, RegisterRequest, ResetPasswordRequest, User } from '../../types'
 
 export function useAuth() {
   const router = useRouter()
@@ -16,7 +11,10 @@ export function useAuth() {
   const error = ref('')
 
   // 使用安全存储存储用户信息和token (7天过期)
-  const [token, setToken, removeToken] = useAuthStorage<string | null>(STORAGE_KEYS.AUTH_TOKEN, null)
+  const [token, setToken, removeToken] = useAuthStorage<string | null>(
+    STORAGE_KEYS.AUTH_TOKEN,
+    null
+  )
   const [user, setUser, removeUser] = useAuthStorage<User | null>(STORAGE_KEYS.AUTH_USER, null)
 
   // 计算属性

@@ -31,5 +31,13 @@ func RegisterWorkflowRoutes(r *gin.RouterGroup) {
 
 		// 工作流验证
 		workflows.POST("/validate", workflowController.ValidateWorkflow)   // 验证工作流配置
+
+		// API 管理
+		workflows.POST("/:id/api/enable", workflowController.EnableAPI)              // 启用 API
+		workflows.POST("/:id/api/disable", workflowController.DisableAPI)            // 禁用 API
+		workflows.POST("/:id/api/regenerate", workflowController.RegenerateAPIKey)   // 重新生成 API Key
+		workflows.PUT("/:id/api/params", workflowController.UpdateAPIParams)         // 更新 API 参数配置
+		workflows.PUT("/:id/api/timeout", workflowController.UpdateAPITimeout)       // 更新 API 超时时间
+		workflows.PUT("/:id/api/webhook", workflowController.UpdateAPIWebhook)       // 更新 Webhook URL
 	}
 }

@@ -130,7 +130,6 @@ export const getExecution = async (id: string) => {
   return response.data
 }
 
-
 // 删除执行记录
 export const deleteExecution = async (id: string) => {
   const response = await request.delete<null>(`/api/v1/executions/${id}`)
@@ -145,11 +144,13 @@ export const deleteAllExecutions = async (taskId: string) => {
 
 // 测试任务配置
 export interface TestTaskRequest {
-  url: string
-  method: string
-  headers: { key: string; value: string }[]
-  params: { key: string; value: string }[]
-  body: string
+  url?: string
+  method?: string
+  headers?: { key: string; value: string }[]
+  params?: { key: string; value: string }[]
+  body?: string
+  tool_code?: string
+  config?: Record<string, any>
 }
 
 export interface TestTaskResponse {
@@ -158,6 +159,8 @@ export interface TestTaskResponse {
   response_body?: string
   duration_ms?: number
   error_message?: string
+  output?: Record<string, any>
+  message?: string
 }
 
 export const testTask = async (data: TestTaskRequest) => {
