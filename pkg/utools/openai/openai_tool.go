@@ -12,22 +12,20 @@ import (
 	"time"
 )
 
-
 type OpenAITool struct {
 	*utools.BaseTool
 }
 
-
 func NewOpenAITool() *OpenAITool {
 	metadata := &utools.ToolMetadata{
-		Code:         "openai_chatgpt",
-		Name:         "OpenAI Chat",
-		Description:  "使用 OpenAI Chat API 进行对话，支持 GPT-3.5、GPT-4、GPT-4o 等对话模型",
-		Category:     "ai",
-		Version:      "1.0.0",
-		Author:       "AutoForge",
-		AICallable:   true,
-		Tags:         []string{"openai", "chatgpt", "ai", "llm", "gpt", "chat"},
+		Code:        "openai_chatgpt",
+		Name:        "OpenAI Chat",
+		Description: "使用 OpenAI Chat API 进行对话，支持 GPT-3.5、GPT-4、GPT-4o 等对话模型",
+		Category:    "ai",
+		Version:     "1.0.0",
+		Author:      "AutoForge",
+		AICallable:  true,
+		Tags:        []string{"openai", "chatgpt", "ai", "llm", "gpt", "chat"},
 		OutputFieldsSchema: map[string]utools.OutputFieldDef{
 			"response": {
 				Type:  "object",
@@ -92,8 +90,8 @@ func NewOpenAITool() *OpenAITool {
 			"model": {
 				Type:        "string",
 				Title:       "模型",
-				Description: "使用的对话模型，例如：gpt-3.5-turbo、gpt-4、gpt-4o 等",
-				Default:     "gpt-3.5-turbo",
+				Description: "使用的对话模型，例如：gpt-4.1-nano、gpt-4、gpt-4o 等",
+				Default:     "gpt-4.1-nano",
 			},
 			"prompt": {
 				Type:        "string",
@@ -164,10 +162,8 @@ func NewOpenAITool() *OpenAITool {
 	}
 }
 
-
 func (t *OpenAITool) Execute(ctx *utools.ExecutionContext, toolConfig map[string]interface{}) (*utools.ExecutionResult, error) {
 	startTime := time.Now()
-
 
 	cfg := config.GetConfig()
 	apiKey := cfg.OpenAI.APIKey
@@ -184,7 +180,6 @@ func (t *OpenAITool) Execute(ctx *utools.ExecutionContext, toolConfig map[string
 	if apiBase == "" {
 		apiBase = "https://api.openai.com"
 	}
-
 
 	model, _ := toolConfig["model"].(string)
 	if model == "" {
@@ -309,7 +304,6 @@ func (t *OpenAITool) Execute(ctx *utools.ExecutionContext, toolConfig map[string
 		}, err
 	}
 
-
 	var result map[string]interface{}
 	if err := json.Unmarshal(body, &result); err != nil {
 		return &utools.ExecutionResult{
@@ -320,7 +314,6 @@ func (t *OpenAITool) Execute(ctx *utools.ExecutionContext, toolConfig map[string
 			DurationMs: time.Since(startTime).Milliseconds(),
 		}, err
 	}
-
 
 	if resp.StatusCode != 200 {
 		errorMsg := fmt.Sprintf("HTTP %d", resp.StatusCode)
@@ -338,7 +331,6 @@ func (t *OpenAITool) Execute(ctx *utools.ExecutionContext, toolConfig map[string
 		}, fmt.Errorf("openai api error: %s", errorMsg)
 	}
 
-
 	if errorObj, ok := result["error"].(map[string]interface{}); ok {
 		errorMsg, _ := errorObj["message"].(string)
 		errorType, _ := errorObj["type"].(string)
@@ -351,13 +343,12 @@ func (t *OpenAITool) Execute(ctx *utools.ExecutionContext, toolConfig map[string
 		}, fmt.Errorf("openai api error: %s", errorMsg)
 	}
 
-
 	choices, ok := result["choices"].([]interface{})
 	if !ok || len(choices) == 0 {
 		return &utools.ExecutionResult{
-			Success:    false,
-			Message:    "OpenAI API 返回格式异常：未找到 choices 字段",
-			Error:      "no choices in response",
+			Success: false,
+			Message: "OpenAI API 返回格式异常：未找到 choices 字段",
+			Error:   "no choices in response",
 			Output: map[string]interface{}{
 				"raw_response": result,
 				"status_code":  resp.StatusCode,
@@ -366,65 +357,64 @@ func (t *OpenAITool) Execute(ctx *utools.ExecutionContext, toolConfig map[string
 		}, fmt.Errorf("no choices in response, raw: %v", result)
 	}
 
+	content := ""
+	finishReason := ""
+	if len(choices) > 0 {
+		if choice, ok := choices[0].(map[string]interface{}); ok {
+			if message, ok := choice["message"].(map[string]interface{}); ok {
+				if c, ok := message["content"].(string); ok {
+					content = c
+				}
+			}
+			if fr, ok := choice["finish_reason"].(string); ok {
+				finishReason = fr
+			}
+		}
+	}
 
-    content := ""
-    finishReason := ""
-    if len(choices) > 0 {
-        if choice, ok := choices[0].(map[string]interface{}); ok {
-            if message, ok := choice["message"].(map[string]interface{}); ok {
-                if c, ok := message["content"].(string); ok {
-                    content = c
-                }
-            }
-            if fr, ok := choice["finish_reason"].(string); ok {
-                finishReason = fr
-            }
-        }
-    }
+	var promptTokens, completionTokens, totalTokens int
+	if usage, ok := result["usage"].(map[string]interface{}); ok {
+		if v, ok := usage["prompt_tokens"].(float64); ok {
+			promptTokens = int(v)
+		}
+		if v, ok := usage["completion_tokens"].(float64); ok {
+			completionTokens = int(v)
+		}
+		if v, ok := usage["total_tokens"].(float64); ok {
+			totalTokens = int(v)
+		}
+	}
+	modelStr, _ := result["model"].(string)
 
+	output := map[string]interface{}{
+		"response":          result,
+		"content":           content,
+		"model":             modelStr,
+		"finish_reason":     finishReason,
+		"prompt_tokens":     promptTokens,
+		"completion_tokens": completionTokens,
+		"total_tokens":      totalTokens,
+		"prompt":            prompt,
+	}
 
-    var promptTokens, completionTokens, totalTokens int
-    if usage, ok := result["usage"].(map[string]interface{}); ok {
-        if v, ok := usage["prompt_tokens"].(float64); ok { promptTokens = int(v) }
-        if v, ok := usage["completion_tokens"].(float64); ok { completionTokens = int(v) }
-        if v, ok := usage["total_tokens"].(float64); ok { totalTokens = int(v) }
-    }
-    modelStr, _ := result["model"].(string)
+	if content != "" {
+		var contentJSON map[string]interface{}
+		if err := json.Unmarshal([]byte(content), &contentJSON); err == nil {
+			output["content_json"] = contentJSON
 
+			for k, v := range contentJSON {
+				output[k] = v
+			}
+		}
+	}
 
-    output := map[string]interface{}{
-        "response":          result,
-        "content":           content,
-        "model":             modelStr,
-        "finish_reason":     finishReason,
-        "prompt_tokens":     promptTokens,
-        "completion_tokens": completionTokens,
-        "total_tokens":      totalTokens,
-        "prompt":            prompt,
-    }
-
-
-    if content != "" {
-        var contentJSON map[string]interface{}
-        if err := json.Unmarshal([]byte(content), &contentJSON); err == nil {
-            output["content_json"] = contentJSON
-
-
-            for k, v := range contentJSON {
-                output[k] = v
-            }
-        }
-    }
-
-    return &utools.ExecutionResult{
-        Success:    true,
-        Message:    "ChatGPT 调用成功",
-        Output:     output,
-        DurationMs: time.Since(startTime).Milliseconds(),
-    }, nil
+	return &utools.ExecutionResult{
+		Success:    true,
+		Message:    "ChatGPT 调用成功",
+		Output:     output,
+		DurationMs: time.Since(startTime).Milliseconds(),
+	}, nil
 }
-
-
 
 func (t *OpenAITool) DescribeOutput(config map[string]interface{}) map[string]utools.OutputFieldDef {
 	return map[string]utools.OutputFieldDef{
@@ -439,7 +429,6 @@ func (t *OpenAITool) DescribeOutput(config map[string]interface{}) map[string]ut
 		"prompt":            {Type: "string", Label: "原始提示词"},
 	}
 }
-
 
 func init() {
 	tool := NewOpenAITool()

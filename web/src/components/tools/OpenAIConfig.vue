@@ -10,7 +10,7 @@
       </label>
       <BaseInput
         v-model="localConfig.model"
-        placeholder="例如：gpt-3.5-turbo, gpt-4, gpt-4o, dall-e-3"
+        placeholder="例如：gpt-4.1-nano, gpt-4, gpt-4o, dall-e-3"
       />
       <p class="mt-1 text-xs text-text-tertiary">填写要使用的模型名称</p>
     </div>
@@ -187,7 +187,7 @@ const emit = defineEmits<{
 const placeholderSessionId = '{{params.session_id}}'
 
 const localConfig = ref({
-  model: props.config.model || 'gpt-3.5-turbo',
+  model: props.config.model || 'gpt-4.1-nano',
   prompt: props.config.prompt || '',
   system_message: props.config.system_message || '',
   temperature: props.config.temperature ?? 0.7,
@@ -220,7 +220,7 @@ watch(
     })
     if (hasChanged) {
       localConfig.value = {
-        model: newConfig.model || 'gpt-3.5-turbo',
+        model: newConfig.model || 'gpt-4.1-nano',
         prompt: newConfig.prompt || '',
         system_message: newConfig.system_message || '',
         temperature: newConfig.temperature ?? 0.7,

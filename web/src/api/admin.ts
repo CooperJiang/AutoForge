@@ -35,6 +35,8 @@ export interface StatsResponse {
   active_tasks: number
   today_executions: number
   success_rate: number
+  total_workflows: number
+  total_templates: number
   recent_users: UserActivity[]
 }
 

@@ -1,6 +1,6 @@
 <template>
   <div class="px-6 py-6">
-    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 mb-6">
+    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-6 gap-4 mb-6">
       <div
         class="bg-bg-elevated border-2 border-border-primary rounded-xl p-5 shadow-sm hover:shadow-lg transition-all group"
       >
@@ -78,90 +78,80 @@
           </p>
         </div>
       </div>
-    </div>
 
-    <div class="bg-bg-elevated rounded-t-xl shadow-lg border-2 border-b-0 border-border-primary">
-      <div class="flex border-b border-border-primary">
-        <button
-          @click="activeTab = 'executions'"
-          :class="[
-            'px-6 py-3 font-semibold transition-colors relative',
-            activeTab === 'executions'
-              ? 'text-green-600 bg-bg-hover'
-              : 'text-text-secondary hover:text-text-primary hover:bg-bg-hover',
-          ]"
-        >
-          执行记录
-          <span
-            v-if="activeTab === 'executions'"
-            class="absolute bottom-0 left-0 right-0 h-0.5 bg-green-600"
-          ></span>
-        </button>
-        <button
-          @click="activeTab = 'tasks'"
-          :class="[
-            'px-6 py-3 font-semibold transition-colors relative',
-            activeTab === 'tasks'
-              ? 'text-green-600 bg-bg-hover'
-              : 'text-text-secondary hover:text-text-primary hover:bg-bg-hover',
-          ]"
-        >
-          任务管理
-          <span
-            v-if="activeTab === 'tasks'"
-            class="absolute bottom-0 left-0 right-0 h-0.5 bg-green-600"
-          ></span>
-        </button>
-        <button
-          @click="activeTab = 'users'"
-          :class="[
-            'px-6 py-3 font-semibold transition-colors relative',
-            activeTab === 'users'
-              ? 'text-green-600 bg-bg-hover'
-              : 'text-text-secondary hover:text-text-primary hover:bg-bg-hover',
-          ]"
-        >
-          用户管理
-          <span
-            v-if="activeTab === 'users'"
-            class="absolute bottom-0 left-0 right-0 h-0.5 bg-green-600"
-          ></span>
-        </button>
+      <div
+        class="bg-bg-elevated border-2 border-border-primary rounded-xl p-5 shadow-sm hover:shadow-lg transition-all group"
+      >
+        <div class="flex items-start justify-between mb-3">
+          <div class="p-3 bg-indigo-500/10 rounded-lg">
+            <Workflow class="w-6 h-6 text-indigo-600 dark:text-indigo-400" />
+          </div>
+          <div
+            class="text-xs font-semibold px-2 py-1 bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 rounded-full"
+          >
+            工作流
+          </div>
+        </div>
+        <div>
+          <p class="text-text-tertiary text-xs font-medium mb-1">总工作流数</p>
+          <p class="text-3xl font-bold text-text-primary">{{ stats.total_workflows }}</p>
+        </div>
+      </div>
+
+      <div
+        class="bg-bg-elevated border-2 border-border-primary rounded-xl p-5 shadow-sm hover:shadow-lg transition-all group"
+      >
+        <div class="flex items-start justify-between mb-3">
+          <div class="p-3 bg-cyan-500/10 rounded-lg">
+            <Package class="w-6 h-6 text-cyan-600 dark:text-cyan-400" />
+          </div>
+          <div
+            class="text-xs font-semibold px-2 py-1 bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 rounded-full"
+          >
+            模板
+          </div>
+        </div>
+        <div>
+          <p class="text-text-tertiary text-xs font-medium mb-1">工作流模板</p>
+          <p class="text-3xl font-bold text-text-primary">{{ stats.total_templates }}</p>
+        </div>
       </div>
     </div>
 
-    <div
-      v-show="activeTab === 'executions'"
-      class="bg-bg-elevated rounded-b-xl shadow-lg border-2 border-t-0 border-border-primary p-6"
-    >
-      <ExecutionsTab />
-    </div>
+    <!-- Tab Content -->
+    <div class="bg-bg-elevated rounded-xl shadow-lg border-2 border-border-primary p-6">
+      <div v-show="activeTab === 'executions'">
+        <ExecutionsTab />
+      </div>
 
-    <div
-      v-show="activeTab === 'tasks'"
-      class="bg-bg-elevated rounded-b-xl shadow-lg border-2 border-t-0 border-border-primary p-6"
-    >
-      <TasksTab
-        :tasks="tasks"
-        :total="total"
-        :current-page="currentPage"
-        :total-pages="totalPages"
-        @search="handleTaskSearch"
-        @copy-id="handleCopy"
-        @view="viewTask"
-        @toggle-status="toggleTaskStatus"
-        @execute="executeTaskNow"
-        @delete="deleteTaskConfirm"
-        @prev-page="prevPage"
-        @next-page="nextPage"
-      />
-    </div>
+      <div v-show="activeTab === 'tasks'">
+        <TasksTab
+          :tasks="tasks"
+          :total="total"
+          :current-page="currentPage"
+          :total-pages="totalPages"
+          @search="handleTaskSearch"
+          @copy-id="handleCopy"
+          @view="viewTask"
+          @toggle-status="toggleTaskStatus"
+          @execute="executeTaskNow"
+          @delete="deleteTaskConfirm"
+          @prev-page="prevPage"
+          @next-page="nextPage"
+        />
+      </div>
 
-    <div
-      v-show="activeTab === 'users'"
-      class="bg-bg-elevated rounded-b-xl shadow-lg border-2 border-t-0 border-border-primary p-6"
-    >
-      <UsersTab />
+      <div v-show="activeTab === 'users'">
+        <UsersTab />
+      </div>
+
+      <div v-show="activeTab === 'workflows'">
+        <TemplateManagement />
+      </div>
+
+      <div v-show="activeTab === 'categories'">
+        <CategoryManagement />
+      </div>
     </div>
 
     <Dialog
@@ -182,7 +172,28 @@
 
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue'
-import { Users, ListTodo, Activity, TrendingUp } from 'lucide-vue-next'
+import { Users, ListTodo, Activity, TrendingUp, Workflow, Package } from 'lucide-vue-next'
+
+const props = defineProps<{
+  activeTab?: string
+}>()
+
+const emit = defineEmits<{
+  'update:active-tab': [value: string]
+}>()
+
+// Use props or default to 'executions'
+const internalActiveTab = ref(props.activeTab || 'executions')
+
+// Computed to sync with props
+const activeTab = computed({
+  get: () => props.activeTab || internalActiveTab.value,
+  set: (value) => {
+    internalActiveTab.value = value
+    emit('update:active-tab', value)
+  },
+})
+
 import * as adminApi from '@/api/admin'
 import type { Task } from '@/api/task'
 import type { StatsResponse } from '@/api/admin'
@@ -194,9 +205,8 @@ import { copyToClipboard } from '@/utils/clipboard'
 import ExecutionsTab from './ExecutionsTab.vue'
 import TasksTab from './components/TasksTab.vue'
 import UsersTab from './UsersTab.vue'
-
-// Tab 状态（默认显示执行记录）
-const activeTab = ref('executions')
+import TemplateManagement from './TemplateManagement.vue'
+import CategoryManagement from './CategoryManagement.vue'
 
 // 统计数据
 const stats = ref<StatsResponse>({
@@ -205,6 +215,8 @@ const stats = ref<StatsResponse>({
   active_tasks: 0,
   today_executions: 0,
   success_rate: 0,
+  total_workflows: 0,
+  total_templates: 0,
   recent_users: [],
 })
 

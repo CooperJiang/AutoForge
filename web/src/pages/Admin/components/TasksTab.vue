@@ -1,16 +1,10 @@
 <template>
   <div>
-    <div class="flex gap-3 mb-6 items-center">
-      <div class="flex-shrink-0" style="width: 200px">
-        <BaseInput v-model="filters.user_id" placeholder="用户ID" />
-      </div>
-      <div class="flex-shrink-0" style="width: 150px">
-        <BaseSelect v-model="filters.status" :options="statusOptions" placeholder="全部状态" />
-      </div>
-      <div class="flex-1">
-        <BaseInput v-model="filters.keyword" placeholder="搜索任务名称或URL" />
-      </div>
-      <BaseButton @click="$emit('search', filters)" variant="primary" class="flex-shrink-0">
+    <div class="flex gap-2 mb-6 items-center">
+      <BaseInput v-model="filters.user_id" placeholder="用户ID" style="width: 260px" />
+      <BaseSelect v-model="filters.status" :options="statusOptions" placeholder="全部状态" style="width: 260px" />
+      <BaseInput v-model="filters.keyword" placeholder="搜索任务名称或URL" style="width: 260px" />
+      <BaseButton @click="$emit('search', filters)" variant="primary">
         搜索
       </BaseButton>
     </div>

@@ -2,6 +2,7 @@ package database
 
 import (
 	"auto-forge/internal/models"
+	"auto-forge/migrations"
 	"auto-forge/pkg/common"
 	"auto-forge/pkg/config"
 	log "auto-forge/pkg/logger"
@@ -88,6 +89,11 @@ func InitDB() {
 		log.Fatal("数据库迁移失败: %v", err)
 	}
 
+	// 执行数据迁移
+	if err := runDataMigrations(); err != nil {
+		log.Error("数据迁移失败: %v", err)
+	}
+
 	// 检查并创建 root 用户
 	if err := createRootUserIfNotExists(); err != nil {
 		log.Fatal("创建 root 用户失败: %v", err)
@@ -114,6 +120,7 @@ func autoMigrate() error {
 		&models.WorkflowExecution{},
 		&models.WorkflowTemplate{},
 		&models.TemplateInstall{},
+		&models.TemplateCategory{},
 		// 在这里添加其他模型
 	)
 }
@@ -145,6 +152,11 @@ func createRootUserIfNotExists() error {
 	}
 
 	return nil
+}
+
+// runDataMigrations 执行数据迁移
+func runDataMigrations() error {
+	return migrations.RunAllMigrations(db)
 }
 
 // Close 关闭数据库连接

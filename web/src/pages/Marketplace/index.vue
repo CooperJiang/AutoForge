@@ -14,7 +14,7 @@
       <BaseSelect
         v-model="selectedCategory"
         :options="categoryOptions"
-        class="w-48"
+        style="width: 260px"
         placeholder="选择分类"
         @update:modelValue="handleFilterChange"
       />
@@ -26,17 +26,16 @@
       </BaseButton>
 
       <!-- Search -->
-      <div class="flex-1">
-        <BaseInput
-          v-model="searchKeyword"
-          placeholder="搜索模板..."
-          @keyup.enter="handleFilterChange"
-        >
-          <template #prefix>
-            <Search class="w-4 h-4" />
-          </template>
-        </BaseInput>
-      </div>
+      <BaseInput
+        v-model="searchKeyword"
+        placeholder="搜索模板..."
+        style="width: 260px"
+        @keyup.enter="handleFilterChange"
+      >
+        <template #prefix>
+          <Search class="w-4 h-4" />
+        </template>
+      </BaseInput>
     </div>
 
     <!-- Template Grid -->
@@ -88,7 +87,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { Star, Search, Package } from 'lucide-vue-next'
 import BaseButton from '@/components/BaseButton'
@@ -112,16 +111,30 @@ const pageSize = ref(20)
 const totalItems = ref(0)
 const detailDialogVisible = ref(false)
 const selectedTemplateId = ref('')
+const categories = ref<any[]>([])
 
-// Category options for select
-const categoryOptions = [
-  { label: '全部分类', value: '' },
-  { label: '自动化', value: 'automation' },
-  { label: '通知', value: 'notification' },
-  { label: '数据处理', value: 'data' },
-  { label: '集成', value: 'integration' },
-  { label: '其他', value: 'other' },
-]
+// Computed category options
+const categoryOptions = computed(() => {
+  const options = [{ label: '全部分类', value: '' }]
+  categories.value.forEach((cat) => {
+    options.push({
+      label: cat.name,
+      value: cat.name,
+    })
+  })
+  return options
+})
+
+// Load categories
+const loadCategories = async () => {
+  try {
+    const data = await templateApi.listCategories({ page_size: 100, is_active: true })
+    categories.value = data.items || []
+  } catch (error) {
+    console.error('Failed to load categories:', error)
+    message.error('加载分类列表失败')
+  }
+}
 
 // Load templates
 const loadTemplates = async () => {
@@ -210,6 +223,7 @@ const handleInstallFromDetail = async (templateId: string) => {
 }
 
 onMounted(() => {
+  loadCategories()
   loadTemplates()
 })
 </script>

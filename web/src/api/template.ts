@@ -89,6 +89,37 @@ export interface InstallTemplateResult {
   message: string
 }
 
+// 模板分类相关类型
+export interface TemplateCategory {
+  id: string
+  name: string
+  description: string
+  sort_order: number
+  is_active: boolean
+  created_at: string
+  updated_at: string
+}
+
+export interface CreateCategoryDto {
+  name: string
+  description?: string
+  sort_order?: number
+}
+
+export interface UpdateCategoryDto {
+  name?: string
+  description?: string
+  sort_order?: number
+  is_active?: boolean
+}
+
+export interface CategoryListData {
+  items: TemplateCategory[]
+  total: number
+  page: number
+  page_size: number
+}
+
 export const templateApi = {
   /**
    * 获取模板列表
@@ -149,6 +180,50 @@ export const templateApi = {
    */
   getInstallHistory: async () => {
     const response = await request.get<any[]>('/api/v1/templates/installs')
+    return response.data
+  },
+
+  /**
+   * 获取分类列表
+   */
+  listCategories: async (params?: {
+    page?: number
+    page_size?: number
+    is_active?: boolean
+  }) => {
+    const response = await request.get<CategoryListData>('/api/v1/template-categories', { params })
+    return response.data
+  },
+
+  /**
+   * 获取分类详情
+   */
+  getCategoryById: async (id: string) => {
+    const response = await request.get<TemplateCategory>(`/api/v1/template-categories/${id}`)
+    return response.data
+  },
+
+  /**
+   * 创建分类（管理员）
+   */
+  createCategory: async (data: CreateCategoryDto) => {
+    const response = await request.post<TemplateCategory>('/api/v1/template-categories', data)
+    return response.data
+  },
+
+  /**
+   * 更新分类（管理员）
+   */
+  updateCategory: async (id: string, data: UpdateCategoryDto) => {
+    const response = await request.put<TemplateCategory>(`/api/v1/template-categories/${id}`, data)
+    return response.data
+  },
+
+  /**
+   * 删除分类（管理员）
+   */
+  deleteCategory: async (id: string) => {
+    const response = await request.delete<void>(`/api/v1/template-categories/${id}`)
     return response.data
   },
 }

@@ -223,6 +223,15 @@ func (s *AdminService) GetStats() (map[string]interface{}, error) {
 	}
 	stats["success_rate"] = successRate
 
+	// 获取工作流总数
+	var totalWorkflows int64
+	db.Model(&models.Workflow{}).Count(&totalWorkflows)
+	stats["total_workflows"] = totalWorkflows
+
+	// 获取工作流模板总数
+	var totalTemplates int64
+	db.Model(&models.WorkflowTemplate{}).Count(&totalTemplates)
+	stats["total_templates"] = totalTemplates
 
 	type UserActivity struct {
 		UserID      string

@@ -127,7 +127,7 @@
       "type": "tool",
       "toolCode": "openai_chatgpt",
       "config": {
-        "model": "gpt-3.5-turbo",
+        "model": "gpt-4.1-nano",
         "messages_json": "{{nodes.context_prepare.messages_json}}",
         "temperature": 0.7
       }

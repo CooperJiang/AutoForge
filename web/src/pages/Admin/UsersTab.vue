@@ -1,21 +1,18 @@
 <template>
   <div>
-    <div class="flex gap-3 mb-6 items-center">
-      <div class="flex-shrink-0" style="width: 200px">
-        <BaseInput v-model="filters.keyword" placeholder="搜索用户名或邮箱" />
-      </div>
-      <div class="flex-shrink-0" style="width: 150px">
-        <BaseSelect
-          v-model="filters.status"
-          :options="[
-            { label: '全部状态', value: 0 },
-            { label: '正常', value: 1 },
-            { label: '禁用', value: 2 },
-          ]"
-          placeholder="全部状态"
-        />
-      </div>
-      <BaseButton @click="loadUsers" variant="primary" class="flex-shrink-0"> 搜索 </BaseButton>
+    <div class="flex gap-2 mb-6 items-center">
+      <BaseInput v-model="filters.keyword" placeholder="搜索用户名或邮箱" style="width: 260px" />
+      <BaseSelect
+        v-model="filters.status"
+        :options="[
+          { label: '全部状态', value: '0' },
+          { label: '正常', value: '1' },
+          { label: '禁用', value: '2' },
+        ]"
+        placeholder="全部状态"
+        style="width: 260px"
+      />
+      <BaseButton @click="loadUsers" variant="primary"> 搜索 </BaseButton>
     </div>
 
     <div class="overflow-x-auto">
@@ -147,7 +144,7 @@ const pageSize = ref(20)
 // 筛选条件
 const filters = ref({
   keyword: '',
-  status: 0,
+  status: '0',
 })
 
 // 计算总页数
@@ -163,8 +160,8 @@ const loadUsers = async () => {
       page_size: pageSize.value,
       keyword: filters.value.keyword,
     }
-    if (filters.value.status > 0) {
-      params.status = filters.value.status
+    if (filters.value.status !== '0') {
+      params.status = parseInt(filters.value.status)
     }
     const res = await adminApi.getUsers(params)
     users.value = res.data.users || []

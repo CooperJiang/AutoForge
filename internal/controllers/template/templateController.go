@@ -9,7 +9,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-var templateService = template.NewTemplateService()
+var tplService = template.NewTemplateService()
 
 // CreateTemplate 创建模板
 func CreateTemplate(c *gin.Context) {
@@ -25,7 +25,7 @@ func CreateTemplate(c *gin.Context) {
 		return
 	}
 
-	tpl, err := templateService.CreateTemplate(userID, &req)
+	tpl, err := tplService.CreateTemplate(userID, &req)
 	if err != nil {
 		log.Error("创建模板失败: %v", err)
 		errors.HandleError(c, errors.New(errors.CodeInternal, err.Error()))
@@ -43,7 +43,7 @@ func GetTemplateList(c *gin.Context) {
 		return
 	}
 
-	result, err := templateService.GetTemplateList(&req)
+	result, err := tplService.GetTemplateList(&req)
 	if err != nil {
 		log.Error("获取模板列表失败: %v", err)
 		errors.HandleError(c, errors.New(errors.CodeInternal, "获取模板列表失败"))
@@ -61,7 +61,7 @@ func GetTemplateDetail(c *gin.Context) {
 		return
 	}
 
-	detail, err := templateService.GetTemplateDetail(templateID)
+	detail, err := tplService.GetTemplateDetail(templateID)
 	if err != nil {
 		log.Error("获取模板详情失败: %v", err)
 		errors.HandleError(c, errors.New(errors.CodeInternal, err.Error()))
@@ -85,7 +85,7 @@ func InstallTemplate(c *gin.Context) {
 		return
 	}
 
-	result, err := templateService.InstallTemplate(userID, &req)
+	result, err := tplService.InstallTemplate(userID, &req)
 	if err != nil {
 		log.Error("安装模板失败: %v", err)
 		errors.HandleError(c, errors.New(errors.CodeInternal, err.Error()))
@@ -115,7 +115,7 @@ func UpdateTemplate(c *gin.Context) {
 		return
 	}
 
-	tpl, err := templateService.UpdateTemplate(templateID, userID, &req)
+	tpl, err := tplService.UpdateTemplate(templateID, userID, &req)
 	if err != nil {
 		log.Error("更新模板失败: %v", err)
 		errors.HandleError(c, errors.New(errors.CodeInternal, err.Error()))
@@ -139,7 +139,7 @@ func DeleteTemplate(c *gin.Context) {
 		return
 	}
 
-	if err := templateService.DeleteTemplate(templateID, userID); err != nil {
+	if err := tplService.DeleteTemplate(templateID, userID); err != nil {
 		log.Error("删除模板失败: %v", err)
 		errors.HandleError(c, errors.New(errors.CodeInternal, err.Error()))
 		return
@@ -156,7 +156,7 @@ func GetInstallHistory(c *gin.Context) {
 		return
 	}
 
-	history, err := templateService.GetUserInstallHistory(userID)
+	history, err := tplService.GetUserInstallHistory(userID)
 	if err != nil {
 		log.Error("获取安装历史失败: %v", err)
 		errors.HandleError(c, errors.New(errors.CodeInternal, "获取安装历史失败"))

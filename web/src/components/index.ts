@@ -29,6 +29,7 @@ import VariableSelector from './VariableSelector'
 import RetryConfig from './RetryConfig'
 import Tabs from './Tabs'
 import Slider from './Slider'
+import RadioGroup from './RadioGroup'
 
 /* 导出 message 工具函数 */
 export { message } from '@/utils/message'
@@ -53,6 +54,7 @@ const componentMap = {
   WeekDayPicker,
   MonthDayPicker,
   Slider,
+  RadioGroup,
 
   JsonViewer,
   NextRunCountdown,
@@ -79,6 +81,7 @@ export {
   AppHeader,
   Tabs,
   Slider,
+  RadioGroup,
   TimePicker,
   ParamInput,
   JsonViewer,

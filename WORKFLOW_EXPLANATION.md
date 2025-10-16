@@ -67,7 +67,7 @@ messages.push({
 ```
 POST https://api.openai.com/v1/chat/completions
 {
-  "model": "gpt-3.5-turbo",
+  "model": "gpt-4.1-nano",
   "messages": [...拼接好的完整对话历史],
   "temperature": 0.7
 }
@@ -104,7 +104,7 @@ TTL = 604800 秒（7天）
 节点输出：
 {
   "content": "AI 的回复内容",
-  "model": "gpt-3.5-turbo",
+  "model": "gpt-4.1-nano",
   "finish_reason": "stop",
   "total_tokens": 156,
   ...
@@ -124,7 +124,7 @@ TTL = 604800 秒（7天）
   "output": {
     "chat_with_memory": {
       "content": "AI 的完整回复内容",  // ← 这就是你要的聊天内容
-      "model": "gpt-3.5-turbo",
+      "model": "gpt-4.1-nano",
       "prompt_tokens": 85,
       "completion_tokens": 71,
       "total_tokens": 156,
@@ -178,7 +178,7 @@ curl -X POST http://localhost:7777/api/v1/workflows/wf123/execute \
   "output": {
     "chat_with_memory": {
       "content": "你好 Alice！很高兴认识你。设计师的工作一定很有创意，而且旅游和摄影的爱好也能为你的设计带来很多灵感吧！有什么我可以帮助你的吗？",
-      "model": "gpt-3.5-turbo",
+      "model": "gpt-4.1-nano",
       "total_tokens": 142
     }
   }
@@ -205,7 +205,7 @@ curl -X POST http://localhost:7777/api/v1/workflows/wf123/execute \
   "output": {
     "chat_with_memory": {
       "content": "你的名字是 Alice，你是一名设计师，喜欢旅游和摄影。",
-      "model": "gpt-3.5-turbo",
+      "model": "gpt-4.1-nano",
       "total_tokens": 98
     }
   }
@@ -234,7 +234,7 @@ curl -X POST http://localhost:7777/api/v1/workflows/wf123/execute \
   "output": {
     "chat_with_memory": {
       "content": "基于你喜欢摄影和旅游，我推荐以下目的地：\n1. 冰岛 - 极光和壮丽的自然风光\n2. 日本京都 - 传统建筑和四季美景\n3. 新西兰南岛 - 湖光山色，摄影师的天堂\n4. 摩洛哥 - 色彩斑斓的街道和异域风情\n5. 挪威峡湾 - 震撼的自然景观",
-      "model": "gpt-3.5-turbo",
+      "model": "gpt-4.1-nano",
       "total_tokens": 215
     }
   }

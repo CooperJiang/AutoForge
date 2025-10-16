@@ -29,4 +29,22 @@ func RegisterTemplateRoutes(r *gin.RouterGroup) {
 			authenticated.DELETE("/:id", templateController.DeleteTemplate)            // 删除模板
 		}
 	}
+
+	// 模板分类路由
+	categories := r.Group("/template-categories")
+	{
+		// 公开接口 - 获取分类列表
+		categories.GET("", templateController.GetCategoryList)             // 获取分类列表
+		categories.GET("/:id", templateController.GetCategoryDetail)       // 获取分类详情
+
+		// 管理员操作 - 分类管理
+		authenticated := categories.Group("")
+		authenticated.Use(middleware.RequireAuth())
+		authenticated.Use(middleware.RequireAdmin())
+		{
+			authenticated.POST("", templateController.CreateCategory)        // 创建分类
+			authenticated.PUT("/:id", templateController.UpdateCategory)     // 更新分类
+			authenticated.DELETE("/:id", templateController.DeleteCategory)  // 删除分类
+		}
+	}
 }
