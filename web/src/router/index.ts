@@ -100,6 +100,14 @@ const router = createRouter({
             title: '执行详情',
           },
         },
+        {
+          path: '/marketplace',
+          name: 'marketplace',
+          component: () => import('@/pages/Marketplace/index.vue'),
+          meta: {
+            title: '模板市场',
+          },
+        },
       ],
     },
 
@@ -144,21 +152,16 @@ const router = createRouter({
   ],
 })
 
-
 router.beforeEach((to, from, next) => {
-
   const token = SecureStorage.getItem<string>(STORAGE_KEYS.AUTH_TOKEN)
-
 
   const publicPaths = ['/auth', '/admin/login']
   const isPublicPath = publicPaths.includes(to.path)
-
 
   if (!isPublicPath && !token) {
     next({ name: 'auth' })
     return
   }
-
 
   if (to.path === '/auth' && token) {
     next({ name: 'home' })
@@ -167,7 +170,6 @@ router.beforeEach((to, from, next) => {
 
   next()
 })
-
 
 router.afterEach((to) => {
   const defaultTitle = '定时任务系统'

@@ -57,6 +57,9 @@ func RegisterRoutes(r *gin.Engine) {
 		// 公开工作流调用路由（无需认证）
 		RegisterPublicWorkflowRoutes(version)
 
+		// 模板市场路由
+		RegisterTemplateRoutes(version)
+
 		// 在这里添加其他模块路由
 		// 例如：
 		// productRoutes := api.Group("/product")

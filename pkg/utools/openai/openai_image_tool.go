@@ -123,7 +123,7 @@ func (t *OpenAIImageTool) Execute(ctx *utools.ExecutionContext, toolConfig map[s
 
 	apiBase := cfg.OpenAI.APIBase
 	if apiBase == "" {
-		apiBase = "https:
+		apiBase = "https://api.openai.com"
 	}
 
 

@@ -313,7 +313,7 @@ func (t *HealthCheckerTool) Execute(ctx *utools.ExecutionContext, config map[str
 
 
 	var sslInfo map[string]interface{}
-	if checkSSL && strings.HasPrefix(url, "https:
+	if checkSSL && strings.HasPrefix(url, "https://") {
 		cert := resp.TLS.PeerCertificates[0]
 		daysUntilExpiry := int(time.Until(cert.NotAfter).Hours() / 24)
 

@@ -1,11 +1,9 @@
 <template>
   <div class="space-y-4">
-    
     <div class="bg-primary-light border-l-4 border-primary p-3 rounded">
       <p class="text-sm text-text-primary">💡 API 凭证已在系统配置中统一管理，无需每次填写</p>
     </div>
 
-    
     <div>
       <label class="block text-sm font-medium text-text-secondary mb-2">
         模型 <span class="text-red-500">*</span>
@@ -17,7 +15,6 @@
       <p class="mt-1 text-xs text-text-tertiary">填写要使用的模型名称</p>
     </div>
 
-    
     <div class="bg-blue-500/10 border border-blue-500/20 rounded-lg p-3">
       <p class="text-sm text-blue-800 dark:text-blue-300 font-medium mb-2">💡 配置方式选择</p>
       <ul class="text-xs text-blue-700 dark:text-blue-400 space-y-1">
@@ -27,7 +24,6 @@
       </ul>
     </div>
 
-    
     <div>
       <label class="block text-sm font-medium text-text-secondary mb-2"> 提示词 (可选) </label>
       <textarea
@@ -44,7 +40,6 @@
       </p>
     </div>
 
-    
     <div>
       <label class="block text-sm font-medium text-text-secondary mb-2"> 系统消息 (可选) </label>
       <textarea
@@ -56,7 +51,6 @@
       <p class="mt-1 text-xs text-text-tertiary">定义 AI 的角色和行为方式</p>
     </div>
 
-    
     <div>
       <label class="block text-sm font-medium text-text-secondary mb-2">
         温度: {{ localConfig.temperature }}
@@ -77,7 +71,6 @@
       <p class="mt-1 text-xs text-text-tertiary">控制回复的随机性，值越高越有创意但可能不够准确</p>
     </div>
 
-    
     <div>
       <label class="block text-sm font-medium text-text-secondary mb-2">
         最大 Token 数 (可选)
@@ -90,14 +83,12 @@
       <p class="mt-1 text-xs text-text-tertiary">限制生成回复的长度，留空则使用模型默认值</p>
     </div>
 
-    
     <div>
       <label class="block text-sm font-medium text-text-secondary mb-2"> 超时时间 (秒) </label>
       <BaseInput v-model.number="localConfig.timeout" type="number" placeholder="300" />
       <p class="mt-1 text-xs text-text-tertiary">默认 300 秒，对于图片生成等耗时操作可适当增加</p>
     </div>
 
-    
     <div class="border-t border-border-primary pt-4">
       <label class="block text-sm font-medium text-text-secondary mb-2">
         消息数组 (JSON，可选，存在时优先使用)
@@ -114,7 +105,6 @@
       </p>
     </div>
 
-    
     <div class="border-t border-border-primary pt-4 space-y-3">
       <div class="bg-blue-500/10 border border-blue-500/20 rounded-lg p-3 mb-3">
         <p class="text-sm text-blue-800 dark:text-blue-300">

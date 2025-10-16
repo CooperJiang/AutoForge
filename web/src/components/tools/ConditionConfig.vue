@@ -24,7 +24,6 @@
       />
     </div>
 
-    
     <div
       v-if="localConfig.conditionType === 'simple'"
       class="space-y-3 border-t border-border-primary pt-4"
@@ -44,7 +43,6 @@
           </button>
         </label>
 
-        
         <div
           v-if="showFieldHelper && previousNodes && previousNodes.length > 0"
           class="mb-2 p-3 bg-bg-hover rounded-lg border border-border-primary"
@@ -59,7 +57,6 @@
               <div class="font-semibold text-text-primary mb-1">{{ node.name }}</div>
               <div class="text-text-tertiary text-[10px] mb-2">ID: {{ node.id }}</div>
 
-              
               <div class="flex flex-wrap gap-1">
                 <button
                   v-for="field in getCommonFields(node.type, node.toolCode)"
@@ -109,7 +106,6 @@
         <p class="text-xs text-text-tertiary mt-1">与检查字段进行比较的值</p>
       </div>
 
-      
       <div class="bg-bg-hover rounded-lg p-3">
         <div class="text-xs font-semibold text-text-secondary mb-2">条件示例：</div>
         <div class="text-xs text-text-secondary space-y-1 font-mono">
@@ -120,7 +116,6 @@
       </div>
     </div>
 
-    
     <div
       v-if="localConfig.conditionType === 'expression'"
       class="space-y-3 border-t border-border-primary pt-4"
@@ -149,7 +144,6 @@
       </div>
     </div>
 
-    
     <div
       v-if="localConfig.conditionType === 'script'"
       class="space-y-3 border-t border-border-primary pt-4"
@@ -173,7 +167,6 @@
       </div>
     </div>
 
-    
     <div class="border-t border-border-primary pt-4">
       <div class="text-sm font-semibold text-text-secondary mb-3">分支说明</div>
       <div class="grid grid-cols-2 gap-3">

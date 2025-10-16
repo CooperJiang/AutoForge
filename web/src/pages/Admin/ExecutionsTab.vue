@@ -1,6 +1,5 @@
 <template>
   <div>
-    
     <div class="flex gap-3 mb-6 items-center">
       <div class="flex-shrink-0" style="width: 200px">
         <BaseInput v-model="filters.user_id" placeholder="用户ID" />
@@ -24,7 +23,6 @@
       </BaseButton>
     </div>
 
-    
     <div class="overflow-x-auto">
       <table class="w-full">
         <thead>
@@ -106,7 +104,6 @@
       </table>
     </div>
 
-    
     <div class="flex justify-between items-center mt-6">
       <div class="text-sm text-text-secondary">共 {{ total }} 条记录</div>
       <div class="flex gap-2">
@@ -130,10 +127,8 @@
       </div>
     </div>
 
-    
     <ExecutionDetailDialog v-model="showExecutionDetail" :execution="selectedExecution" />
 
-    
     <Dialog
       v-model="showDeleteDialog"
       title="确认删除"

@@ -8,18 +8,15 @@ interface ParsedCurl {
 
 export function parseCurl(curlCommand: string): ParsedCurl | null {
   try {
-
     const cleaned = curlCommand
       .replace(/\\\n/g, ' ')
       .replace(/\n/g, ' ')
       .replace(/\s+/g, ' ')
       .trim()
 
-
     if (!cleaned.startsWith('curl')) {
       return null
     }
-
 
     const urlMatch = cleaned.match(/curl\s+'([^']+)'|curl\s+"([^"]+)"|curl\s+([^\s-]+)/)
     if (!urlMatch) {
@@ -27,17 +24,14 @@ export function parseCurl(curlCommand: string): ParsedCurl | null {
     }
     const url = urlMatch[1] || urlMatch[2] || urlMatch[3]
 
-
     const urlObj = new URL(url)
     const params: { key: string; value: string }[] = []
     urlObj.searchParams.forEach((value, key) => {
       params.push({ key, value })
     })
 
-
     const methodMatch = cleaned.match(/-X\s+([A-Z]+)/)
     const method = methodMatch ? methodMatch[1] : 'GET'
-
 
     const headers: { key: string; value: string }[] = []
     const headerRegex = /-H\s+'([^:]+):\s*([^']+)'|-H\s+"([^:]+):\s*([^"]+)"/g
@@ -49,9 +43,7 @@ export function parseCurl(curlCommand: string): ParsedCurl | null {
       headers.push({ key: key.trim(), value: value.trim() })
     }
 
-
     let body: string | undefined
-
 
     const bodyPatterns = [
       /--data-raw\s+'([^']*)'|--data-raw\s+"([^"]*)"/,
@@ -70,7 +62,6 @@ export function parseCurl(curlCommand: string): ParsedCurl | null {
       }
     }
 
-
     if (!body) {
       const unquotedMatch = cleaned.match(
         /(?:--data-raw|--data-binary|--data|-d|--json)\s+([^\s-][^\s]*?)(?:\s+--|$|\s+-[a-zA-Z])/
@@ -79,7 +70,6 @@ export function parseCurl(curlCommand: string): ParsedCurl | null {
         body = unquotedMatch[1]
       }
     }
-
 
     if (body && method === 'GET') {
       return {

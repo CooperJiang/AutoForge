@@ -1,6 +1,5 @@
 <template>
   <main class="flex h-screen bg-bg-hover">
-    
     <div class="w-[480px] bg-bg-elevated border-r border-border-primary overflow-y-auto">
       <div class="p-6">
         <div class="mb-6">
@@ -13,7 +12,6 @@
         </div>
 
         <form @submit.prevent="handleSubmit">
-          
           <div class="mb-4">
             <label class="block text-sm font-medium text-text-secondary mb-2">
               任务名称 <span class="text-red-500">*</span>
@@ -21,7 +19,6 @@
             <BaseInput v-model="form.name" placeholder="例如：每日签到" required />
           </div>
 
-          
           <div class="mb-4">
             <label class="block text-sm font-medium text-text-secondary mb-2">
               执行规则 <span class="text-red-500">*</span>
@@ -40,7 +37,6 @@
             </p>
           </div>
 
-          
           <div class="mb-4">
             <label class="block text-sm font-medium text-text-secondary mb-2">
               选择工具 <span class="text-red-500">*</span>
@@ -54,7 +50,6 @@
             />
           </div>
 
-          
           <div v-if="form.tool_code" class="mb-4">
             <label class="block text-sm font-medium text-text-secondary mb-2">
               工具配置 <span class="text-red-500">*</span>
@@ -69,7 +64,6 @@
             </BaseButton>
           </div>
 
-          
           <div class="flex gap-2 mt-6">
             <BaseButton type="button" variant="secondary" @click="goBack" class="flex-1">
               取消
@@ -87,7 +81,6 @@
       </div>
     </div>
 
-    
     <div class="flex-1 p-6 overflow-y-auto">
       <div class="bg-bg-elevated border-2 border-border-primary rounded-lg p-6">
         <h2 class="text-lg font-semibold text-text-primary mb-4">任务预览</h2>
@@ -118,7 +111,6 @@
       </div>
     </div>
 
-    
     <Dialog
       v-model="showConfigDialog"
       title="配置工具参数"

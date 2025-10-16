@@ -1,6 +1,5 @@
 <template>
   <div class="space-y-4">
-    
     <div class="bg-indigo-500/10 border-l-4 border-indigo-500 rounded p-3">
       <p class="text-sm text-indigo-800 dark:text-indigo-300">
         💬 <strong>对话上下文管理器</strong>：管理多轮对话的历史记录，支持两种模式
@@ -11,7 +10,6 @@
       </ul>
     </div>
 
-    
     <div>
       <label class="block text-sm font-medium text-text-secondary mb-2">
         工作模式 <span class="text-red-500">*</span>
@@ -24,7 +22,6 @@
       <p class="mt-1 text-xs text-text-tertiary">Prepare = 准备消息，Persist = 保存消息</p>
     </div>
 
-    
     <div>
       <label class="block text-sm font-medium text-text-secondary mb-2">
         会话标识 <span class="text-red-500">*</span>
@@ -36,7 +33,6 @@
       <p class="mt-1 text-xs text-text-tertiary">用于区分不同用户的对话。支持变量引用。</p>
     </div>
 
-    
     <div
       v-if="localConfig.mode === 'prepare'"
       class="border-t border-border-primary pt-4 space-y-3"
@@ -63,7 +59,6 @@
       </div>
     </div>
 
-    
     <div
       v-if="localConfig.mode === 'persist'"
       class="border-t border-border-primary pt-4 space-y-3"
@@ -92,7 +87,6 @@
       </div>
     </div>
 
-    
     <div class="border-t border-border-primary pt-4 space-y-3">
       <h4 class="text-sm font-medium text-text-primary">通用配置</h4>
 
@@ -120,7 +114,6 @@
       </div>
     </div>
 
-    
     <div class="bg-bg-hover rounded-lg p-3">
       <div class="text-xs font-semibold text-text-secondary mb-2">典型工作流配置：</div>
       <div class="text-xs text-text-secondary space-y-1 font-mono">

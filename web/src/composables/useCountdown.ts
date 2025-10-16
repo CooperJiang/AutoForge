@@ -1,7 +1,6 @@
 import { ref, computed, onUnmounted, watch } from 'vue'
 
 export interface CountdownResult {
-
   countdown: string
 
   isExpired: boolean
@@ -17,7 +16,6 @@ export interface CountdownResult {
 }
 
 export interface UseCountdownOptions {
-
   autoStart?: boolean
 
   onFinish?: () => void
@@ -66,7 +64,6 @@ export function useCountdown(
     const target = getTargetTimestamp()
 
     if (!target) {
-
       if (countdown.value !== '') {
         countdown.value = ''
         isExpired.value = false
@@ -85,7 +82,6 @@ export function useCountdown(
     const diff = targetMs - now
     const diffSeconds = Math.floor(diff / 1000)
 
-
     if (onlyUpdateOnSecondChange && diffSeconds === lastSecond) {
       return
     }
@@ -93,7 +89,6 @@ export function useCountdown(
     lastSecond = diffSeconds
 
     remainingMs.value = diff
-
 
     if (diff <= 0) {
       if (countdown.value !== '已过期') {
@@ -105,7 +100,6 @@ export function useCountdown(
         seconds.value = 0
       }
 
-
       if (!hasTriggeredFinish && onFinish) {
         hasTriggeredFinish = true
         onFinish()
@@ -113,7 +107,6 @@ export function useCountdown(
 
       return
     }
-
 
     if (diff <= finishOffset && !hasTriggeredFinish && onFinish) {
       hasTriggeredFinish = true
@@ -128,7 +121,6 @@ export function useCountdown(
     minutes.value = Math.floor((diffSeconds % 3600) / 60)
     seconds.value = diffSeconds % 60
 
-
     const parts = []
     if (days.value > 0) parts.push(`${days.value}天`)
     if (hours.value > 0) parts.push(`${hours.value}小时`)
@@ -137,7 +129,6 @@ export function useCountdown(
 
     const newCountdown = parts.join('') + '后'
 
-
     if (countdown.value !== newCountdown) {
       countdown.value = newCountdown
     }
@@ -145,7 +136,6 @@ export function useCountdown(
     if (isExpired.value !== false) {
       isExpired.value = false
     }
-
 
     if (onTick) {
       onTick({
@@ -187,9 +177,7 @@ export function useCountdown(
     start()
   }
 
-
   const remainingSeconds = computed(() => Math.floor(remainingMs.value / 1000))
-
 
   if (typeof targetTimestamp !== 'function') {
     watch(
@@ -204,11 +192,9 @@ export function useCountdown(
     )
   }
 
-
   if (autoStart) {
     start()
   }
-
 
   onUnmounted(() => {
     stop()

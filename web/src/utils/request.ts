@@ -3,9 +3,7 @@ import type { BaseResponse } from '@/types'
 import { useMessage } from '@/composables/useMessage'
 import SecureStorage, { STORAGE_KEYS } from './storage'
 
-
 const request: AxiosInstance = axios.create({
-
   baseURL: import.meta.env.VITE_API_BASE_URL,
   timeout: 10000,
   headers: {
@@ -13,18 +11,14 @@ const request: AxiosInstance = axios.create({
   },
 })
 
-
 const { error: showError } = useMessage()
-
 
 request.interceptors.request.use(
   (config) => {
-
     const token = SecureStorage.getItem<string>(STORAGE_KEYS.AUTH_TOKEN)
     if (token) {
       config.headers.Authorization = `Bearer ${token}`
     }
-
 
     if (config.method === 'get') {
       config.params = {
@@ -41,17 +35,13 @@ request.interceptors.request.use(
   }
 )
 
-
 request.interceptors.response.use(
   (response: AxiosResponse<BaseResponse>) => {
     const { data } = response
 
-
     if (data.code !== 200) {
-
       const errorMessage = (data as any).detail || data.message || '请求失败'
       const error: any = new Error(errorMessage)
-
 
       error.response = response
       error.code = data.code
@@ -61,20 +51,17 @@ request.interceptors.response.use(
       return Promise.reject(error)
     }
 
-
     return {
       ...response,
       data: data.data,
     } as AxiosResponse
   },
   (error) => {
-
     let message = '网络错误'
     let shouldShowError = true
 
     if (error.response) {
       const { status, data } = error.response
-
 
       if (status === 401) {
         message = '登录已过期，请重新登录'
@@ -91,7 +78,6 @@ request.interceptors.response.use(
         const customError = new Error(message)
         return Promise.reject(customError)
       }
-
 
       if (data?.detail) {
         message = data.detail
@@ -116,7 +102,6 @@ request.interceptors.response.use(
       message = '网络连接失败，请检查网络连接'
     }
 
-
     if (shouldShowError) {
       showError(message)
     }
@@ -125,7 +110,6 @@ request.interceptors.response.use(
     return Promise.reject(customError)
   }
 )
-
 
 export const ApiClient = {
   async get<T = unknown>(url: string, config?: AxiosRequestConfig): Promise<T> {

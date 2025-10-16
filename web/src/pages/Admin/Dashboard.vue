@@ -1,8 +1,6 @@
 <template>
   <div class="px-6 py-6">
-    
     <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 mb-6">
-      
       <div
         class="bg-bg-elevated border-2 border-border-primary rounded-xl p-5 shadow-sm hover:shadow-lg transition-all group"
       >
@@ -22,7 +20,6 @@
         </div>
       </div>
 
-      
       <div
         class="bg-bg-elevated border-2 border-border-primary rounded-xl p-5 shadow-sm hover:shadow-lg transition-all group"
       >
@@ -42,7 +39,6 @@
         </div>
       </div>
 
-      
       <div
         class="bg-bg-elevated border-2 border-border-primary rounded-xl p-5 shadow-sm hover:shadow-lg transition-all group"
       >
@@ -62,7 +58,6 @@
         </div>
       </div>
 
-      
       <div
         class="bg-bg-elevated border-2 border-border-primary rounded-xl p-5 shadow-sm hover:shadow-lg transition-all group"
       >
@@ -85,7 +80,6 @@
       </div>
     </div>
 
-    
     <div class="bg-bg-elevated rounded-t-xl shadow-lg border-2 border-b-0 border-border-primary">
       <div class="flex border-b border-border-primary">
         <button
@@ -136,8 +130,6 @@
       </div>
     </div>
 
-    
-    
     <div
       v-show="activeTab === 'executions'"
       class="bg-bg-elevated rounded-b-xl shadow-lg border-2 border-t-0 border-border-primary p-6"
@@ -145,7 +137,6 @@
       <ExecutionsTab />
     </div>
 
-    
     <div
       v-show="activeTab === 'tasks'"
       class="bg-bg-elevated rounded-b-xl shadow-lg border-2 border-t-0 border-border-primary p-6"
@@ -166,7 +157,6 @@
       />
     </div>
 
-    
     <div
       v-show="activeTab === 'users'"
       class="bg-bg-elevated rounded-b-xl shadow-lg border-2 border-t-0 border-border-primary p-6"
@@ -174,7 +164,6 @@
       <UsersTab />
     </div>
 
-    
     <Dialog
       v-model="showDeleteDialog"
       title="确认删除"
@@ -185,10 +174,8 @@
       @confirm="deleteTask"
     />
 
-    
     <TestResultDialog v-model="showTestResult" :result="testResult" />
 
-    
     <TaskDetailDialog v-model="showTaskDetail" :task="selectedTask" />
   </div>
 </template>

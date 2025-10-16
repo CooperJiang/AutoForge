@@ -1,6 +1,5 @@
 <template>
   <div class="space-y-4">
-    
     <div>
       <label class="block text-sm font-medium text-text-secondary mb-2">
         输出类型 <span class="text-red-500">*</span>
@@ -9,7 +8,6 @@
       <p class="text-xs text-text-tertiary mt-1">选择最终输出的展示类型</p>
     </div>
 
-    
     <div>
       <label class="block text-sm font-medium text-text-secondary mb-2">
         主要内容 <span class="text-red-500">*</span>
@@ -25,7 +23,6 @@
       </p>
     </div>
 
-    
     <div>
       <label class="block text-sm font-medium text-text-secondary mb-2"> 标题（可选） </label>
       <input
@@ -36,7 +33,6 @@
       />
     </div>
 
-    
     <div>
       <label class="block text-sm font-medium text-text-secondary mb-2"> 描述（可选） </label>
       <textarea
@@ -47,7 +43,6 @@
       />
     </div>
 
-    
     <div v-if="localConfig.output_type === 'image' || localConfig.output_type === 'video'">
       <label class="block text-sm font-medium text-text-secondary mb-2"> 替代文本（可选） </label>
       <input
@@ -58,7 +53,6 @@
       />
     </div>
 
-    
     <div v-if="localConfig.output_type === 'video'">
       <label class="block text-sm font-medium text-text-secondary mb-2"> 缩略图 URL（可选） </label>
       <input
@@ -69,7 +63,6 @@
       />
     </div>
 
-    
     <div>
       <label class="block text-sm font-medium text-text-secondary mb-2"> 元数据（可选） </label>
       <textarea

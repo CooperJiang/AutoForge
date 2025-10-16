@@ -28,7 +28,6 @@
       </p>
     </div>
 
-    
     <div class="border-t border-border-primary pt-4">
       <div class="flex items-center justify-between mb-3">
         <label class="block text-sm font-medium text-text-secondary">
@@ -81,7 +80,6 @@
           </div>
         </div>
 
-        
         <div class="bg-bg-tertiary rounded-lg p-3 border border-slate-300">
           <div class="flex items-center gap-2 mb-1">
             <div
@@ -96,7 +94,6 @@
       </div>
     </div>
 
-    
     <div class="bg-bg-hover rounded-lg p-3">
       <div class="text-xs font-semibold text-text-secondary mb-2">示例：根据HTTP状态码分支</div>
       <div class="text-xs text-text-secondary space-y-1 font-mono">

@@ -1,7 +1,6 @@
 <template>
   <div>
     <div class="grid grid-cols-1 xl:grid-cols-12 gap-6">
-      
       <div class="xl:col-span-3">
         <ProfileSidebar
           :active-tab="activeTab"
@@ -12,9 +11,7 @@
         />
       </div>
 
-      
       <div class="xl:col-span-9">
-        
         <ProfileSection
           v-show="activeTab === 'profile'"
           :user-name="userName"
@@ -23,7 +20,6 @@
           @update-email="handleUpdateEmail"
         />
 
-        
         <PasswordSection v-show="activeTab === 'password'" />
       </div>
     </div>

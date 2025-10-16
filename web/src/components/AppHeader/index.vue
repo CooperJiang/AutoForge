@@ -1,13 +1,10 @@
 <template>
   <header class="bg-bg-elevated flex-shrink-0 backdrop-blur-xl">
     <div class="max-w-[1920px] mx-auto px-6 py-3.5 flex items-center justify-between">
-      
       <Breadcrumb v-if="breadcrumbItems.length > 0" :items="breadcrumbItems" />
       <div v-else class="flex-1" />
 
-      
       <div class="flex items-center gap-3">
-        
         <ThemeToggle />
       </div>
     </div>

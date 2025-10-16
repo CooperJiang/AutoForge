@@ -1,19 +1,15 @@
 <template>
   <div class="space-y-6">
-    
     <div v-if="loading" class="flex justify-center items-center py-20">
       <div class="text-text-tertiary">加载中...</div>
     </div>
 
-    
     <div v-else-if="!execution" class="flex flex-col justify-center items-center py-20">
       <div class="text-text-tertiary mb-4">执行记录不存在</div>
       <BaseButton size="sm" @click="handleBack">返回列表</BaseButton>
     </div>
 
-    
     <template v-else>
-      
       <div
         v-if="execution?.status === 'running'"
         class="relative bg-primary-light border-l-4 border-primary p-4 rounded-lg mb-4 overflow-hidden"
@@ -38,13 +34,12 @@
             <div class="text-xs text-text-secondary mt-0.5">正在实时更新执行进度...</div>
           </div>
         </div>
-        
+
         <div class="absolute bottom-0 left-0 right-0 h-0.5 bg-primary/20">
           <div class="h-full bg-primary animate-progress"></div>
         </div>
       </div>
 
-      
       <div class="flex items-center justify-between">
         <div>
           <p class="text-sm text-text-tertiary font-mono">{{ executionId }}</p>
@@ -69,7 +64,6 @@
         </div>
       </div>
 
-      
       <div class="bg-bg-elevated rounded-lg border border-border-primary p-6">
         <h3 class="text-sm font-semibold text-text-primary mb-4">执行概览</h3>
         <div class="grid grid-cols-4 gap-6">
@@ -101,7 +95,6 @@
         </div>
       </div>
 
-      
       <div class="bg-bg-elevated rounded-lg border border-border-primary">
         <div class="px-6 py-4 border-b border-border-primary">
           <div class="flex items-center justify-between">
@@ -120,7 +113,6 @@
             class="p-6"
           >
             <div class="flex items-start gap-4">
-              
               <div class="flex flex-col items-center">
                 <div
                   :class="[
@@ -136,7 +128,6 @@
                 ></div>
               </div>
 
-              
               <div class="flex-1">
                 <div class="flex items-center justify-between mb-2">
                   <div class="flex items-center gap-2">
@@ -157,7 +148,6 @@
                     </span>
                   </div>
                   <div class="flex items-center gap-2">
-                    
                     <div v-if="nodeLog.status === 'running'" class="flex items-center gap-1.5">
                       <div
                         class="w-1.5 h-1.5 bg-blue-500 rounded-full animate-bounce"
@@ -183,7 +173,6 @@
                   </div>
                 </div>
 
-                
                 <div
                   v-if="nodeLog.start_time"
                   class="flex items-center gap-4 text-xs text-text-secondary mb-3"
@@ -202,7 +191,6 @@
                   </span>
                 </div>
 
-                
                 <div v-if="nodeLog.input && Object.keys(nodeLog.input).length > 0" class="mb-3">
                   <button
                     type="button"
@@ -226,7 +214,6 @@
                   </div>
                 </div>
 
-                
                 <div v-if="nodeLog.output || nodeLog.status === 'running'" class="mb-3">
                   <button
                     type="button"
@@ -276,7 +263,6 @@
                   </div>
                 </div>
 
-                
                 <div v-if="nodeLog.error" class="bg-red-50 border border-red-200 rounded-lg p-3">
                   <div class="flex items-start gap-2">
                     <AlertCircle class="w-4 h-4 text-red-600 flex-shrink-0 mt-0.5" />

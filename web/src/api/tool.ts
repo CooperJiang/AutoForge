@@ -34,7 +34,6 @@ export const getToolDetail = async (code: string) => {
   return response.data
 }
 
-
 export const describeToolOutput = async (code: string, config: Record<string, any>) => {
   const response = await request.post<Record<string, OutputFieldDef>>(
     `/api/v1/tools/${code}/describe-output`,

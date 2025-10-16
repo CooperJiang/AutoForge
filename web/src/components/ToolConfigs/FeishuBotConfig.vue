@@ -1,6 +1,5 @@
 <template>
   <div class="space-y-4">
-    
     <div>
       <label class="block text-sm font-medium text-text-primary mb-1">
         Webhook 地址 <span class="text-error">*</span>
@@ -15,7 +14,6 @@
       <p class="mt-1 text-xs text-text-tertiary">在飞书群中添加自定义机器人后获取</p>
     </div>
 
-    
     <div>
       <label class="block text-sm font-medium text-text-primary mb-1"> 签名密钥（可选） </label>
       <input
@@ -28,7 +26,6 @@
       <p class="mt-1 text-xs text-text-tertiary">启用签名验证可以提高安全性</p>
     </div>
 
-    
     <div>
       <label class="block text-sm font-medium text-text-primary mb-1">
         消息类型 <span class="text-error">*</span>
@@ -45,7 +42,6 @@
       </select>
     </div>
 
-    
     <template v-if="localConfig.msg_type === 'text'">
       <div>
         <label class="block text-sm font-medium text-text-primary mb-1">
@@ -61,7 +57,6 @@
       </div>
     </template>
 
-    
     <template v-if="localConfig.msg_type === 'post'">
       <div>
         <label class="block text-sm font-medium text-text-primary mb-1"> 标题 </label>
@@ -91,7 +86,6 @@
       </div>
     </template>
 
-    
     <template v-if="localConfig.msg_type === 'image'">
       <div>
         <label class="block text-sm font-medium text-text-primary mb-1">
@@ -108,7 +102,6 @@
       </div>
     </template>
 
-    
     <template v-if="localConfig.msg_type === 'interactive'">
       <div>
         <label class="block text-sm font-medium text-text-primary mb-1"> 卡片模板 </label>
@@ -222,7 +215,6 @@
       </template>
     </template>
 
-    
     <div class="mt-4 p-3 bg-bg-secondary rounded-lg border border-border-primary">
       <div class="flex items-start gap-2">
         <span class="text-primary text-lg">💡</span>

@@ -1,6 +1,5 @@
 <template>
   <div class="url-viewer-container">
-    
     <div class="flex items-center justify-between mb-2 gap-2">
       <div class="text-xs text-text-secondary">URL 预览</div>
       <div class="flex items-center gap-2">
@@ -22,7 +21,6 @@
       </div>
     </div>
 
-    
     <iframe
       ref="iframeRef"
       :src="fullUrl"
@@ -32,7 +30,6 @@
       @load="adjustIframeHeight"
     />
 
-    
     <div
       class="mt-2 flex items-center gap-2 p-2 bg-bg-hover rounded border border-border-primary overflow-hidden"
     >

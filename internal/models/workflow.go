@@ -150,6 +150,30 @@ func (wap WorkflowAPIParams) Value() (driver.Value, error) {
 	return json.Marshal(wap)
 }
 
+// WorkflowViewport 画布视口状态
+type WorkflowViewport struct {
+	X    float64 `json:"x"`
+	Y    float64 `json:"y"`
+	Zoom float64 `json:"zoom"`
+}
+
+// Scan 实现 sql.Scanner 接口
+func (wv *WorkflowViewport) Scan(value interface{}) error {
+	if value == nil {
+		return nil
+	}
+	bytes, ok := value.([]byte)
+	if !ok {
+		return nil
+	}
+	return json.Unmarshal(bytes, wv)
+}
+
+// Value 实现 driver.Valuer 接口
+func (wv WorkflowViewport) Value() (driver.Value, error) {
+	return json.Marshal(wv)
+}
+
 // Workflow 工作流模型
 type Workflow struct {
 	BaseModel
@@ -160,6 +184,7 @@ type Workflow struct {
 	Nodes       WorkflowNodes   `gorm:"type:json;not null" json:"nodes"`
 	Edges       WorkflowEdges   `gorm:"type:json;not null" json:"edges"`
 	EnvVars     WorkflowEnvVars `gorm:"type:json" json:"env_vars"`
+	Viewport    *WorkflowViewport `gorm:"type:json" json:"viewport,omitempty"`
 
 	// 调度配置
 	ScheduleType  string `gorm:"size:20" json:"schedule_type"`

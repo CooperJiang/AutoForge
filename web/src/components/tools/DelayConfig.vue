@@ -35,7 +35,6 @@
       </p>
     </div>
 
-    
     <div class="bg-bg-hover rounded-lg p-3">
       <div class="text-xs font-semibold text-text-secondary mb-2">使用场景：</div>
       <div class="text-xs text-text-secondary space-y-1">

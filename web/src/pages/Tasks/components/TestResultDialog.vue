@@ -9,7 +9,6 @@
     @confirm="$emit('update:modelValue', false)"
   >
     <div v-if="result" class="space-y-3">
-      
       <div class="flex items-center gap-2">
         <span class="text-sm font-medium text-text-secondary">状态:</span>
         <span
@@ -22,19 +21,16 @@
         </span>
       </div>
 
-      
       <div v-if="result.status_code" class="flex items-center gap-2">
         <span class="text-sm font-medium text-text-secondary">HTTP 状态码:</span>
         <span class="text-sm text-text-primary">{{ result.status_code }}</span>
       </div>
 
-      
       <div v-if="result.duration_ms !== undefined" class="flex items-center gap-2">
         <span class="text-sm font-medium text-text-secondary">响应时间:</span>
         <span class="text-sm text-text-primary">{{ result.duration_ms }} ms</span>
       </div>
 
-      
       <div v-if="result.error_message" class="space-y-1">
         <span class="text-sm font-medium text-text-secondary">错误信息:</span>
         <div class="bg-red-50 border border-red-200 rounded-lg p-3">
@@ -44,7 +40,6 @@
         </div>
       </div>
 
-      
       <div v-if="result.message" class="space-y-1">
         <span class="text-sm font-medium text-text-secondary">工具消息:</span>
         <div class="bg-bg-hover border border-border-primary rounded-lg p-3">
@@ -54,13 +49,11 @@
         </div>
       </div>
 
-      
       <div v-if="result.response_body" class="space-y-1">
         <span class="text-sm font-medium text-text-secondary">响应内容:</span>
         <JsonViewer :content="result.response_body" />
       </div>
 
-      
       <div v-if="outputJson" class="space-y-1">
         <span class="text-sm font-medium text-text-secondary">输出内容:</span>
         <JsonViewer :content="outputJson" />

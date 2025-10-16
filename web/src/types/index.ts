@@ -1,4 +1,3 @@
-
 export interface BaseResponse<T = unknown> {
   code: number
   message: string
@@ -7,12 +6,10 @@ export interface BaseResponse<T = unknown> {
   timestamp?: string
 }
 
-
 export interface PaginationParams {
   page?: number
   size?: number
 }
-
 
 export interface PaginationResponse<T> {
   items: T[]
@@ -22,13 +19,11 @@ export interface PaginationResponse<T> {
   total_pages: number
 }
 
-
 export interface BaseModel {
   id: string
   created_at: string
   updated_at: string
 }
-
 
 export interface User {
   id?: string
@@ -42,7 +37,6 @@ export interface User {
   updated_at?: string
 }
 
-
 export interface LoginRequest {
   account: string
   password: string
@@ -52,7 +46,6 @@ export interface LoginResponse {
   token: string
   user: User
 }
-
 
 export interface RegisterRequest {
   username: string
@@ -66,7 +59,6 @@ export interface RegisterResponse {
   user: User
 }
 
-
 export interface SendCodeRequest {
   email: string
 }
@@ -75,19 +67,16 @@ export interface SendCodeResponse {
   message: string
 }
 
-
 export interface ResetPasswordRequest {
   email: string
   code: string
   newPassword: string
 }
 
-
 export interface ChangePasswordRequest {
   oldPassword: string
   newPassword: string
 }
-
 
 export interface UpdateProfileRequest {
   username?: string
@@ -95,7 +84,6 @@ export interface UpdateProfileRequest {
   avatar?: string
   code?: string
 }
-
 
 export enum Status {
   INACTIVE = 0,
@@ -108,7 +96,6 @@ export enum UserRole {
   USER = 3,
 }
 
-
 export interface FormField {
   name: string
   label: string
@@ -119,7 +106,6 @@ export interface FormField {
   rules?: Array<(value: unknown) => boolean | string>
 }
 
-
 export interface MenuItem {
   id: string
   title: string
@@ -128,14 +114,12 @@ export interface MenuItem {
   children?: MenuItem[]
 }
 
-
 export interface ApiResponse<T = unknown> {
   code: number
   message: string
   data: T
   success: boolean
 }
-
 
 export interface ApiError {
   code: number
@@ -150,13 +134,11 @@ export interface PaginatedResponse<T> {
   limit: number
 }
 
-
 export interface PageQuery {
   page?: number
   limit?: number
   search?: string
 }
-
 
 export interface PageResponse<T> {
   list: T[]
@@ -165,14 +147,12 @@ export interface PageResponse<T> {
   limit: number
 }
 
-
 export interface RequestConfig {
   timeout?: number
   headers?: Record<string, string>
   params?: Record<string, unknown>
   data?: unknown
 }
-
 
 export interface HttpResponse<T = unknown> {
   data: T

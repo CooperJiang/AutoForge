@@ -6,13 +6,10 @@
     </div>
 
     <div class="p-8">
-      
       <UsernameForm :user-name="userName" @update="$emit('update-username', $event)" />
 
-      
       <div class="my-8 border-b-2 border-border-primary"></div>
 
-      
       <EmailForm :user-email="userEmail" @update="$emit('update-email', $event)" />
     </div>
   </div>

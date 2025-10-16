@@ -17,7 +17,6 @@
         class="w-full px-3 py-2 border-2 border-border-primary rounded-lg focus:outline-none focus:border-primary bg-bg-elevated text-text-primary cursor-pointer"
       />
 
-      
       <div
         v-if="showPicker"
         class="absolute z-[9999] mt-1 bg-bg-elevated border-2 border-border-primary rounded-lg shadow-lg p-4"
@@ -26,7 +25,6 @@
         @mouseup.stop
       >
         <div class="flex gap-2 items-center">
-          
           <div class="flex flex-col">
             <label class="text-xs text-text-secondary mb-1">时</label>
             <input
@@ -45,7 +43,6 @@
 
           <span class="text-text-primary mt-5">:</span>
 
-          
           <div class="flex flex-col">
             <label class="text-xs text-text-secondary mb-1">分</label>
             <input
@@ -64,7 +61,6 @@
 
           <span class="text-text-primary mt-5">:</span>
 
-          
           <div class="flex flex-col">
             <label class="text-xs text-text-secondary mb-1">秒</label>
             <input

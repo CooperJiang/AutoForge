@@ -11,17 +11,14 @@
               messageClasses[message.type],
             ]"
           >
-            
             <div class="flex-shrink-0">
               <component :is="messageIcons[message.type]" class="w-6 h-6" />
             </div>
 
-            
             <div class="flex-1 text-sm font-medium leading-relaxed">
               {{ message.content }}
             </div>
 
-            
             <button
               v-if="message.showClose"
               @click="removeMessage(message.id)"

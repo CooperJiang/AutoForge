@@ -45,7 +45,7 @@ func NewFeishuTool() *FeishuTool {
 			"webhook_url": {
 				Type:        "string",
 				Title:       "Webhook 地址",
-				Description: "飞书机器人的 Webhook URL，格式：https:
+				Description: "飞书机器人的 Webhook URL，格式：https://...",
 			},
 			"sign_secret": {
 				Type:        "string",
@@ -89,7 +89,7 @@ func NewFeishuTool() *FeishuTool {
 			"image_url": {
 				Type:        "string",
 				Title:       "图片 URL",
-				Description: "图片的公网访问地址（当消息类型为 image 时使用），格式：https:
+				Description: "图片的公网访问地址（当消息类型为 image 时使用），格式：https://...",
 			},
 			"card_template": {
 				Type:        "string",
@@ -118,7 +118,7 @@ func NewFeishuTool() *FeishuTool {
 			"card_buttons": {
 				Type:        "string",
 				Title:       "卡片按钮",
-				Description: "卡片按钮列表，JSON 格式数组，示例：[{\"text\":\"查看详情\",\"url\":\"https:
+				Description: "卡片按钮列表，JSON 格式数组",
 			},
 			"card_custom_json": {
 				Type:        "string",
@@ -644,7 +644,7 @@ func (t *FeishuTool) generateSign(secret string, timestamp int64) string {
 
 
 func (t *FeishuTool) getTenantAccessToken(appID, appSecret string) (string, error) {
-	url := "https:
+	url := "https://open.feishu.cn/open-apis/auth/v3/tenant_access_token/internal"
 
 	payload := map[string]string{
 		"app_id":     appID,
@@ -711,7 +711,7 @@ func (t *FeishuTool) uploadImage(appID, appSecret, imageURL string) (string, err
 	t.logger.Info("图片下载成功", zap.Int("size", len(imageData)))
 
 
-	uploadURL := "https:
+	uploadURL := "https://open.feishu.cn/open-apis/im/v1/images"
 	t.logger.Info("步骤 3: 上传图片到飞书", zap.String("upload_url", uploadURL))
 
 

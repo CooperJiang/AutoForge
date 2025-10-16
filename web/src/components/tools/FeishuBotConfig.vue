@@ -1,6 +1,5 @@
 <template>
   <div class="space-y-4">
-    
     <div>
       <label class="block text-sm font-medium text-text-secondary mb-2">
         Webhook 地址 <span class="text-red-500">*</span>
@@ -14,7 +13,6 @@
       <p class="mt-1 text-xs text-text-tertiary">在飞书群中添加自定义机器人后获取</p>
     </div>
 
-    
     <div>
       <label class="block text-sm font-medium text-text-secondary mb-2"> 签名密钥（可选） </label>
       <BaseInput
@@ -25,7 +23,6 @@
       <p class="mt-1 text-xs text-text-tertiary">启用签名验证可以提高安全性</p>
     </div>
 
-    
     <div>
       <label class="block text-sm font-medium text-text-secondary mb-2">
         消息类型 <span class="text-red-500">*</span>
@@ -38,7 +35,6 @@
       <p class="mt-1 text-xs text-text-tertiary">💡 切换消息类型后,界面只显示当前类型的配置项</p>
     </div>
 
-    
     <template v-if="localConfig.msg_type === 'text'">
       <div>
         <label
@@ -54,7 +50,6 @@
           </button>
         </label>
 
-        
         <VariableHelper
           :show="showVariableHelper"
           :previous-nodes="previousNodes"
@@ -76,7 +71,6 @@
       </div>
     </template>
 
-    
     <template v-if="localConfig.msg_type === 'post'">
       <div>
         <label class="block text-sm font-medium text-text-secondary mb-2"> 标题 </label>
@@ -102,7 +96,6 @@
           </button>
         </label>
 
-        
         <VariableHelper
           :show="showVariableHelper"
           :previous-nodes="previousNodes"
@@ -127,9 +120,7 @@
       </div>
     </template>
 
-    
     <template v-if="localConfig.msg_type === 'image'">
-      
       <div
         class="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg p-3 mb-4"
       >
@@ -183,7 +174,6 @@
       </div>
     </template>
 
-    
     <template v-if="localConfig.msg_type === 'interactive'">
       <div>
         <label class="block text-sm font-medium text-text-secondary mb-2"> 卡片模板 </label>
@@ -217,7 +207,6 @@
             </button>
           </label>
 
-          
           <VariableHelper
             :show="showVariableHelper"
             :previous-nodes="previousNodes"
@@ -299,7 +288,6 @@
       </template>
     </template>
 
-    
     <div class="mt-4 p-3 bg-bg-secondary rounded-lg border border-border-primary">
       <div class="flex items-start gap-2">
         <span class="text-primary text-lg">💡</span>

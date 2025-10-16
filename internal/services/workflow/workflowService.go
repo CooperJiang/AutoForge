@@ -60,6 +60,7 @@ func (s *WorkflowService) CreateWorkflow(userID string, req *request.CreateWorkf
 		Nodes:         models.WorkflowNodes(req.Nodes),
 		Edges:         models.WorkflowEdges(req.Edges),
 		EnvVars:       models.WorkflowEnvVars(req.EnvVars),
+		Viewport:      req.Viewport,
 		ScheduleType:  req.ScheduleType,
 		ScheduleValue: req.ScheduleValue,
 		Enabled:       req.Enabled,
@@ -218,6 +219,9 @@ func (s *WorkflowService) UpdateWorkflow(workflowID, userID string, req *request
 	}
 	if req.EnvVars != nil {
 		updates["env_vars"] = models.WorkflowEnvVars(*req.EnvVars)
+	}
+	if req.Viewport != nil {
+		updates["viewport"] = req.Viewport
 	}
 	if req.ScheduleType != nil {
 		updates["schedule_type"] = *req.ScheduleType
@@ -479,6 +483,7 @@ func (s *WorkflowService) toWorkflowResponse(workflow *models.Workflow) response
 		Nodes:           workflow.Nodes,
 		Edges:           workflow.Edges,
 		EnvVars:         workflow.EnvVars,
+		Viewport:        workflow.Viewport,
 		ScheduleType:    workflow.ScheduleType,
 		ScheduleValue:   workflow.ScheduleValue,
 		Enabled:         workflow.Enabled,

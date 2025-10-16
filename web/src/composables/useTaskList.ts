@@ -10,10 +10,8 @@ export function useTaskList() {
   const loading = ref(false)
   const refreshing = ref(false)
 
-
   const searchKeyword = ref('')
   const statusFilter = ref<'all' | 'enabled' | 'disabled'>('all')
-
 
   const filteredTasks = computed(() => {
     if (!tasks.value || !Array.isArray(tasks.value)) {

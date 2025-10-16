@@ -3,7 +3,6 @@
     class="group bg-gradient-to-br from-bg-elevated to-bg-secondary rounded-xl shadow-md hover:shadow-2xl transition-all duration-300 p-4 cursor-pointer border-2 border-border-primary hover:border-primary hover:-translate-y-1 flex flex-col min-h-[180px]"
     @click="$emit('click')"
   >
-    
     <div class="flex items-start gap-3 mb-3">
       <div
         :class="[
@@ -25,12 +24,10 @@
       </div>
     </div>
 
-    
     <p class="text-sm text-text-secondary mb-3 line-clamp-2 flex-shrink-0 leading-relaxed">
       {{ tool.description }}
     </p>
 
-    
     <div class="flex flex-wrap gap-1.5 mb-3 flex-shrink-0">
       <span
         v-for="tag in displayTags.slice(0, 3)"
@@ -47,7 +44,6 @@
       </span>
     </div>
 
-    
     <div class="flex items-center justify-between pt-3 border-t-2 border-border-primary mt-auto">
       <span class="text-xs text-text-tertiary truncate mr-2 font-medium">
         {{ tool.author }}

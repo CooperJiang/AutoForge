@@ -6,14 +6,11 @@
         class="fixed inset-0 z-50 flex items-center justify-center"
         @click.self="handleCancel"
       >
-        
         <div class="absolute inset-0 bg-black/50 backdrop-blur-sm"></div>
 
-        
         <div
           class="relative bg-bg-elevated rounded-lg shadow-xl max-w-md w-full mx-4 overflow-hidden"
         >
-          
           <div class="px-6 py-4 border-b border-border-primary">
             <div class="flex items-center gap-3">
               <div
@@ -33,17 +30,23 @@
             </div>
           </div>
 
-          
           <div class="px-6 py-4">
             <p class="text-text-secondary leading-relaxed">{{ message }}</p>
           </div>
 
-          
           <div
             class="px-6 py-4 bg-bg-hover border-t border-border-primary flex items-center justify-end gap-3"
           >
             <BaseButton size="sm" variant="ghost" @click="handleCancel">
               {{ cancelText }}
+            </BaseButton>
+            <BaseButton
+              v-if="extraButtonText"
+              size="sm"
+              :variant="extraButtonVariant"
+              @click="handleExtra"
+            >
+              {{ extraButtonText }}
             </BaseButton>
             <BaseButton
               size="sm"
@@ -70,6 +73,8 @@ interface Props {
   confirmText?: string
   cancelText?: string
   variant?: 'info' | 'warning' | 'danger' | 'question'
+  extraButtonText?: string
+  extraButtonVariant?: 'primary' | 'secondary' | 'danger' | 'success' | 'ghost'
 }
 
 withDefaults(defineProps<Props>(), {
@@ -77,12 +82,14 @@ withDefaults(defineProps<Props>(), {
   confirmText: '确定',
   cancelText: '取消',
   variant: 'question',
+  extraButtonVariant: 'danger',
 })
 
 const emit = defineEmits<{
   'update:modelValue': [value: boolean]
   confirm: []
   cancel: []
+  extra: []
 }>()
 
 const variantIcons = {
@@ -118,6 +125,11 @@ const handleConfirm = () => {
 
 const handleCancel = () => {
   emit('cancel')
+  emit('update:modelValue', false)
+}
+
+const handleExtra = () => {
+  emit('extra')
   emit('update:modelValue', false)
 }
 </script>

@@ -13,7 +13,6 @@
         </p>
       </div>
 
-      
       <div v-if="error" class="bg-red-50 border border-red-200 rounded-md p-4">
         <div class="flex">
           <div class="flex-shrink-0">
@@ -84,7 +83,6 @@
             class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-primary hover:bg-primary-hover focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
             <span v-if="loading" class="absolute left-0 inset-y-0 flex items-center pl-3">
-              
               <svg
                 class="animate-spin h-5 w-5 text-blue-300"
                 xmlns="http://www.w3.org/2000/svg"

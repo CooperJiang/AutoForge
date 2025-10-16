@@ -5,7 +5,6 @@
       :style="{ paddingLeft: `${level * 16 + 8}px` }"
       @click="handleClick"
     >
-      
       <ChevronRight
         v-if="isExpandable"
         class="w-3.5 h-3.5 text-text-secondary transition-transform flex-shrink-0"
@@ -13,20 +12,16 @@
       />
       <div v-else class="w-3.5" />
 
-      
       <component :is="getIcon()" class="w-3.5 h-3.5 flex-shrink-0" :class="getIconColor()" />
 
-      
       <span class="font-mono text-xs font-medium text-text-primary flex-shrink-0">
         {{ name }}
       </span>
 
-      
       <span class="text-xs text-text-tertiary truncate flex-1">
         {{ getDescription() }}
       </span>
 
-      
       <button
         v-if="!isExpandable"
         @click.stop="handleCopy"
@@ -37,7 +32,6 @@
       </button>
     </div>
 
-    
     <div v-if="isExpandable && expanded" class="mt-0.5">
       <VariableTreeNode
         v-for="(childValue, childKey) in getChildren()"

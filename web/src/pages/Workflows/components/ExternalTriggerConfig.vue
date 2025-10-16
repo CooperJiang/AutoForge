@@ -1,6 +1,5 @@
 <template>
   <div class="space-y-4">
-    
     <div class="bg-blue-500/10 border border-blue-500/20 rounded-lg p-3">
       <div class="flex items-start gap-2">
         <Globe class="w-4 h-4 text-blue-600 dark:text-blue-400 mt-0.5 flex-shrink-0" />
@@ -14,7 +13,6 @@
       </div>
     </div>
 
-    
     <div>
       <div class="flex items-center justify-between mb-2">
         <label class="text-xs font-medium text-text-primary">参数定义</label>
@@ -41,7 +39,6 @@
           :key="index"
           class="border border-border-primary rounded-lg p-3 space-y-2 hover:border-primary transition-colors"
         >
-          
           <div class="flex items-center justify-between gap-2">
             <BaseInput
               v-model="param.key"
@@ -60,7 +57,6 @@
             </BaseButton>
           </div>
 
-          
           <div>
             <label class="text-xs text-text-secondary mb-1 block">类型</label>
             <BaseSelect
@@ -71,7 +67,6 @@
             />
           </div>
 
-          
           <div class="flex items-center gap-2">
             <input
               :id="`required-${index}`"
@@ -85,7 +80,6 @@
             </label>
           </div>
 
-          
           <div>
             <label class="text-xs text-text-secondary mb-1 block">默认值</label>
             <BaseInput
@@ -96,7 +90,6 @@
             />
           </div>
 
-          
           <div>
             <label class="text-xs text-text-secondary mb-1 block">描述</label>
             <textarea
@@ -108,7 +101,6 @@
             />
           </div>
 
-          
           <div>
             <label class="text-xs text-text-secondary mb-1 block">示例值</label>
             <BaseInput
@@ -122,7 +114,6 @@
       </div>
     </div>
 
-    
     <div>
       <label class="text-xs font-medium text-text-primary mb-2 block"
         >Webhook 回调地址（可选）</label
@@ -136,7 +127,6 @@
       <p class="text-xs text-text-tertiary mt-1">异步执行完成后，会将结果 POST 到此 URL</p>
     </div>
 
-    
     <div class="bg-bg-tertiary rounded-lg p-3">
       <div class="flex items-start gap-2">
         <Info class="w-4 h-4 text-primary mt-0.5 flex-shrink-0" />

@@ -1,11 +1,9 @@
 <template>
   <div class="space-y-4">
-    
     <div class="bg-primary-light border-l-4 border-primary p-3 rounded">
       <p class="text-sm text-text-primary">💡 API 凭证已在系统配置中统一管理，无需每次填写</p>
     </div>
 
-    
     <div>
       <label class="block text-sm font-medium text-text-secondary mb-2">
         模型 <span class="text-red-500">*</span>
@@ -16,7 +14,6 @@
       </p>
     </div>
 
-    
     <div>
       <label class="block text-sm font-medium text-text-secondary mb-2">
         提示词 <span class="text-red-500">*</span>
@@ -35,7 +32,6 @@
       </p>
     </div>
 
-    
     <div>
       <label class="block text-sm font-medium text-text-secondary mb-2"> 图片尺寸 </label>
       <BaseInput v-model="localConfig.size" placeholder="1024x1024" />
@@ -44,7 +40,6 @@
       </p>
     </div>
 
-    
     <div>
       <label class="block text-sm font-medium text-text-secondary mb-2"> 图片质量（可选） </label>
       <BaseInput v-model="localConfig.quality" placeholder="standard" />
@@ -53,7 +48,6 @@
       </p>
     </div>
 
-    
     <div>
       <label class="block text-sm font-medium text-text-secondary mb-2"> 生成数量（可选） </label>
       <BaseInput v-model="localConfig.n" placeholder="1" />
@@ -62,7 +56,6 @@
       </p>
     </div>
 
-    
     <div>
       <label class="block text-sm font-medium text-text-secondary mb-2"> 返回格式 </label>
       <BaseInput v-model="localConfig.response_format" placeholder="url" />
@@ -71,7 +64,6 @@
       </p>
     </div>
 
-    
     <div>
       <label class="block text-sm font-medium text-text-secondary mb-2"> 超时时间 (秒) </label>
       <BaseInput v-model="localConfig.timeout" placeholder="300" />

@@ -10,16 +10,13 @@ export function useAuth() {
   const loading = ref(false)
   const error = ref('')
 
-
   const [token, setToken, removeToken] = useAuthStorage<string | null>(
     STORAGE_KEYS.AUTH_TOKEN,
     null
   )
   const [user, setUser, removeUser] = useAuthStorage<User | null>(STORAGE_KEYS.AUTH_USER, null)
 
-
   const isAuthenticated = computed(() => !!token.value && !!user.value)
-
 
   const login = async (credentials: LoginRequest) => {
     try {
@@ -27,7 +24,6 @@ export function useAuth() {
       error.value = ''
 
       const response = await authApi.login(credentials)
-
 
       const responseData = (response as any).data || response
 
@@ -43,7 +39,6 @@ export function useAuth() {
       loading.value = false
     }
   }
-
 
   const register = async (userData: RegisterRequest) => {
     try {
@@ -61,7 +56,6 @@ export function useAuth() {
     }
   }
 
-
   const sendRegistrationCode = async (email: string) => {
     try {
       loading.value = true
@@ -77,7 +71,6 @@ export function useAuth() {
       loading.value = false
     }
   }
-
 
   const sendResetPasswordCode = async (email: string) => {
     try {
@@ -95,7 +88,6 @@ export function useAuth() {
     }
   }
 
-
   const resetPassword = async (data: ResetPasswordRequest) => {
     try {
       loading.value = true
@@ -112,7 +104,6 @@ export function useAuth() {
     }
   }
 
-
   const logout = (shouldRedirect: boolean = true) => {
     removeToken()
     removeUser()
@@ -120,7 +111,6 @@ export function useAuth() {
       router.push('/login')
     }
   }
-
 
   const getUserInfo = async () => {
     try {
@@ -140,13 +130,11 @@ export function useAuth() {
   }
 
   return {
-
     loading,
     error,
     user,
     token,
     isAuthenticated,
-
 
     login,
     register,

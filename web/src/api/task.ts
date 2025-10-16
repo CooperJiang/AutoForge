@@ -44,7 +44,6 @@ export interface PaginationResponse<T> {
   page_size: number
 }
 
-
 export const createTask = async (data: {
   name: string
   description?: string
@@ -53,26 +52,21 @@ export const createTask = async (data: {
   schedule_type: string
   schedule_value: string
 }) => {
-
   const response = await request.post<Task>('/api/v1/tasks', data)
   return response.data
 }
 
-
 export const getTaskList = async (page = 1, pageSize = 20) => {
-
   const response = await request.get<PaginationResponse<Task>>('/api/v1/tasks', {
     params: { page, page_size: pageSize },
   })
   return response.data
 }
 
-
 export const getTask = async (id: string) => {
   const response = await request.get<Task>(`/api/v1/tasks/${id}`)
   return response.data
 }
-
 
 export const updateTask = async (
   id: string,
@@ -89,30 +83,25 @@ export const updateTask = async (
   return response.data
 }
 
-
 export const deleteTask = async (id: string) => {
   const response = await request.delete<null>(`/api/v1/tasks/${id}`)
   return response.data
 }
-
 
 export const enableTask = async (id: string) => {
   const response = await request.post<null>(`/api/v1/tasks/${id}/enable`)
   return response.data
 }
 
-
 export const disableTask = async (id: string) => {
   const response = await request.post<null>(`/api/v1/tasks/${id}/disable`)
   return response.data
 }
 
-
 export const triggerTask = async (id: string) => {
   const response = await request.post<null>(`/api/v1/tasks/${id}/trigger`)
   return response.data
 }
-
 
 export const getTaskExecutions = async (taskId: string, page = 1, pageSize = 20) => {
   const response = await request.get<PaginationResponse<TaskExecution>>(
@@ -124,24 +113,20 @@ export const getTaskExecutions = async (taskId: string, page = 1, pageSize = 20)
   return response.data
 }
 
-
 export const getExecution = async (id: string) => {
   const response = await request.get<TaskExecution>(`/api/v1/executions/${id}`)
   return response.data
 }
-
 
 export const deleteExecution = async (id: string) => {
   const response = await request.delete<null>(`/api/v1/executions/${id}`)
   return response.data
 }
 
-
 export const deleteAllExecutions = async (taskId: string) => {
   const response = await request.delete<null>(`/api/v1/tasks/${taskId}/executions`)
   return response.data
 }
-
 
 export interface TestTaskRequest {
   url?: string

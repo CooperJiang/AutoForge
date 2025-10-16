@@ -152,7 +152,7 @@ func (s *OAuth2Service) FindOrCreateLinuxDoUser(userInfo *LinuxDoUserInfo) (*mod
 
 	avatarURL := strings.Replace(userInfo.AvatarTemplate, "{size}", "120", 1)
 	if !strings.HasPrefix(avatarURL, "http") {
-		avatarURL = "https:
+		avatarURL = "https://linux.do" + avatarURL
 	}
 
 	externalID := fmt.Sprintf("%d", userInfo.ID)

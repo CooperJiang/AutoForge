@@ -1,6 +1,5 @@
 <template>
   <div class="space-y-6">
-    
     <div class="flex items-center justify-between">
       <div class="flex items-center gap-3">
         <div>
@@ -21,7 +20,6 @@
       </div>
     </div>
 
-    
     <div
       v-if="
         workflowInfo &&
@@ -51,7 +49,6 @@
       </div>
     </div>
 
-    
     <div class="bg-bg-elevated rounded-lg border border-border-primary p-4">
       <div class="flex items-center gap-3">
         <BaseSelect v-model="statusFilter" :options="statusOptions" class="w-40" />
@@ -59,12 +56,10 @@
       </div>
     </div>
 
-    
     <div v-if="loading" class="flex justify-center items-center py-20">
       <div class="text-text-tertiary">加载中...</div>
     </div>
 
-    
     <div v-else class="space-y-3">
       <div
         v-for="execution in filteredExecutions"
@@ -74,7 +69,6 @@
         <div class="flex items-start justify-between">
           <div class="flex-1 cursor-pointer" @click="handleViewExecution(execution)">
             <div class="flex items-center gap-3 mb-2">
-              
               <span
                 :class="[
                   'px-2.5 py-1 rounded-full text-xs font-semibold',
@@ -90,17 +84,14 @@
                 {{ getStatusText(execution.status) }}
               </span>
 
-              
               <span class="text-xs font-mono text-text-tertiary">{{ execution.id }}</span>
 
-              
               <span class="text-xs text-text-tertiary flex items-center gap-1">
                 <component :is="getTriggerIcon(execution.trigger_type)" class="w-3.5 h-3.5" />
                 {{ getTriggerText(execution.trigger_type) }}
               </span>
             </div>
 
-            
             <div class="flex items-center gap-4 text-sm text-text-secondary">
               <div class="flex items-center gap-1">
                 <Clock class="w-4 h-4" />
@@ -113,7 +104,6 @@
               <div v-else class="text-primary font-medium">执行中...</div>
             </div>
 
-            
             <div class="mt-3 flex items-center gap-2">
               <div class="flex-1 bg-bg-tertiary rounded-full h-2 overflow-hidden">
                 <div
@@ -137,7 +127,6 @@
               </span>
             </div>
 
-            
             <div
               v-if="execution.error"
               class="mt-2 text-sm text-red-600 bg-red-50 rounded px-2 py-1"
@@ -146,7 +135,6 @@
             </div>
           </div>
 
-          
           <div class="flex items-center gap-2 flex-shrink-0 ml-4">
             <button
               @click.stop="handleDeleteExecution(execution)"
@@ -163,14 +151,12 @@
         </div>
       </div>
 
-      
       <div v-if="filteredExecutions.length === 0" class="text-center py-16">
         <Activity class="w-16 h-16 mx-auto mb-4 text-slate-300" />
         <p class="text-text-tertiary">暂无执行记录</p>
       </div>
     </div>
 
-    
     <Dialog
       v-model="showDeleteDialog"
       title="确认删除"

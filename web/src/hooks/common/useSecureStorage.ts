@@ -11,10 +11,8 @@ export function useSecureStorage<T>(
   defaultValue: T,
   options: SecureStorageOptions = {}
 ): [Ref<T>, (newValue: T) => void, () => void] {
-
   const initialValue = SecureStorage.getItem<T>(key, defaultValue) ?? defaultValue
   const value = ref<T>(initialValue) as Ref<T>
-
 
   watch(
     value,
@@ -37,7 +35,6 @@ export function useSecureStorage<T>(
 
   return [value, setValue, removeValue]
 }
-
 
 export function useAuthStorage<T>(
   key: string,
@@ -65,6 +62,5 @@ export function usePersistentStorage<T>(
 ): [Ref<T>, (newValue: T) => void, () => void] {
   return useSecureStorage(key, defaultValue, {
     encrypt: true,
-
   })
 }

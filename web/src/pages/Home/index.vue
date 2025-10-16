@@ -1,6 +1,5 @@
 <template>
   <div class="min-h-screen bg-bg-secondary">
-    
     <nav class="bg-bg-elevated shadow-sm">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between h-16">
@@ -47,7 +46,6 @@
       </div>
     </nav>
 
-    
     <main class="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
       <div class="text-center">
         <h1 class="text-4xl font-bold text-gray-900 mb-8">欢迎来到用户端</h1>

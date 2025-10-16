@@ -1,12 +1,12 @@
 package database
 
 import (
-	"fmt"
 	"auto-forge/internal/models"
 	"auto-forge/pkg/common"
 	"auto-forge/pkg/config"
 	log "auto-forge/pkg/logger"
 	"auto-forge/pkg/utils"
+	"fmt"
 	"time"
 
 	"gorm.io/driver/mysql"
@@ -112,6 +112,8 @@ func autoMigrate() error {
 		// 工作流模型
 		&models.Workflow{},
 		&models.WorkflowExecution{},
+		&models.WorkflowTemplate{},
+		&models.TemplateInstall{},
 		// 在这里添加其他模型
 	)
 }

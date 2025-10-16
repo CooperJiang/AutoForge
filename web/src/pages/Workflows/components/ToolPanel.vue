@@ -1,18 +1,14 @@
 <template>
   <div class="w-64 bg-bg-elevated border-r border-border-primary flex flex-col overflow-hidden">
-    
     <div class="px-4 py-3 border-b border-border-primary">
       <h3 class="text-sm font-semibold text-text-primary">工具箱</h3>
       <p class="text-xs text-text-tertiary mt-1">点击添加到画布</p>
     </div>
 
-    
     <div class="flex-1 overflow-y-auto p-3 space-y-2">
-      
       <div class="mb-4">
         <div class="text-xs font-semibold text-text-secondary mb-2 px-2">触发器</div>
         <div class="space-y-2">
-          
           <button
             @click="handleAddExternalTrigger"
             draggable="true"
@@ -30,7 +26,6 @@
             </div>
           </button>
 
-          
           <button
             @click="handleAddTrigger"
             draggable="true"
@@ -50,11 +45,9 @@
         </div>
       </div>
 
-      
       <div class="mb-4">
         <div class="text-xs font-semibold text-text-secondary mb-2 px-2">流程控制</div>
         <div class="space-y-2">
-          
           <button
             @click="handleAddCondition"
             draggable="true"
@@ -72,7 +65,6 @@
             </div>
           </button>
 
-          
           <button
             @click="handleAddSwitch"
             draggable="true"
@@ -90,7 +82,6 @@
             </div>
           </button>
 
-          
           <button
             @click="handleAddDelay"
             draggable="true"
@@ -110,7 +101,6 @@
         </div>
       </div>
 
-      
       <div>
         <div class="text-xs font-semibold text-text-secondary mb-2 px-2">工具</div>
         <div class="space-y-2">

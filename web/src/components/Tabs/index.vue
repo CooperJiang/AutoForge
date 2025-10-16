@@ -1,6 +1,5 @@
 <template>
   <div class="tabs-container">
-    
     <div class="border-b border-border-primary">
       <div class="flex gap-1">
         <button
@@ -23,7 +22,6 @@
       </div>
     </div>
 
-    
     <div class="tabs-content mt-6">
       <slot></slot>
     </div>

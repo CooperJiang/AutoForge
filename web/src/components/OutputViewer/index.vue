@@ -1,6 +1,5 @@
 <template>
   <div class="output-viewer max-w-full overflow-auto">
-    
     <component
       v-if="hasRenderConfig"
       :is="viewerComponent"
@@ -8,7 +7,6 @@
       @error="handleError"
     />
 
-    
     <JsonViewer v-else :content="jsonContent" />
   </div>
 </template>

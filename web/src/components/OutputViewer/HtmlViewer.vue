@@ -1,6 +1,5 @@
 <template>
   <div class="html-viewer-container">
-    
     <div class="flex items-center justify-between mb-2 gap-2">
       <div class="text-xs text-text-secondary">HTML 预览</div>
       <button
@@ -12,7 +11,6 @@
       </button>
     </div>
 
-    
     <iframe
       ref="iframeRef"
       :srcdoc="sanitizedHtml"

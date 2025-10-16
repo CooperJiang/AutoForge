@@ -9,6 +9,7 @@ type CreateWorkflowRequest struct {
 	Nodes         []models.WorkflowNode   `json:"nodes" binding:"required"`
 	Edges         []models.WorkflowEdge   `json:"edges" binding:"required"`
 	EnvVars       []models.WorkflowEnvVar `json:"env_vars"`
+	Viewport      *models.WorkflowViewport `json:"viewport"`
 	ScheduleType  string                  `json:"schedule_type"`
 	ScheduleValue string                  `json:"schedule_value"`
 	Enabled       bool                    `json:"enabled"`
@@ -21,6 +22,7 @@ type UpdateWorkflowRequest struct {
 	Nodes         *[]models.WorkflowNode   `json:"nodes"`
 	Edges         *[]models.WorkflowEdge   `json:"edges"`
 	EnvVars       *[]models.WorkflowEnvVar `json:"env_vars"`
+	Viewport      *models.WorkflowViewport `json:"viewport"`
 	ScheduleType  *string                  `json:"schedule_type"`
 	ScheduleValue *string                  `json:"schedule_value"`
 	Enabled       *bool                    `json:"enabled"`

@@ -182,7 +182,7 @@ func (t *OpenAITool) Execute(ctx *utools.ExecutionContext, toolConfig map[string
 
 	apiBase := cfg.OpenAI.APIBase
 	if apiBase == "" {
-		apiBase = "https:
+		apiBase = "https://api.openai.com"
 	}
 
 

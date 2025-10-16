@@ -38,7 +38,6 @@
         </div>
       </div>
 
-      
       <div v-if="displayTags.length > 0">
         <h3 class="text-sm font-semibold text-text-secondary mb-2">标签</h3>
         <div class="flex flex-wrap gap-2">
@@ -52,7 +51,6 @@
         </div>
       </div>
 
-      
       <div v-if="toolConfig">
         <h3 class="text-sm font-semibold text-text-primary mb-2 flex items-center gap-2">
           <BookOpen class="w-4 h-4" />
@@ -91,7 +89,6 @@
         </div>
       </div>
 
-      
       <div class="flex items-center justify-end gap-2 pt-2">
         <BaseButton variant="ghost" size="md" @click="close"> 取消 </BaseButton>
         <BaseButton variant="primary" size="md" @click="handleUseTool" class="whitespace-nowrap">

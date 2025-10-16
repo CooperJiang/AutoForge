@@ -11,6 +11,7 @@ type WorkflowResponse struct {
 	Nodes           []models.WorkflowNode   `json:"nodes"`
 	Edges           []models.WorkflowEdge   `json:"edges"`
 	EnvVars         []models.WorkflowEnvVar `json:"env_vars"`
+	Viewport        *models.WorkflowViewport `json:"viewport,omitempty"`
 	ScheduleType    string                  `json:"schedule_type"`
 	ScheduleValue   string                  `json:"schedule_value"`
 	Enabled         bool                    `json:"enabled"`

@@ -1,6 +1,5 @@
 <template>
   <div class="fixed inset-0 bg-bg-hover flex flex-col">
-    
     <div
       class="bg-bg-elevated border-b border-border-primary px-6 py-3 flex items-center justify-between flex-shrink-0"
     >
@@ -24,7 +23,6 @@
         </div>
       </div>
       <div class="flex items-center gap-3">
-        
         <div
           :class="[
             'px-3 py-1.5 rounded-full text-xs font-medium flex items-center gap-1.5 transition-colors border',
@@ -43,7 +41,6 @@
 
         <div class="h-6 w-px bg-bg-tertiary"></div>
 
-        
         <Tooltip text="API 设置" position="bottom">
           <BaseButton size="sm" variant="ghost" @click="showAPISettings = true">
             <Globe class="w-4 h-4" />
@@ -69,10 +66,14 @@
             <Trash2 class="w-4 h-4" />
           </BaseButton>
         </Tooltip>
+        <Tooltip v-if="isAdmin && workflow.id" text="发布为模板" position="bottom">
+          <BaseButton size="sm" variant="ghost" @click="showPublishDialog = true">
+            <Package class="w-4 h-4" />
+          </BaseButton>
+        </Tooltip>
 
         <div class="h-6 w-px bg-bg-tertiary"></div>
 
-        
         <BaseButton
           size="sm"
           variant="secondary"
@@ -89,14 +90,12 @@
       </div>
     </div>
 
-    
     <div class="flex-1 flex overflow-hidden">
-      
       <ToolPanel @add-node="handleAddNode" />
 
-      
       <div class="flex-1 relative" @drop="handleDrop" @dragover.prevent @dragenter.prevent>
         <VueFlow
+          v-if="isVueFlowReady"
           v-model:nodes="vueFlowNodes"
           v-model:edges="vueFlowEdges"
           :default-zoom="1"
@@ -134,7 +133,6 @@
           </template>
         </VueFlow>
 
-        
         <div
           v-if="nodes.length === 0"
           class="absolute inset-0 flex items-center justify-center pointer-events-none"
@@ -148,7 +146,6 @@
       </div>
     </div>
 
-    
     <NodeConfigDrawer
       v-model="showConfigDrawer"
       :node="selectedNode"
@@ -158,27 +155,22 @@
       @delete="handleDeleteNode"
     />
 
-    
     <WorkflowAPISettings v-model="showAPISettings" :workflow="workflow" @refresh="loadWorkflow" />
 
-    
     <EnvVarManager
       v-model="showEnvVarManager"
       :env-vars="envVars"
       @update:env-vars="handleUpdateEnvVars"
     />
 
-    
     <ImportExportDialog v-model="showImportDialog" mode="import" @import="handleImportData" />
 
-    
     <ImportExportDialog
       v-model="showExportDialog"
       mode="export"
       :workflow-data="exportWorkflowData"
     />
 
-    
     <ExecuteWithParamsDialog
       :visible="showExecuteDialog"
       :workflow="workflow"
@@ -186,7 +178,14 @@
       @execute="executeWorkflow"
     />
 
-    
+    <PublishTemplateDialog
+      v-if="workflow.id"
+      :visible="showPublishDialog"
+      :workflow-id="workflow.id"
+      @close="showPublishDialog = false"
+      @success="showPublishDialog = false"
+    />
+
     <ConfirmDialog
       v-model="confirmDialog.show"
       :title="confirmDialog.title"
@@ -198,7 +197,6 @@
       @cancel="confirmDialog.resolve?.(false)"
     />
 
-    
     <Dialog
       v-model="showDeleteConfirm"
       title="删除节点"
@@ -213,6 +211,21 @@
         <p class="text-text-secondary text-sm mt-1">此操作无法撤销。</p>
       </div>
     </Dialog>
+
+    <!-- 离开确认对话框 -->
+    <ConfirmDialog
+      v-model="showLeaveDialog"
+      title="提示"
+      message="检测到有未保存的更改，草稿已自动保存"
+      variant="warning"
+      cancel-text="继续编辑"
+      extra-button-text="放弃更改"
+      extra-button-variant="danger"
+      confirm-text="保存并离开"
+      @cancel="handleCancelLeave"
+      @extra="handleDiscardAndLeave"
+      @confirm="handleSaveAndLeave"
+    />
   </div>
 </template>
 
@@ -233,6 +246,7 @@ import {
   Power,
   Trash2,
   Globe,
+  Package,
 } from 'lucide-vue-next'
 import BaseButton from '@/components/BaseButton'
 import ConfirmDialog from '@/components/ConfirmDialog'
@@ -250,8 +264,10 @@ import WorkflowAPISettings from './components/WorkflowAPISettings.vue'
 import EnvVarManager from './components/EnvVarManager.vue'
 import ImportExportDialog from './components/ImportExportDialog.vue'
 import ExecuteWithParamsDialog from './components/ExecuteWithParamsDialog.vue'
+import PublishTemplateDialog from './components/PublishTemplateDialog.vue'
 import { useWorkflow } from '@/composables/useWorkflow'
 import { message } from '@/utils/message'
+import SecureStorage, { STORAGE_KEYS } from '@/utils/storage'
 import type { WorkflowNode, WorkflowEnvVar } from '@/types/workflow'
 
 // 确认对话框状态
@@ -305,18 +321,41 @@ const {
   loadWorkflow: loadWorkflowData,
   clearDraft,
 } = useWorkflow(workflowId.value)
-const { project } = useVueFlow()
+const { project, viewport, setViewport } = useVueFlow()
 
 // Vue Flow state
 const vueFlowNodes = ref<any[]>([])
 const vueFlowEdges = ref<any[]>([])
+const isVueFlowReady = ref(false)
 const showConfigDrawer = ref(false)
 const showEnvVarManager = ref(false)
 const showAPISettings = ref(false)
 const showImportDialog = ref(false)
 const showExportDialog = ref(false)
 const showExecuteDialog = ref(false)
+const showPublishDialog = ref(false)
 const selectedNode = ref<WorkflowNode | null>(null)
+
+// User role check
+const USER_ROLE = {
+  SUPER_ADMIN: 1,
+  ADMIN: 2,
+  USER: 3,
+}
+
+const user = computed(() =>
+  SecureStorage.getItem<{
+    username: string
+    id: string
+    email: string
+    role: number
+  }>(STORAGE_KEYS.AUTH_USER)
+)
+
+const isAdmin = computed(() => {
+  const role = user.value?.role
+  return role === USER_ROLE.SUPER_ADMIN || role === USER_ROLE.ADMIN
+})
 
 // 追踪是否有未保存的更改
 const hasUnsavedChanges = ref(false)
@@ -564,6 +603,19 @@ const handleBack = () => {
   router.push('/workflows')
 }
 
+// 将 VueFlow 节点的位置同步回工作流节点
+const syncPositionsFromVueFlow = () => {
+  vueFlowNodes.value.forEach((vueFlowNode) => {
+    const node = nodes.value.find((n) => n.id === vueFlowNode.id)
+    if (node && vueFlowNode.position) {
+      node.position = {
+        x: vueFlowNode.position.x,
+        y: vueFlowNode.position.y,
+      }
+    }
+  })
+}
+
 // 保存
 const handleSave = async () => {
   const validation = validateWorkflow()
@@ -573,6 +625,9 @@ const handleSave = async () => {
   }
 
   try {
+    // 保存前先同步节点位置
+    syncPositionsFromVueFlow()
+
     const currentWorkflowId = workflowId.value
 
     // 从触发器节点中提取调度配置
@@ -617,6 +672,11 @@ const handleSave = async () => {
       schedule_type: scheduleType,
       schedule_value: scheduleValue,
       enabled: workflow.value.enabled,
+      viewport: {
+        x: viewport.value.x,
+        y: viewport.value.y,
+        zoom: viewport.value.zoom,
+      },
     }
 
     if (currentWorkflowId && currentWorkflowId !== 'create') {
@@ -653,10 +713,12 @@ const handleToggleEnabled = async () => {
 
   try {
     const newStatus = !workflow.value.enabled
+    const { workflowApi } = await import('@/api/workflow')
     await workflowApi.toggleEnabled(workflow.value.id, newStatus)
     toggleEnabled()
     message.success(`工作流已${newStatus ? '启用' : '禁用'}`)
   } catch (error: any) {
+    console.error('Toggle enabled error:', error)
     message.error(error.response?.data?.message || '操作失败')
   }
 }
@@ -788,6 +850,8 @@ const handleImportData = (data: any) => {
 const loadWorkflow = async () => {
   const currentWorkflowId = workflowId.value
   if (!currentWorkflowId || currentWorkflowId === 'create') {
+    // 创建模式，直接显示 VueFlow
+    isVueFlowReady.value = true
     return
   }
 
@@ -806,26 +870,70 @@ const loadWorkflow = async () => {
     await nextTick()
     syncToVueFlow()
 
-    // 加载完成后重置未保存标记
+    // 显示 VueFlow
+    isVueFlowReady.value = true
+
+    // 恢复视口状态（必须在 VueFlow 渲染后）
+    if (data.viewport) {
+      await nextTick()
+      await nextTick()
+      setViewport({
+        x: data.viewport.x,
+        y: data.viewport.y,
+        zoom: data.viewport.zoom,
+      })
+    }
+
+    // 加载完成后，再次使用 nextTick 确保所有响应式更新完成后再重置标记
+    await nextTick()
     hasUnsavedChanges.value = false
   } catch (error: any) {
     console.error('Load workflow failed:', error)
     message.error('加载工作流失败')
+    // 即使加载失败，也显示 VueFlow
+    isVueFlowReady.value = true
   }
+}
+
+// 路由守卫相关
+const showLeaveDialog = ref(false)
+const pendingNavigation = ref<any>(null)
+
+const handleSaveAndLeave = async () => {
+  try {
+    await handleSave()
+    showLeaveDialog.value = false
+    // 保存成功后，清除未保存标记，然后继续导航
+    hasUnsavedChanges.value = false
+    if (pendingNavigation.value) {
+      // 使用 nextTick 确保状态更新后再导航
+      await nextTick()
+      pendingNavigation.value()
+    }
+  } catch (error) {
+    // 保存失败，不离开
+    console.error('Save failed:', error)
+  }
+}
+
+const handleDiscardAndLeave = () => {
+  showLeaveDialog.value = false
+  if (pendingNavigation.value) {
+    pendingNavigation.value()
+  }
+}
+
+const handleCancelLeave = () => {
+  showLeaveDialog.value = false
+  pendingNavigation.value = null
 }
 
 // 路由守卫 - 阻止用户在有未保存更改时离开
 onBeforeRouteLeave(async (to, from, next) => {
   if (hasUnsavedChanges.value) {
-    const confirmed = await confirm({
-      title: '离开编辑器',
-      message: '有未保存的更改，确定要离开吗？（草稿将保留）',
-      variant: 'warning',
-      confirmText: '离开',
-      cancelText: '继续编辑',
-    })
-
-    next(confirmed)
+    showLeaveDialog.value = true
+    pendingNavigation.value = () => next()
+    next(false)
   } else {
     next()
   }

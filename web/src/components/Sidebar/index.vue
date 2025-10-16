@@ -1,6 +1,5 @@
 <template>
   <aside class="w-56 bg-bg-primary flex flex-col flex-shrink-0 h-screen">
-    
     <div class="px-4 py-4 border-b border-border-primary">
       <div class="flex items-center gap-2.5 cursor-pointer group" @click="handleLogoClick">
         <div
@@ -19,7 +18,6 @@
       </div>
     </div>
 
-    
     <nav class="flex-1 overflow-y-auto py-2.5 px-2.5">
       <div class="space-y-0.5">
         <router-link
@@ -38,7 +36,6 @@
         </router-link>
       </div>
 
-      
       <div v-if="isAdmin" class="mt-5">
         <div class="px-3 py-1.5 mb-1 text-xs font-bold text-text-tertiary uppercase tracking-wider">
           管理功能
@@ -62,7 +59,6 @@
       </div>
     </nav>
 
-    
     <div class="border-t border-border-primary p-3">
       <div class="flex items-center gap-2.5">
         <div
@@ -89,7 +85,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
-import { ListTodo, Wrench, Workflow, Settings, User, LogOut } from 'lucide-vue-next'
+import { ListTodo, Wrench, Workflow, Settings, User, LogOut, Package } from 'lucide-vue-next'
 import SecureStorage, { STORAGE_KEYS } from '@/utils/storage'
 import { message } from '@/utils/message'
 
@@ -132,6 +128,7 @@ const isAdmin = computed(() => {
 const menuItems = [
   { path: '/', label: '任务管理', icon: ListTodo },
   { path: '/workflows', label: '工作流', icon: Workflow },
+  { path: '/marketplace', label: '模板市场', icon: Package },
   { path: '/tools', label: '工具箱', icon: Wrench },
   { path: '/profile', label: '个人中心', icon: User },
 ]

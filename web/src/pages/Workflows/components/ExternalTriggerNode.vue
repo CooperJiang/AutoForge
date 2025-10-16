@@ -2,7 +2,6 @@
   <div
     class="external-trigger-node bg-bg-elevated rounded-lg shadow-lg border-2 border-blue-500 hover:border-blue-600 transition-all group relative"
   >
-    
     <button
       class="absolute -top-2 -right-2 w-6 h-6 bg-red-500 hover:bg-red-600 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center z-10 shadow-lg"
       @click.stop="handleDelete"
@@ -11,7 +10,6 @@
       <X class="w-4 h-4" />
     </button>
 
-    
     <div
       class="px-3 py-2 bg-gradient-to-r from-blue-500 to-blue-600 rounded-t-lg flex items-center gap-2"
     >
@@ -19,14 +17,12 @@
       <span class="text-sm font-medium text-white truncate">{{ data.name }}</span>
     </div>
 
-    
     <div class="px-3 py-2.5 space-y-2">
       <div class="flex items-center gap-1 text-xs text-text-secondary">
         <Zap class="w-3 h-3 text-blue-500" />
         <span>外部 API 触发</span>
       </div>
 
-      
       <div
         v-if="paramCount > 0"
         class="flex items-center gap-1 text-xs text-blue-600 bg-blue-50 px-2 py-1 rounded"
@@ -38,7 +34,6 @@
       <div v-else class="text-xs text-text-tertiary">未配置参数</div>
     </div>
 
-    
     <Handle type="source" :position="Position.Bottom" class="handle-bottom" />
   </div>
 </template>

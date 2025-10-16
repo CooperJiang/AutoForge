@@ -2,7 +2,6 @@
   <div
     class="group rounded-lg border-2 border-border-primary hover:border-primary transition-all duration-200 bg-bg-elevated shadow-sm hover:shadow-md"
   >
-    
     <div class="p-3.5 pb-3">
       <div class="flex items-start justify-between gap-2 mb-2">
         <h3 class="text-sm font-bold text-text-primary truncate flex-1">
@@ -24,7 +23,6 @@
       </p>
     </div>
 
-    
     <div class="px-3.5 pb-2.5 flex items-center gap-4">
       <span class="flex items-center gap-1.5 text-xs text-text-secondary">
         <Box class="w-3.5 h-3.5" />
@@ -38,7 +36,6 @@
       </span>
     </div>
 
-    
     <div class="px-3.5 pb-3">
       <div
         v-if="hasSchedule"
@@ -61,7 +58,6 @@
       </div>
     </div>
 
-    
     <div class="px-3.5 pb-3.5 flex items-center gap-2">
       <button
         @click="$emit('edit', workflow)"
@@ -87,7 +83,6 @@
       </button>
     </div>
 
-    
     <div
       class="px-3.5 py-2.5 bg-bg-hover border-t-2 border-border-primary flex items-center justify-between"
     >
@@ -125,7 +120,6 @@
     </div>
   </div>
 
-  
   <Dialog
     v-model="showDeleteDialog"
     title="确认删除"

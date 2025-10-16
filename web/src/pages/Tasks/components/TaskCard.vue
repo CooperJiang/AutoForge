@@ -2,7 +2,6 @@
   <div
     class="bg-bg-elevated border-2 border-border-primary rounded-lg shadow-sm hover:shadow-md transition-shadow"
   >
-    
     <div class="p-4 border-b border-border-primary">
       <div class="flex items-start justify-between">
         <div class="flex-1 min-w-0">
@@ -26,7 +25,6 @@
       </div>
     </div>
 
-    
     <div class="px-4 py-3 bg-bg-hover">
       <div class="space-y-1.5 text-xs">
         <div class="flex items-center">
@@ -63,7 +61,6 @@
       </div>
     </div>
 
-    
     <div class="border-t border-border-primary">
       <button
         @click="toggleExecutions"
@@ -89,7 +86,6 @@
         </span>
       </button>
 
-      
       <Transition
         enter-active-class="transition-all duration-200 ease-out"
         enter-from-class="opacity-0 max-h-0"
@@ -189,7 +185,6 @@
     </div>
   </div>
 
-  
   <Dialog
     v-model="showDeleteDialog"
     title="确认删除"
@@ -200,7 +195,6 @@
     @confirm="handleDelete"
   />
 
-  
   <Dialog
     v-model="showDeleteExecutionDialog"
     title="确认删除"

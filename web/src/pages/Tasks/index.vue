@@ -1,13 +1,10 @@
 <template>
-  
   <div v-if="loading" class="flex justify-center items-center py-20">
     <div class="text-text-tertiary">加载中...</div>
   </div>
 
-  
   <main v-else>
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-      
       <div class="lg:col-span-1">
         <TaskFormPanel
           v-model:task-form="taskForm"
@@ -23,7 +20,6 @@
         />
       </div>
 
-      
       <div class="lg:col-span-2">
         <TaskListPanel
           :tasks="tasks"
@@ -46,7 +42,6 @@
     </div>
   </main>
 
-  
   <Dialog
     v-model="dialogVisible"
     :title="dialogConfig.title"

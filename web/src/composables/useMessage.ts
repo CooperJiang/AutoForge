@@ -11,13 +11,11 @@ export interface Message {
   timer?: ReturnType<typeof setTimeout>
 }
 
-
 const messages = ref<Message[]>([])
 
 let messageId = 0
 
 const generateId = () => `message_${++messageId}_${Date.now()}`
-
 
 const addMessage = (options: Omit<Message, 'id' | 'timer'>) => {
   const message: Message = {
@@ -29,7 +27,6 @@ const addMessage = (options: Omit<Message, 'id' | 'timer'>) => {
 
   messages.value.push(message)
 
-
   if (message.duration && message.duration > 0) {
     message.timer = setTimeout(() => {
       removeMessage(message.id)
@@ -38,7 +35,6 @@ const addMessage = (options: Omit<Message, 'id' | 'timer'>) => {
 
   return message.id
 }
-
 
 const removeMessage = (id: string) => {
   const index = messages.value.findIndex((msg) => msg.id === id)
@@ -52,9 +48,7 @@ const removeMessage = (id: string) => {
   }
 }
 
-
 const clearMessages = () => {
-
   messages.value.forEach((message) => {
     if (message.timer) {
       clearTimeout(message.timer)
@@ -90,6 +84,5 @@ export const useMessage = () => {
     clearMessages,
   }
 }
-
 
 export { messages, removeMessage }

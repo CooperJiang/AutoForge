@@ -16,7 +16,6 @@ export interface VariableContext {
 export function parseVariables(text: string, context: VariableContext): any {
   if (typeof text !== 'string') return text
 
-
   const variableRegex = /\{\{([^}]+)\}\}/g
 
   return text.replace(variableRegex, (match, variable) => {
@@ -60,7 +59,6 @@ function resolveVariable(path: string, context: VariableContext): any {
 
   let value: any
 
-
   if (root === 'env') {
     value = context.env
   } else if (root === 'trigger') {
@@ -70,7 +68,6 @@ function resolveVariable(path: string, context: VariableContext): any {
   } else {
     return undefined
   }
-
 
   for (let i = 1; i < parts.length; i++) {
     if (value === undefined || value === null) return undefined
@@ -136,11 +133,9 @@ export function validateVariable(
   const parts = variable.split('.')
   const root = parts[0]
 
-
   if (root === 'env' || root === 'trigger') {
     return { valid: true }
   }
-
 
   if (!availableNodes.includes(root)) {
     return {
@@ -156,7 +151,6 @@ export function validateVariable(
  * 获取节点的可用输出字段（用于UI提示）
  */
 export function getNodeOutputSchema(nodeType: string, toolCode?: string): Record<string, string> {
-
   if (toolCode === 'http_request') {
     return {
       'response.status': '响应状态码',
@@ -166,7 +160,6 @@ export function getNodeOutputSchema(nodeType: string, toolCode?: string): Record
     }
   }
 
-
   if (toolCode === 'email_sender') {
     return {
       success: '是否发送成功',
@@ -174,7 +167,6 @@ export function getNodeOutputSchema(nodeType: string, toolCode?: string): Record
       error: '错误信息（如果失败）',
     }
   }
-
 
   if (toolCode === 'health_checker') {
     return {
@@ -185,7 +177,6 @@ export function getNodeOutputSchema(nodeType: string, toolCode?: string): Record
     }
   }
 
-
   if (nodeType === 'condition') {
     return {
       result: '条件结果 (true/false)',
@@ -193,14 +184,12 @@ export function getNodeOutputSchema(nodeType: string, toolCode?: string): Record
     }
   }
 
-
   if (nodeType === 'switch') {
     return {
       matchedCase: '匹配的分支',
       value: '实际值',
     }
   }
-
 
   if (nodeType === 'trigger') {
     return {

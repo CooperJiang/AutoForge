@@ -1,7 +1,6 @@
 <template>
   <Drawer v-model="isOpen" title="节点配置" size="xl" @close="handleClose">
     <div v-if="node" class="space-y-4">
-      
       <div class="bg-bg-hover rounded-lg p-4">
         <h3 class="text-sm font-semibold text-text-primary mb-3">基本信息</h3>
         <div class="space-y-3">
@@ -12,11 +11,9 @@
         </div>
       </div>
 
-      
       <div v-if="node.type === 'tool' && node.toolCode" class="border-t border-border-primary pt-4">
         <h3 class="text-sm font-semibold text-text-primary mb-3">工具配置</h3>
 
-        
         <div class="bg-bg-hover rounded-lg p-3 border border-border-primary mb-4">
           <div class="flex items-center justify-between mb-2">
             <h4 class="text-sm font-medium text-text-primary">变量助手</h4>
@@ -41,9 +38,7 @@
           </p>
         </div>
 
-        
         <div v-if="node.toolCode === 'http_request'" class="space-y-4">
-          
           <div class="bg-primary-light border border-primary rounded-lg p-3 text-xs text-primary">
             💡 小提示：按
             <kbd class="px-1.5 py-0.5 bg-bg-elevated border border-primary rounded">{{
@@ -74,7 +69,6 @@
             />
           </div>
 
-          
           <div>
             <label class="block text-sm font-medium text-text-secondary mb-2">
               请求头（可选）
@@ -99,7 +93,6 @@
             </div>
           </div>
 
-          
           <div>
             <label class="block text-sm font-medium text-text-secondary mb-2">
               请求参数（可选）
@@ -124,7 +117,6 @@
             </div>
           </div>
 
-          
           <div>
             <button
               type="button"
@@ -148,7 +140,6 @@
           </div>
         </div>
 
-        
         <EmailToolConfig
           v-else-if="node.toolCode === 'email_sender'"
           v-model:config="localNode.config"
@@ -156,13 +147,11 @@
           :env-vars="props.envVars"
         />
 
-        
         <HealthCheckerConfig
           v-else-if="node.toolCode === 'health_checker'"
           v-model:config="localNode.config"
         />
 
-        
         <FeishuBotConfig
           v-else-if="node.toolCode === 'feishu_bot'"
           v-model:config="localNode.config"
@@ -170,7 +159,6 @@
           :env-vars="props.envVars"
         />
 
-        
         <OpenAIConfig
           v-else-if="node.toolCode === 'openai_chatgpt'"
           v-model:config="localNode.config"
@@ -178,7 +166,6 @@
           :env-vars="props.envVars"
         />
 
-        
         <OpenAIImageConfig
           v-else-if="node.toolCode === 'openai_image'"
           v-model:config="localNode.config"
@@ -193,7 +180,6 @@
           :env-vars="props.envVars"
         />
 
-        
         <OutputFormatterConfig
           v-else-if="node.toolCode === 'output_formatter'"
           v-model:config="localNode.config"
@@ -201,7 +187,6 @@
           :env-vars="props.envVars"
         />
 
-        
         <HtmlRenderConfig
           v-else-if="node.toolCode === 'html_render'"
           v-model:config="localNode.config"
@@ -209,13 +194,11 @@
           :env-vars="props.envVars"
         />
 
-        
         <RedisContextConfig
           v-else-if="node.toolCode === 'redis_context'"
           v-model:config="localNode.config"
         />
 
-        
         <ContextManagerConfig
           v-else-if="node.toolCode === 'context_manager'"
           v-model:config="localNode.config"
@@ -224,23 +207,19 @@
         />
       </div>
 
-      
       <div v-if="node.type === 'external_trigger'" class="border-t border-border-primary pt-4">
         <h3 class="text-sm font-semibold text-text-primary mb-3">外部 API 触发配置</h3>
         <ExternalTriggerConfig v-model:config="localNode.config" @update="handleConfigUpdate" />
       </div>
 
-      
       <div v-if="node.type === 'trigger'" class="border-t border-border-primary pt-4">
         <h3 class="text-sm font-semibold text-text-primary mb-3">触发配置</h3>
         <TriggerConfig v-model:config="localNode.config" />
       </div>
 
-      
       <div v-if="node.type === 'condition'" class="border-t border-border-primary pt-4">
         <h3 class="text-sm font-semibold text-text-primary mb-3">条件配置</h3>
 
-        
         <div class="bg-bg-hover rounded-lg p-3 border border-border-primary mb-4">
           <div class="flex items-center justify-between mb-2">
             <h4 class="text-sm font-medium text-text-primary">变量助手</h4>
@@ -268,11 +247,9 @@
         <ConditionConfig v-model:config="localNode.config" :previous-nodes="props.previousNodes" />
       </div>
 
-      
       <div v-if="node.type === 'delay'" class="border-t border-border-primary pt-4">
         <h3 class="text-sm font-semibold text-text-primary mb-3">延迟配置</h3>
 
-        
         <div class="bg-bg-hover rounded-lg p-3 border border-border-primary mb-4">
           <div class="flex items-center justify-between mb-2">
             <h4 class="text-sm font-medium text-text-primary">变量助手</h4>
@@ -304,11 +281,9 @@
         />
       </div>
 
-      
       <div v-if="node.type === 'switch'" class="border-t border-border-primary pt-4">
         <h3 class="text-sm font-semibold text-text-primary mb-3">开关配置</h3>
 
-        
         <div class="bg-bg-hover rounded-lg p-3 border border-border-primary mb-4">
           <div class="flex items-center justify-between mb-2">
             <h4 class="text-sm font-medium text-text-primary">变量助手</h4>
@@ -340,7 +315,6 @@
         />
       </div>
 
-      
       <div v-if="node.type === 'tool'" class="border-t border-border-primary pt-4">
         <h3 class="text-sm font-semibold text-text-primary mb-3">错误重试</h3>
         <RetryConfig
@@ -349,7 +323,6 @@
         />
       </div>
 
-      
       <div v-if="testResult" class="border-t border-border-primary pt-4">
         <div class="bg-bg-hover rounded-lg p-4">
           <div class="flex items-center justify-between mb-3">
@@ -388,7 +361,6 @@
         </div>
       </div>
 
-      
       <div class="flex items-center justify-between pt-4 border-t border-border-primary">
         <BaseButton size="sm" variant="danger" @click="handleDelete">
           <Trash2 class="w-4 h-4 mr-1" />
@@ -412,7 +384,6 @@
     </div>
   </Drawer>
 
-  
   <Dialog
     v-model="showDeleteConfirm"
     title="删除节点"

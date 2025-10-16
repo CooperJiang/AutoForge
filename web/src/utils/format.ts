@@ -90,7 +90,6 @@ export function maskUserId(userId: string, showStart = 4, showEnd = 4): string {
 
   const len = userId.length
 
-
   if (len <= showStart + showEnd) {
     if (len <= 3) return userId
     const start = Math.floor(len / 3)
@@ -116,7 +115,6 @@ export function formatTime(
   if (typeof time === 'string') {
     timestamp = new Date(time).getTime()
   } else {
-
     timestamp = time < 10000000000 ? time * 1000 : time
   }
 

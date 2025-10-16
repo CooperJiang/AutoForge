@@ -3,7 +3,6 @@
     class="condition-node bg-bg-elevated rounded-lg shadow-lg border-2 border-amber-400 min-w-[200px] hover:shadow-xl transition-shadow group relative"
     :class="{ 'ring-2 ring-amber-500': data.selected }"
   >
-    
     <button
       class="absolute -top-2 -right-2 w-6 h-6 bg-red-500 hover:bg-red-600 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center z-10 shadow-lg"
       @click.stop="handleDelete"
@@ -12,16 +11,13 @@
       <X class="w-4 h-4" />
     </button>
 
-    
     <Handle
       type="target"
       :position="Position.Top"
       class="w-3 h-3 !bg-amber-500 !border-2 !border-bg-elevated"
     />
 
-    
     <div class="px-4 py-3">
-      
       <div class="flex items-center gap-2 mb-2">
         <div
           class="flex-shrink-0 w-8 h-8 rounded-lg bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center text-white shadow-sm"
@@ -38,7 +34,6 @@
         </div>
       </div>
 
-      
       <div class="flex items-center gap-1 text-xs">
         <div v-if="hasConfig" class="flex items-center gap-1 text-emerald-600">
           <CheckCircle2 class="w-3 h-3" />
@@ -51,7 +46,6 @@
       </div>
     </div>
 
-    
     <Handle
       id="true"
       type="source"
@@ -66,7 +60,6 @@
       </div>
     </Handle>
 
-    
     <Handle
       id="false"
       type="source"

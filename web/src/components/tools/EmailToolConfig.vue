@@ -61,14 +61,12 @@
         </button>
       </label>
 
-      
       <div
         v-if="showVariableHelper"
         class="mb-2 p-3 bg-bg-hover rounded-lg border border-border-primary"
       >
         <div class="text-xs font-semibold text-text-secondary mb-2">可用变量：</div>
         <div class="space-y-2">
-          
           <div v-if="previousNodes && previousNodes.length > 0">
             <div class="text-xs text-text-secondary mb-1">前置节点输出：</div>
             <div class="space-y-2">
@@ -80,7 +78,6 @@
                 <div class="font-semibold text-text-primary mb-1">{{ node.name }}</div>
                 <div class="text-text-tertiary text-[10px] mb-2">ID: {{ node.id }}</div>
 
-                
                 <div class="text-[10px] text-text-secondary mb-1">常见字段（点击插入）：</div>
                 <div class="flex flex-wrap gap-1">
                   <button
@@ -95,7 +92,6 @@
                   </button>
                 </div>
 
-                
                 <div class="mt-2 text-[10px] text-text-secondary">
                   也可手动输入：
                   <button
@@ -109,7 +105,7 @@
               </div>
             </div>
           </div>
-          
+
           <div v-if="formattedEnvVars && formattedEnvVars.length > 0">
             <div class="text-xs text-text-secondary mb-1">环境变量：</div>
             <div class="space-y-1">

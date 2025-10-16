@@ -3,10 +3,8 @@
  * 支持加密、有效期管理、统一接口
  */
 
-
 class SimpleEncryption {
   private static key = 'gin-template-secret-key-2024'
-
 
   static encrypt(text: string): string {
     const keyBytes = new TextEncoder().encode(this.key)
@@ -42,13 +40,11 @@ class SimpleEncryption {
   }
 }
 
-
 interface StorageItem<T = unknown> {
   value: T
   timestamp: number
   expiry?: number
 }
-
 
 interface StorageOptions {
   encrypt?: boolean
@@ -107,14 +103,12 @@ class SecureStorage {
       if (decrypt) {
         jsonString = SimpleEncryption.decrypt(stored)
         if (!jsonString) {
-
           this.removeItem(key)
           return defaultValue
         }
       }
 
       const item: StorageItem<T> = JSON.parse(jsonString)
-
 
       if (item.expiry && Date.now() > item.expiry) {
         this.removeItem(key)
@@ -275,9 +269,7 @@ class SecureStorage {
             try {
               SimpleEncryption.decrypt(stored)
               encryptedItems++
-            } catch {
-
-            }
+            } catch {}
           }
         }
       })
@@ -323,7 +315,6 @@ class SecureStorage {
   }
 }
 
-
 export const STORAGE_KEYS = {
   AUTH_TOKEN: 'auth_token',
   AUTH_USER: 'auth_user',
@@ -332,7 +323,6 @@ export const STORAGE_KEYS = {
   LANGUAGE: 'language',
   REMEMBER_LOGIN: 'remember_login',
 } as const
-
 
 export const EXPIRY_TIME = {
   MINUTE: 60 * 1000,

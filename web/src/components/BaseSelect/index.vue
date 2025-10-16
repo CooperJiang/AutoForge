@@ -29,7 +29,6 @@
       </div>
     </button>
 
-    
     <Teleport to="body">
       <Transition
         enter-active-class="transition ease-out duration-100"

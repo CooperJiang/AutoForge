@@ -59,6 +59,11 @@ export interface Workflow {
   schedule_type?: string
   schedule_value?: string
   enabled: boolean
+  viewport?: {
+    x: number
+    y: number
+    zoom: number
+  }
   next_run_time?: number
   total_executions?: number
   success_count?: number
@@ -120,7 +125,6 @@ export interface FieldRender {
   display: boolean
 }
 
-
 export interface CreateWorkflowDto {
   name: string
   description: string
@@ -147,6 +151,5 @@ export interface ExecuteWorkflowDto {
   env_vars?: Record<string, string>
   params?: Record<string, any>
 }
-
 
 export type WorkflowExecutionDetail = WorkflowExecution

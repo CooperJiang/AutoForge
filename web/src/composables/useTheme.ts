@@ -50,12 +50,9 @@ function resolveTheme(theme: Theme): 'light' | 'dark' {
 function applyTheme(theme: 'light' | 'dark') {
   const html = document.documentElement
 
-
   html.removeAttribute('data-theme')
 
-
   html.setAttribute('data-theme', theme)
-
 
   appliedTheme.value = theme
 }
@@ -116,15 +113,12 @@ function watchSystemTheme() {
 
   systemThemeQuery = window.matchMedia('(prefers-color-scheme: dark)')
 
-
   const handler = (e: MediaQueryListEvent) => {
-
     if (currentTheme.value === 'auto') {
       const newTheme = e.matches ? 'dark' : 'light'
       applyTheme(newTheme)
     }
   }
-
 
   if (systemThemeQuery.addEventListener) {
     systemThemeQuery.addEventListener('change', handler)
@@ -137,14 +131,11 @@ function watchSystemTheme() {
  * 初始化主题
  */
 function initTheme() {
-
   const saved = loadTheme()
   currentTheme.value = saved
 
-
   const resolved = resolveTheme(saved)
   applyTheme(resolved)
-
 
   watchSystemTheme()
 }
@@ -153,7 +144,6 @@ function initTheme() {
  * 主题管理 Composable
  */
 export function useTheme() {
-
   onMounted(() => {
     if (!document.documentElement.hasAttribute('data-theme')) {
       initTheme()
@@ -192,7 +182,6 @@ export function useTheme() {
     getSystemTheme,
   }
 }
-
 
 if (typeof window !== 'undefined') {
   initTheme()

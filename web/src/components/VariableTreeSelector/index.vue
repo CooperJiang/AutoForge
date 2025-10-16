@@ -1,6 +1,5 @@
 <template>
   <div class="variable-tree-selector">
-    
     <div class="flex flex-wrap gap-2">
       <button
         v-for="node in previousNodes"
@@ -15,7 +14,6 @@
       </button>
     </div>
 
-    
     <Teleport to="body">
       <div
         v-if="activeNodeId"
@@ -25,7 +23,6 @@
         <div
           class="bg-bg-elevated rounded-lg shadow-2xl border border-border-primary max-w-2xl w-full mx-4 max-h-[70vh] flex flex-col"
         >
-          
           <div class="px-4 py-3 border-b border-border-primary flex items-center justify-between">
             <div>
               <h3 class="text-sm font-semibold text-text-primary">选择变量</h3>
@@ -38,7 +35,6 @@
             </button>
           </div>
 
-          
           <div
             class="px-4 py-2 bg-amber-50 dark:bg-amber-900/20 border-b border-amber-200 dark:border-amber-800"
           >
@@ -47,7 +43,6 @@
             </p>
           </div>
 
-          
           <div class="flex-1 overflow-y-auto p-4">
             <div class="space-y-1">
               <VariableTreeNode
@@ -62,7 +57,6 @@
             </div>
           </div>
 
-          
           <div class="px-4 py-3 border-t border-border-primary bg-bg-hover">
             <p class="text-xs text-text-secondary">
               <strong>提示：</strong>点击任意字段复制变量，格式为

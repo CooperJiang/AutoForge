@@ -7,9 +7,7 @@
     @confirm="handleConfirm"
     @cancel="handleCancel"
   >
-    
     <div v-if="mode === 'import'" class="space-y-4">
-      
       <div class="space-y-3">
         <div class="flex items-center justify-between">
           <label class="text-sm font-medium text-text-secondary">工作流JSON：</label>
@@ -39,7 +37,6 @@
         </div>
       </div>
 
-      
       <div class="bg-amber-500/10 border border-amber-500/20 rounded-lg p-3">
         <p class="text-xs text-amber-800 dark:text-amber-200">
           ⚠️ 导入将覆盖当前工作流内容，请确保已保存重要数据
@@ -47,9 +44,7 @@
       </div>
     </div>
 
-    
     <div v-if="mode === 'export'" class="space-y-4">
-      
       <div class="space-y-3">
         <div class="flex items-center justify-between">
           <label class="text-sm font-medium text-text-secondary">编辑JSON内容：</label>
@@ -75,7 +70,6 @@
         </div>
       </div>
 
-      
       <div class="bg-primary-light border border-primary rounded-lg p-3">
         <p class="text-xs text-primary mb-2">💡 <strong>提示：</strong></p>
         <ul class="text-xs text-primary space-y-1 ml-4">
