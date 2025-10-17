@@ -155,7 +155,7 @@ onMounted(async () => {
     })
 
     toolOutputSchemas.value = schemas
-  } catch {
+  } catch (error) {
     console.error('Failed to load tool schemas:', error)
   }
 })

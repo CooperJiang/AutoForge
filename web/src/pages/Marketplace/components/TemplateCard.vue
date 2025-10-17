@@ -1,97 +1,87 @@
 <template>
   <div
-    class="bg-bg-elevated rounded-xl border-2 border-border-primary hover:border-primary hover:shadow-xl transition-all cursor-pointer p-5 shadow-sm"
+    class="bg-bg-elevated rounded-xl border-2 border-border-primary hover:border-primary hover:shadow-xl transition-all cursor-pointer overflow-hidden shadow-sm"
     @click="$emit('view', template)"
   >
-    <!-- Header with Icon -->
-    <div class="flex items-start gap-3 mb-3">
-      <div
-        class="w-14 h-14 rounded-xl bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center flex-shrink-0 border border-border-primary"
-      >
-        <span class="text-3xl">{{ template.icon || '📦' }}</span>
-      </div>
-      <div class="flex-1 min-w-0">
-        <h3 class="text-base font-semibold text-text-primary mb-1 truncate">
+    <!-- Cover Image -->
+    <div
+      v-if="template.cover_image"
+      class="h-28 bg-cover bg-center"
+      :style="`background-image: url(${template.cover_image});`"
+    ></div>
+    <div
+      v-else
+      class="h-28 bg-gradient-to-br from-green-400 via-primary to-green-600 flex items-center justify-center p-2.5"
+    >
+      <h3 class="text-white text-base font-bold text-center line-clamp-2 max-w-[160px] drop-shadow-lg">
+        {{ template.name }}
+      </h3>
+    </div>
+
+    <!-- Content -->
+    <div class="p-3">
+      <!-- Title and Badges -->
+      <div class="flex items-start justify-between mb-2 gap-2">
+        <h3 class="text-sm font-semibold text-text-primary line-clamp-1 flex-1 min-w-0">
           {{ template.name }}
         </h3>
-        <div class="flex items-center gap-2">
+        <div class="flex items-center gap-1 flex-shrink-0">
           <span
             v-if="template.is_official"
-            class="inline-flex items-center px-2 py-0.5 rounded text-xs bg-primary/10 text-primary"
+            class="text-xs px-1.5 py-0.5 bg-blue-500/10 text-blue-600 dark:text-blue-400 rounded"
           >
-            <Shield class="w-3 h-3 mr-1" />
             官方
           </span>
           <span
             v-if="template.is_featured"
-            class="inline-flex items-center px-2 py-0.5 rounded text-xs bg-accent/10 text-accent"
+            class="text-xs px-1.5 py-0.5 bg-yellow-500/10 text-yellow-600 dark:text-yellow-400 rounded"
           >
-            <Star class="w-3 h-3 mr-1 fill-current" />
             精选
           </span>
         </div>
       </div>
-    </div>
 
-    <!-- Description -->
-    <p class="text-sm text-text-secondary mb-3 line-clamp-2">
-      {{ template.description || '暂无描述' }}
-    </p>
+      <!-- Description -->
+      <p class="text-xs text-text-secondary mb-2 line-clamp-2 min-h-[2rem]">
+        {{ template.description || '暂无描述' }}
+      </p>
 
-    <!-- Category -->
-    <div class="mb-3">
-      <span class="inline-block px-2.5 py-1 rounded-md text-xs font-medium bg-primary/10 text-primary border border-primary/20">
-        {{ getCategoryName(template.category) }}
-      </span>
-    </div>
-
-    <!-- Required Tools -->
-    <div v-if="template.required_tools && template.required_tools.length > 0" class="mb-3">
-      <div class="flex items-center gap-1 mb-2">
-        <Wrench class="w-3.5 h-3.5 text-text-tertiary" />
-        <span class="text-xs font-medium text-text-tertiary">所需工具</span>
-      </div>
-      <div class="flex flex-wrap gap-1.5">
+      <!-- Category and Stats -->
+      <div class="flex items-center justify-between mb-2 pb-2 border-b border-border-primary">
         <span
-          v-for="tool in template.required_tools.slice(0, 3)"
-          :key="tool"
-          class="px-2 py-1 rounded-md text-xs bg-surface-secondary text-text-secondary border border-border-primary"
+          class="inline-block px-2 py-0.5 rounded text-xs font-medium bg-primary/10 text-primary border border-primary/20"
         >
-          {{ tool }}
+          {{ getCategoryName(template.category) }}
         </span>
-        <span
-          v-if="template.required_tools.length > 3"
-          class="px-2 py-1 rounded-md text-xs text-text-tertiary font-medium"
-        >
-          +{{ template.required_tools.length - 3 }}
-        </span>
-      </div>
-    </div>
-
-    <!-- Stats -->
-    <div
-      class="flex items-center justify-between text-xs text-text-tertiary pt-3 border-t border-border-primary"
-    >
-      <div class="flex items-center gap-3">
-        <div class="flex items-center gap-1">
-          <Download class="w-3 h-3" />
-          <span>{{ template.install_count }}</span>
-        </div>
-        <div class="flex items-center gap-1">
-          <Eye class="w-3 h-3" />
-          <span>{{ template.view_count }}</span>
+        <div class="flex items-center gap-2.5 text-xs">
+          <div class="flex items-center gap-1 text-green-600 dark:text-green-400">
+            <Download class="w-3.5 h-3.5" />
+            <span>{{ template.install_count }}</span>
+          </div>
+          <div class="flex items-center gap-1 text-blue-600 dark:text-blue-400">
+            <Eye class="w-3.5 h-3.5" />
+            <span>{{ template.view_count }}</span>
+          </div>
         </div>
       </div>
-      <div class="text-text-tertiary">
-        {{ formatDate(template.created_at) }}
-      </div>
-    </div>
 
-    <!-- Install Button -->
-    <BaseButton class="w-full mt-3" @click.stop="$emit('install', template)">
-      <Download class="w-4 h-4 mr-1.5" />
-      安装模板
-    </BaseButton>
+      <!-- Required Tools -->
+      <div v-if="template.required_tools && template.required_tools.length > 0" class="mb-2">
+        <div class="flex items-center gap-1 mb-1">
+          <Wrench class="w-3 h-3 text-text-tertiary flex-shrink-0" />
+          <span class="text-xs font-medium text-text-tertiary">所需工具:</span>
+          <span class="text-xs text-text-secondary truncate flex-1">
+            {{ template.required_tools.join(', ') }}
+          </span>
+        </div>
+      </div>
+
+      <!-- Install Button -->
+      <BaseButton class="w-full text-sm py-1.5" @click.stop="$emit('install', template)">
+        <Download class="w-3.5 h-3.5 mr-1" />
+        安装工作流
+      </BaseButton>
+    </div>
   </div>
 </template>
 

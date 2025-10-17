@@ -110,6 +110,34 @@
               @input="emitUpdate"
             />
           </div>
+
+          <!-- 文件类型特有配置 -->
+          <div v-if="param.type === 'file'" class="space-y-2 pt-2 border-t border-border-primary">
+            <div>
+              <label class="text-xs text-text-secondary mb-1 block">允许的文件类型</label>
+              <BaseSelect
+                v-model="param.accept"
+                :options="fileTypeOptions"
+                size="sm"
+                @change="emitUpdate"
+              />
+            </div>
+            <div>
+              <label class="text-xs text-text-secondary mb-1 block">最大文件大小（MB）</label>
+              <BaseInput
+                v-model.number="param.maxSize"
+                type="number"
+                placeholder="默认 10MB"
+                size="sm"
+                @input="emitUpdate"
+              />
+            </div>
+            <div class="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded p-2">
+              <p class="text-xs text-blue-800 dark:text-blue-300">
+                📌 文件上传后会生成临时 URL，在工作流中通过 <code class="px-1 bg-blue-100 dark:bg-blue-800 rounded" v-text="`{{external.${param.key}}}`"></code> 引用
+              </p>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -161,11 +189,13 @@ import BaseSelect from '@/components/BaseSelect'
 
 interface Parameter {
   key: string
-  type: 'string' | 'number' | 'boolean' | 'object' | 'array'
+  type: 'string' | 'number' | 'boolean' | 'object' | 'array' | 'file'
   required: boolean
   defaultValue: string
   description: string
   example: string
+  accept?: string  // 文件类型限制，如 "image/*"
+  maxSize?: number // 文件大小限制（MB）
 }
 
 const props = defineProps<{
@@ -186,6 +216,16 @@ const typeOptions = [
   { label: '布尔值 (boolean)', value: 'boolean' },
   { label: '对象 (object)', value: 'object' },
   { label: '数组 (array)', value: 'array' },
+  { label: '文件 (file)', value: 'file' },
+]
+
+// 文件类型选项
+const fileTypeOptions = [
+  { label: '所有文件', value: '*/*' },
+  { label: '图片 (image/*)', value: 'image/*' },
+  { label: 'PNG/JPG', value: 'image/png,image/jpeg' },
+  { label: 'PDF', value: 'application/pdf' },
+  { label: '文本文件', value: 'text/*' },
 ]
 
 // 监听 props 变化
@@ -209,6 +249,8 @@ const addParameter = () => {
     defaultValue: '',
     description: '',
     example: '',
+    accept: 'image/*',
+    maxSize: 10,
   })
   emitUpdate()
 }

@@ -1,5 +1,5 @@
 <template>
-  <div class="space-y-6">
+  <div class="space-y-6 max-w-full overflow-x-hidden">
     <div v-if="loading" class="flex justify-center items-center py-20">
       <div class="text-text-tertiary">加载中...</div>
     </div>
@@ -60,7 +60,7 @@
             ></span>
             {{ getStatusText(execution?.status || '') }}
           </span>
-          <ExecuteWorkflowButton :workflow-id="workflowId" />
+          <ExecuteWorkflowButton :workflow-id="workflowId" @executed="handleExecuted" />
         </div>
       </div>
 
@@ -110,10 +110,10 @@
             v-for="(nodeLog, index) in execution?.node_logs"
             :key="nodeLog.node_id"
             :ref="(el) => setNodeRef(nodeLog.node_id, el)"
-            class="p-6"
+            class="p-6 max-w-full overflow-hidden"
           >
             <div class="flex items-start gap-4">
-              <div class="flex flex-col items-center">
+              <div class="flex flex-col items-center flex-shrink-0">
                 <div
                   :class="[
                     'w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold',
@@ -128,7 +128,7 @@
                 ></div>
               </div>
 
-              <div class="flex-1">
+              <div class="flex-1 min-w-0">
                 <div class="flex items-center justify-between mb-2">
                   <div class="flex items-center gap-2">
                     <h4 class="text-sm font-semibold text-text-primary">{{ nodeLog.node_name }}</h4>
@@ -266,9 +266,32 @@
                 <div v-if="nodeLog.error" class="bg-red-50 border border-red-200 rounded-lg p-3">
                   <div class="flex items-start gap-2">
                     <AlertCircle class="w-4 h-4 text-red-600 flex-shrink-0 mt-0.5" />
-                    <div>
+                    <div class="flex-1 min-w-0">
                       <div class="text-xs font-semibold text-red-900 mb-1">错误信息</div>
-                      <div class="text-xs text-red-700">{{ nodeLog.error }}</div>
+                      <div class="text-xs text-red-700 break-words overflow-hidden">
+                        <div
+                          v-if="!expandedErrors[nodeLog.node_id] && nodeLog.error.length > 200"
+                          class="relative"
+                        >
+                          <div class="line-clamp-3">{{ nodeLog.error }}</div>
+                          <button
+                            @click="toggleErrorExpand(nodeLog.node_id)"
+                            class="mt-1 text-xs text-red-600 hover:text-red-800 font-medium underline"
+                          >
+                            展开全部
+                          </button>
+                        </div>
+                        <div v-else>
+                          <div class="whitespace-pre-wrap break-all">{{ nodeLog.error }}</div>
+                          <button
+                            v-if="nodeLog.error.length > 200"
+                            @click="toggleErrorExpand(nodeLog.node_id)"
+                            class="mt-1 text-xs text-red-600 hover:text-red-800 font-medium underline"
+                          >
+                            收起
+                          </button>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -295,11 +318,15 @@ import { message } from '@/utils/message'
 const router = useRouter()
 const route = useRoute()
 
-const workflowId = route.params.id as string
-const executionId = route.params.executionId as string
+// 使用 ref 来存储参数，这样可以响应路由变化
+const workflowId = ref(route.params.id as string)
+const executionId = ref(route.params.executionId as string)
 
 // 记录展开/收起状态
 const openSections = ref<Record<string, Set<string>>>({})
+
+// 错误信息展开状态
+const expandedErrors = ref<Record<string, boolean>>({})
 
 // 执行详情数据
 const execution = ref<WorkflowExecution | null>(null)
@@ -322,7 +349,7 @@ const loadExecution = async (showLoading = true) => {
   }
   try {
     const { workflowApi } = await import('@/api/workflow')
-    const data = await workflowApi.getExecutionDetail(workflowId, executionId)
+    const data = await workflowApi.getExecutionDetail(workflowId.value, executionId.value)
     execution.value = data
 
     // 如果状态是运行中，启动轮询
@@ -361,7 +388,12 @@ const stopPolling = () => {
 }
 
 const handleBack = () => {
-  router.push(`/workflows/${workflowId}/executions`)
+  router.push(`/workflows/${workflowId.value}/executions`)
+}
+
+// 处理执行完成事件（ExecuteWorkflowButton 会自动导航，watch 会监听到路由变化）
+const handleExecuted = (newExecutionId: string) => {
+  // ExecuteWorkflowButton 会导航，然后 watch 会自动加载新数据
 }
 
 // 切换展开/收起
@@ -374,6 +406,11 @@ const toggleSection = (nodeId: string, section: 'input' | 'output') => {
   } else {
     openSections.value[nodeId].add(section)
   }
+}
+
+// 切换错误信息展开/收起
+const toggleErrorExpand = (nodeId: string) => {
+  expandedErrors.value[nodeId] = !expandedErrors.value[nodeId]
 }
 
 const isSectionOpen = (nodeId: string, section: 'input' | 'output') => {
@@ -602,6 +639,36 @@ watch(
       previousNodeCount = newCount
     }
   }
+)
+
+// 监听路由参数变化
+watch(
+  () => route.params,
+  (newParams) => {
+    // 当路由参数变化时，更新 workflowId 和 executionId
+    const newWorkflowId = newParams.id as string
+    const newExecutionId = newParams.executionId as string
+
+    if (newWorkflowId && newExecutionId) {
+      // 如果参数变化了，重新加载数据
+      if (newWorkflowId !== workflowId.value || newExecutionId !== executionId.value) {
+        workflowId.value = newWorkflowId
+        executionId.value = newExecutionId
+
+        // 停止之前的轮询
+        stopPolling()
+
+        // 重置状态
+        openSections.value = {}
+        expandedErrors.value = {}
+        previousNodeCount = 0
+
+        // 重新加载数据
+        loadExecution()
+      }
+    }
+  },
+  { immediate: false }
 )
 
 onMounted(() => {

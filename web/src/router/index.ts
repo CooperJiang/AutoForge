@@ -105,7 +105,7 @@ const router = createRouter({
           name: 'marketplace',
           component: () => import('@/pages/Marketplace/index.vue'),
           meta: {
-            title: '模板市场',
+            title: '工作流市场',
           },
         },
       ],
@@ -172,7 +172,7 @@ router.beforeEach((to, from, next) => {
 })
 
 router.afterEach((to) => {
-  const defaultTitle = '定时任务系统'
+  const defaultTitle = 'AutoForge - 工作流自动化平台'
   const pageTitle = to.meta.title as string
 
   if (pageTitle) {

@@ -66,17 +66,19 @@ const needsExternalParams = (wf: any): boolean => {
   return false
 }
 
-const handleExecute = async (params?: Record<string, any>) => {
+const handleExecute = async (params?: Record<string, any> | FormData) => {
   busy.value = true
   try {
-    const data = await workflowApi.execute(props.workflowId, params ? { params } : undefined)
+    const data = await workflowApi.execute(
+      props.workflowId,
+      params instanceof FormData ? params : (params ? { params } : undefined)
+    )
     message.success('工作流已开始执行')
     emit('executed', data.execution_id)
     if (props.navigateToDetail) {
       router.push(`/workflows/${props.workflowId}/executions/${data.execution_id}`)
     }
   } catch (error: any) {
-    console.error('Execute workflow failed:', error)
     message.error(error.response?.data?.message || '执行失败')
   } finally {
     busy.value = false
@@ -97,7 +99,6 @@ const handleClick = async () => {
     }
     await handleExecute()
   } catch (error: any) {
-    console.error(error)
     message.error('加载工作流失败')
   }
 }

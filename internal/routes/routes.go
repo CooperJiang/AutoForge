@@ -14,9 +14,6 @@ func RegisterRoutes(r *gin.Engine) {
 	// 注册前端路由
 	RegisterClientRoutes(r)
 
-	// 注册文件访问路由（独立路由，不在 /api/v1 下）
-	RegisterFileRoutes(r)
-
 	// 注册OAuth2回调路由（独立路由，不在 /api/v1 下）
 	RegisterOAuth2CallbackRoutes(r)
 

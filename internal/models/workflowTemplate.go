@@ -21,6 +21,7 @@ type WorkflowTemplate struct {
 	Icon       string `gorm:"type:varchar(100)" json:"icon"`
 
 	RequiredTools StringArray `gorm:"type:json" json:"required_tools"`
+	CaseImages    StringArray `gorm:"type:json" json:"case_images"`
 
 	Status     string `gorm:"type:varchar(20);default:'published';index" json:"status"`
 	IsOfficial bool   `gorm:"default:true" json:"is_official"`

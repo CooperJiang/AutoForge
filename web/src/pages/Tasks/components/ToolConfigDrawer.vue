@@ -327,7 +327,7 @@ import Drawer from '@/components/Drawer'
 import BaseInput from '@/components/BaseInput'
 import BaseSelect from '@/components/BaseSelect'
 import ParamInput from '@/components/ParamInput'
-import FeishuBotConfig from '@/components/ToolConfigs/FeishuBotConfig.vue'
+import FeishuBotConfig from '@/components/tools/FeishuBotConfig/index.vue'
 import { message } from '@/utils/message'
 import { parseCurl } from '@/utils/curlParser'
 

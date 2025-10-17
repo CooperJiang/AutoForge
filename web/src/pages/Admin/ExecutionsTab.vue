@@ -99,28 +99,13 @@
       </table>
     </div>
 
-    <div class="flex justify-between items-center mt-6">
-      <div class="text-sm text-text-secondary">共 {{ total }} 条记录</div>
-      <div class="flex gap-2">
-        <button
-          @click="prevPage"
-          :disabled="currentPage === 1"
-          class="px-4 py-2 bg-bg-tertiary text-text-secondary text-sm font-medium rounded-lg hover:bg-bg-tertiary disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-        >
-          上一页
-        </button>
-        <span class="px-4 py-2 text-sm text-text-secondary">
-          {{ currentPage }} / {{ totalPages }}
-        </span>
-        <button
-          @click="nextPage"
-          :disabled="currentPage >= totalPages"
-          class="px-4 py-2 bg-bg-tertiary text-text-secondary text-sm font-medium rounded-lg hover:bg-bg-tertiary disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-        >
-          下一页
-        </button>
-      </div>
-    </div>
+    <Pagination
+      :current="currentPage"
+      :page-size="pageSize"
+      :total="total"
+      :bordered="false"
+      @change="handlePageChange"
+    />
 
     <ExecutionDetailDialog v-model="showExecutionDetail" :execution="selectedExecution" />
 
@@ -145,6 +130,7 @@ import { maskUserId, formatTime, truncateId } from '@/utils/format'
 import BaseInput from '@/components/BaseInput'
 import BaseSelect from '@/components/BaseSelect'
 import BaseButton from '@/components/BaseButton'
+import Pagination from '@/components/Pagination'
 import Dialog from '@/components/Dialog'
 import ExecutionDetailDialog from '@/components/ExecutionDetailDialog'
 
@@ -217,20 +203,10 @@ const confirmDelete = async () => {
   }
 }
 
-// 上一页
-const prevPage = () => {
-  if (currentPage.value > 1) {
-    currentPage.value--
-    loadExecutions()
-  }
-}
-
-// 下一页
-const nextPage = () => {
-  if (currentPage.value < totalPages.value) {
-    currentPage.value++
-    loadExecutions()
-  }
+// 页码变化
+const handlePageChange = (page: number) => {
+  currentPage.value = page
+  loadExecutions()
 }
 
 onMounted(() => {

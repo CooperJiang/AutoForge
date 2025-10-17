@@ -10,11 +10,15 @@ import (
 func RegisterOAuth2Routes(r *gin.RouterGroup) {
 	oauth2Controller := controllers.NewOAuth2Controller()
 
-	// OAuth2登录路由（跳转到授权页）
+	// Linux.do OAuth2登录路由（跳转到授权页）
 	r.GET("/linuxdo", oauth2Controller.LinuxDoLogin)
-
-	// OAuth2回调处理路由（前端通过POST传递code）
+	// Linux.do OAuth2回调处理路由（前端通过POST传递code）
 	r.POST("/linuxdo/callback", oauth2Controller.LinuxDoCallback)
+
+	// GitHub OAuth2登录路由（跳转到授权页）
+	r.GET("/github", oauth2Controller.GitHubLogin)
+	// GitHub OAuth2回调处理路由（前端通过POST传递code）
+	r.POST("/github/callback", oauth2Controller.GitHubCallback)
 }
 
 // RegisterOAuth2CallbackRoutes 注册OAuth2回调路由（已废弃）

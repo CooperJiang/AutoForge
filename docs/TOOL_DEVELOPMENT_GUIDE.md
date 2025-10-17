@@ -1,476 +1,214 @@
 # 🔧 Cooper 工具开发指南
 
-> 完整的工具开发教程 - 从后端实现到前端配置界面
+> 快速开发高质量工具的核心指南
 
 ## 📋 目录
 
-- [概述](#-概述)
+- [开发流程](#-开发流程)
 - [后端开发](#-后端开发)
 - [前端开发](#-前端开发)
-- [完整示例](#-完整示例)
-- [最佳实践](#-最佳实践)
-- [常见问题](#-常见问题)
+- [开发规范](#-开发规范)
+- [检查清单](#-检查清单)
 
 ---
 
-## 🎯 概述
+## 🎯 开发流程
 
-Cooper 使用插件化的工具系统，每个工具都是一个独立的模块。工具开发分为三个部分：
+### 三步完成工具开发
 
-1. **后端工具实现** - 实现工具的核心逻辑（Go）
-2. **前端图标配置** - 配置工具的图标、标签和使用说明（TypeScript）
-3. **前端配置界面** - 为工具提供用户友好的配置界面（Vue 3）
-
-### 工具系统架构
-
-```
-┌─────────────────────────────────────────────┐
-│    前端图标配置 (web/src/config/tools.ts)    │
-│  定义工具的图标、标签、使用说明等前端元数据     │
-└──────────────┬──────────────────────────────┘
-               │
-               ▼
-┌─────────────────────────────────────────────┐
-│           前端配置界面 (Vue 3)               │
-│  用户通过表单配置工具参数                     │
-└──────────────┬──────────────────────────────┘
-               │ 工具配置 (JSON)
-               ▼
-┌─────────────────────────────────────────────┐
-│           工具注册表 (Registry)               │
-│  管理所有已注册的工具                         │
-└──────────────┬──────────────────────────────┘
-               │ 工具实例
-               ▼
-┌─────────────────────────────────────────────┐
-│         工具实现 (Tool Interface)            │
-│  执行具体的业务逻辑                           │
-└─────────────────────────────────────────────┘
-```
-
-### 开发流程总结
-
-1. **后端开发** (`pkg/utools/your_tool/`)
-   - 创建工具文件并实现 `Tool` 接口
-   - 定义 `ToolMetadata`（无需配置 Icon 字段）
-   - 定义 `ConfigSchema`
-   - 实现 `Execute()` 方法
-   - 在 `pkg/utools/init.go` 中导入
-
-2. **前端图标配置** (`web/src/config/tools.ts`)
-   - 导入 Lucide 图标或准备自定义图标图片
-   - 添加工具配置对象（图标、背景色、标签、使用说明）
-
-3. **前端配置组件** (`web/src/components/tools/`)
-   - 创建 Vue 组件实现配置表单
-   - 在编辑器中注册配置组件
+1. **后端实现** (`pkg/utools/your_tool/`) - 实现 Tool 接口，定义配置和输出
+2. **前端图标** (`web/src/config/tools.ts`) - 配置图标、标签、使用说明
+3. **前端组件** (`web/src/components/tools/`) - 创建配置表单并注册
 
 ---
 
 ## 🔨 后端开发
 
-### 第一步：创建工具目录
-
-在 `pkg/utools/` 下创建你的工具目录：
-
-```bash
-mkdir pkg/utools/your_tool
-cd pkg/utools/your_tool
-```
-
-### 第二步：实现工具接口
-
-创建 `your_tool.go` 文件，实现 `Tool` 接口：
+### 核心代码结构
 
 ```go
 package your_tool
 
-import (
-    "auto-forge/pkg/utools"
-    "fmt"
-    "time"
-)
+import "auto-forge/pkg/utools"
 
-// YourTool 你的工具实现
 type YourTool struct {
     *utools.BaseTool
 }
 
-// NewYourTool 创建工具实例
 func NewYourTool() *YourTool {
-    // 1. 定义工具元数据
     metadata := &utools.ToolMetadata{
-        Code:        "your_tool",           // 唯一标识，小写下划线
-        Name:        "你的工具",             // 显示名称
-        Description: "工具功能描述",         // 详细描述
-        Category:    "automation",          // 分类: network, notification, data, automation
-        Version:     "1.0.0",               // 版本号
-        Author:      "Your Name",           // 作者
-        AICallable:  true,                  // 是否可被 AI 调用
-        Tags:        []string{"tag1", "tag2"}, // 标签
+        Code:        "your_tool",
+        Name:        "你的工具",
+        Description: "功能描述",
+        Category:    "automation",  // network/notification/data/automation
+        Version:     "1.0.0",
+        OutputFieldsSchema: map[string]utools.OutputFieldDef{
+            "response": {  // ⚠️ 必须包含
+                Type:  "object",
+                Label: "完整响应",
+                Children: map[string]utools.OutputFieldDef{
+                    "url": {Type: "string", Label: "URL"},
+                },
+            },
+            "url": {Type: "string", Label: "URL（快捷访问）"},
+        },
     }
 
-    // 2. 定义配置 Schema（JSON Schema 格式）
     schema := &utools.ConfigSchema{
         Type: "object",
         Properties: map[string]utools.PropertySchema{
-            "param1": {
-                Type:        "string",
-                Title:       "参数1",
-                Description: "参数1的描述",
-                Default:     "默认值",
-            },
-            "param2": {
-                Type:        "number",
-                Title:       "参数2",
-                Description: "数字类型参数",
-                Default:     10.0,
-                Minimum:     func() *float64 { v := 1.0; return &v }(),
-                Maximum:     func() *float64 { v := 100.0; return &v }(),
-            },
-            "param3": {
-                Type:        "string",
-                Title:       "选项参数",
-                Description: "下拉选择参数",
-                Enum:        []interface{}{"option1", "option2", "option3"},
-                Default:     "option1",
-            },
-            "secret_param": {
-                Type:        "string",
-                Title:       "敏感参数",
-                Description: "API Key 等敏感信息",
-                Secret:      true, // 标记为敏感信息，会加密存储
+            "param": {
+                Type:    "string",
+                Title:   "参数名",
+                Secret:  false,  // true 表示敏感信息
             },
         },
-        Required: []string{"param1"}, // 必填字段
+        Required: []string{"param"},
     }
 
-    return &YourTool{
-        BaseTool: utools.NewBaseTool(metadata, schema),
-    }
+    return &YourTool{BaseTool: utools.NewBaseTool(metadata, schema)}
 }
 
-// Execute 执行工具
 func (t *YourTool) Execute(ctx *utools.ExecutionContext, config map[string]interface{}) (*utools.ExecutionResult, error) {
-    startTime := time.Now()
-
-    // 1. 解析配置参数
-    param1, _ := config["param1"].(string)
-    param2, _ := config["param2"].(float64)
-    param3, _ := config["param3"].(string)
-
-    // 2. 执行工具逻辑
-    // ... 你的业务代码 ...
-
-    // 3. 返回执行结果
+    // 1. 解析配置
+    param := config["param"].(string)
+    
+    // 2. 执行逻辑
+    result := doSomething(param)
+    
+    // 3. 返回结果（必须包含 response 字段）
     return &utools.ExecutionResult{
-        Success:    true,
-        Message:    "执行成功",
+        Success: true,
+        Message: "成功",
         Output: map[string]interface{}{
-            "result": "执行结果",
-            "param1": param1,
-            "param2": param2,
+            "response": result,  // 完整响应
+            "url": result.URL,   // 快捷访问
         },
-        DurationMs: time.Since(startTime).Milliseconds(),
     }, nil
 }
 
-// init 自动注册工具
 func init() {
-    tool := NewYourTool()
-    if err := utools.Register(tool); err != nil {
-        panic(fmt.Sprintf("Failed to register your tool: %v", err))
-    }
+    utools.Register(NewYourTool())
 }
 ```
 
-### 第三步：配置 Schema 详解
+### 注册工具
 
-Schema 定义了工具的配置参数，支持多种数据类型：
-
-#### 字符串类型 (string)
+⚠️ **在 `cmd/main.go` 中导入**（不是 `init.go`）：
 
 ```go
-"url": {
-    Type:        "string",
-    Title:       "URL 地址",
-    Description: "目标 URL",
-    Format:      "uri",           // 格式验证: uri, email, date-time
-    Pattern:     "^https://.*",   // 正则表达式验证
-    MinLength:   func() *int { v := 5; return &v }(),
-    MaxLength:   func() *int { v := 200; return &v }(),
-}
-```
-
-#### 数字类型 (number)
-
-```go
-"timeout": {
-    Type:        "number",
-    Title:       "超时时间",
-    Description: "请求超时（秒）",
-    Default:     30.0,
-    Minimum:     func() *float64 { v := 1.0; return &v }(),
-    Maximum:     func() *float64 { v := 300.0; return &v }(),
-}
-```
-
-#### 布尔类型 (boolean)
-
-```go
-"enabled": {
-    Type:        "boolean",
-    Title:       "启用",
-    Description: "是否启用此功能",
-    Default:     true,
-}
-```
-
-#### 枚举类型 (enum)
-
-```go
-"method": {
-    Type:        "string",
-    Title:       "请求方法",
-    Description: "HTTP 请求方法",
-    Enum:        []interface{}{"GET", "POST", "PUT", "DELETE"},
-    Default:     "GET",
-}
-```
-
-#### 对象类型 (object)
-
-```go
-"headers": {
-    Type:        "object",
-    Title:       "请求头",
-    Description: "HTTP 请求头",
-    Properties: map[string]utools.PropertySchema{
-        "Authorization": {
-            Type:  "string",
-            Title: "认证令牌",
-        },
-    },
-}
-```
-
-#### 数组类型 (array)
-
-```go
-"tags": {
-    Type:        "array",
-    Title:       "标签",
-    Description: "标签列表",
-    Items: &utools.PropertySchema{
-        Type: "string",
-    },
-}
-```
-
-#### 敏感信息 (secret)
-
-```go
-"api_key": {
-    Type:        "string",
-    Title:       "API Key",
-    Description: "第三方服务的 API 密钥",
-    Secret:      true, // 标记为敏感信息，会加密存储
-}
-```
-
-### 第四步：导入工具模块
-
-在 `pkg/utools/init.go` 中导入你的工具：
-
-```go
-package utools
-
 import (
-    _ "auto-forge/pkg/utools/http"
-    _ "auto-forge/pkg/utools/email"
-    _ "auto-forge/pkg/utools/health"
-    _ "auto-forge/pkg/utools/your_tool"  // 添加这行
+    // ... 其他导入
+    _ "auto-forge/pkg/utools/your_tool"
 )
 ```
 
-### 第五步：测试工具
+### 后端配置管理（可选）
 
-创建单元测试文件 `your_tool_test.go`：
+如果工具需要后端配置（如 API Key、Endpoint），需要更新两个文件：
+
+#### 1. `pkg/config/config.go` - 定义配置结构
 
 ```go
-package your_tool
-
-import (
-    "auto-forge/pkg/utools"
-    "context"
-    "testing"
-)
-
-func TestYourTool_Execute(t *testing.T) {
-    tool := NewYourTool()
-
-    ctx := &utools.ExecutionContext{
-        Context: context.Background(),
-        TaskID:  "test-task",
-        UserID:  "test-user",
-    }
-
-    config := map[string]interface{}{
-        "param1": "test value",
-        "param2": 20.0,
-        "param3": "option1",
-    }
-
-    result, err := tool.Execute(ctx, config)
-    if err != nil {
-        t.Fatalf("Execute failed: %v", err)
-    }
-
-    if !result.Success {
-        t.Errorf("Expected success=true, got %v", result.Success)
-    }
+type Config struct {
+    // ... 其他配置
+    YourTool YourToolConfig `yaml:"your_tool" env:"YOUR_TOOL"`
 }
 
-func TestYourTool_Validate(t *testing.T) {
-    tool := NewYourTool()
-
-    // 测试必填字段缺失
-    config := map[string]interface{}{
-        "param2": 20.0,
-    }
-
-    err := tool.Validate(config)
-    if err == nil {
-        t.Error("Expected validation error for missing required field")
-    }
+type YourToolConfig struct {
+    APIKey  string `yaml:"api_key" env:"API_KEY"`
+    BaseURL string `yaml:"base_url" env:"BASE_URL"`
+    Enabled bool   `yaml:"enabled" env:"ENABLED"`
 }
 ```
 
-运行测试：
+#### 2. `config.yaml` / `config.example.yaml` - 添加配置项
 
-```bash
-go test ./pkg/utools/your_tool -v
+```yaml
+# 你的工具配置
+your_tool:
+  api_key: ""
+  base_url: "https://api.example.com"
+  enabled: false
+```
+
+#### 3. Execute 方法中读取配置
+
+```go
+func (t *YourTool) Execute(ctx *utools.ExecutionContext, config map[string]interface{}) (*utools.ExecutionResult, error) {
+    cfg := config.GetConfig()
+    
+    if !cfg.YourTool.Enabled {
+        return &utools.ExecutionResult{
+            Success: false,
+            Message: "工具未启用",
+        }, fmt.Errorf("工具未启用")
+    }
+    
+    // 使用 cfg.YourTool.APIKey 等
+}
 ```
 
 ---
 
 ## 🎨 前端开发
 
-### 第一步：添加工具图标和元数据配置
+### 1. 配置工具图标和元数据
 
-在 `web/src/config/tools.ts` 中为你的工具添加前端配置（图标、标签、使用说明等）：
+在 `web/src/config/tools.ts` 中添加：
 
 ```typescript
-import { YourIcon } from 'lucide-vue-next' // 导入 Lucide 图标
+import { YourIcon } from 'lucide-vue-next'
 
 export const TOOL_CONFIGS: Record<string, ToolConfig> = {
-  // ... 其他工具配置
-
   your_tool: {
     code: 'your_tool',
-    title: '🔧 你的工具',
-    description: '工具功能描述',
-    icon: YourIcon,  // 使用 Lucide 图标组件
-    // 或使用图片路径: icon: '/icons/your-tool.png',
-    iconBg: 'bg-gradient-to-br from-blue-500 to-indigo-600',  // 图标背景渐变色
-    usageDescription: '详细的使用说明',
-    usageItems: [
-      { text: '功能特点 1' },
-      { text: '功能特点 2' },
-      { text: '适用场景：XXX' },
-    ],
-    tags: ['tag1', 'tag2', 'tag3'],
+    title: '你的工具',
+    description: '功能描述',
+    icon: YourIcon,
+    iconBg: 'bg-gradient-to-br from-blue-500 to-indigo-600',
+    tags: ['tag1', 'tag2'],
   },
 }
 ```
 
-**配置说明：**
-- `icon`: 支持两种方式
-  - **Lucide 图标**（推荐）：从 `lucide-vue-next` 导入图标组件
-  - **自定义图片**：提供图片路径，如 `'/icons/tool.png'`，图片放在 `web/public/icons/` 目录
-- `iconBg`: Tailwind CSS 渐变背景类名，用于图标背景色
-- `usageDescription`: 工具使用说明
-- `usageItems`: 工具特点和使用场景的列表
-- `tags`: 工具标签，用于搜索和分类
+**常用图标：** `Globe`(网络)、`Mail`(邮件)、`Activity`(监控)、`Image`(图片) - [完整列表](https://lucide.dev/icons/)
 
-**常用 Lucide 图标：**
-- `Globe` - 网络/HTTP 相关
-- `Mail` - 邮件相关
-- `Activity` - 监控/健康检查
-- `Shuffle` - 转换/处理
-- `Zap` - 缓存/性能
-- `MessageSquare` - 消息/通知
-- `Palette` - 格式化/输出
-- `FileJson` - 文件/数据
-- `MessageCircle` - 对话/聊天
-- `Image` - 图片相关
+### 2. 创建配置组件
 
-完整的图标列表：https://lucide.dev/icons/
+在 `web/src/components/tools/` 创建 `YourToolConfig/` 文件夹并在其中创建 `index.vue`：
 
-### 第二步：创建配置组件
+**目录结构：**
+```
+web/src/components/tools/
+  YourToolConfig/
+    index.vue          # 主配置组件（必需）
+    types.ts           # 类型定义（可选）
+    composables/       # 复杂逻辑拆分（可选）
+      useYourToolState.ts
+      useYourToolActions.ts
+    components/        # 子组件（可选）
+```
 
-在 `web/src/components/tools/` 下创建 `YourToolConfig.vue`：
+**`YourToolConfig/index.vue`：**
 
 ```vue
 <template>
   <div class="space-y-4">
     <h3 class="text-sm font-semibold text-text-primary mb-3">你的工具配置</h3>
 
-    <!-- 参数1 - 文本输入 -->
     <div>
       <label class="block text-xs font-medium text-text-secondary mb-1.5">
-        参数1 <span class="text-error">*</span>
+        参数名 <span class="text-error">*</span>
       </label>
       <input
-        v-model="localConfig.param1"
+        v-model="localConfig.param"
         type="text"
-        placeholder="请输入参数1"
-        class="w-full px-3 py-2 text-sm border border-border-primary rounded-md focus:ring-2 focus:ring-primary focus:border-primary"
+        placeholder="请输入参数"
+        class="w-full px-3 py-2 text-sm bg-bg-primary text-text-primary 
+               border border-border-primary rounded-md
+               focus:ring-2 focus:ring-primary focus:border-primary"
       />
-    </div>
-
-    <!-- 参数2 - 数字输入 -->
-    <div>
-      <label class="block text-xs font-medium text-text-secondary mb-1.5">
-        参数2
-      </label>
-      <input
-        v-model.number="localConfig.param2"
-        type="number"
-        :min="1"
-        :max="100"
-        placeholder="输入数字 (1-100)"
-        class="w-full px-3 py-2 text-sm border border-border-primary rounded-md focus:ring-2 focus:ring-primary focus:border-primary"
-      />
-    </div>
-
-    <!-- 参数3 - 下拉选择 -->
-    <div>
-      <label class="block text-xs font-medium text-text-secondary mb-1.5">
-        选项参数
-      </label>
-      <select
-        v-model="localConfig.param3"
-        class="w-full px-3 py-2 text-sm border border-border-primary rounded-md focus:ring-2 focus:ring-primary focus:border-primary"
-      >
-        <option value="option1">选项1</option>
-        <option value="option2">选项2</option>
-        <option value="option3">选项3</option>
-      </select>
-    </div>
-
-    <!-- 敏感参数 - 密码输入 -->
-    <div>
-      <label class="block text-xs font-medium text-text-secondary mb-1.5">
-        敏感参数
-      </label>
-      <input
-        v-model="localConfig.secret_param"
-        type="password"
-        placeholder="输入 API Key"
-        class="w-full px-3 py-2 text-sm border border-border-primary rounded-md focus:ring-2 focus:ring-primary focus:border-primary"
-      />
-      <p class="mt-1 text-xs text-text-tertiary">此信息将被加密存储</p>
     </div>
   </div>
 </template>
@@ -482,511 +220,385 @@ interface Props {
   config: Record<string, any>
 }
 
-interface Emits {
-  (e: 'update:config', value: Record<string, any>): void
-}
-
 const props = defineProps<Props>()
-const emit = defineEmits<Emits>()
+const emit = defineEmits<{
+  (e: 'update:config', value: Record<string, any>): void
+}>()
 
-// 本地配置状态
 const localConfig = ref({
-  param1: props.config.param1 || '',
-  param2: props.config.param2 || 10,
-  param3: props.config.param3 || 'option1',
-  secret_param: props.config.secret_param || '',
+  param: props.config.param || '',
 })
 
-// 监听配置变化并向父组件发送更新
-watch(
-  localConfig,
-  (newConfig) => {
+watch(localConfig, (newConfig) => {
     emit('update:config', newConfig)
-  },
-  { deep: true }
-)
+}, { deep: true })
 </script>
 ```
 
-### 第三步：注册配置组件
+### 3. 注册配置组件（⚠️ 重要：两个位置）
 
-在工作流编辑器中注册你的配置组件。
+#### 任务编辑器
 
-找到 `web/src/pages/Workflows/editor.vue`，在工具配置部分添加你的组件：
+`web/src/pages/Tasks/components/ToolConfigDrawer/index.vue`：
 
-```vue
-<script setup lang="ts">
-import YourToolConfig from '@/components/tools/YourToolConfig.vue'
-
-// 工具配置组件映射
-const toolConfigComponents = {
-  http_request: HttpRequestConfig,
-  send_email: EmailToolConfig,
-  health_checker: HealthCheckerConfig,
-  your_tool: YourToolConfig,  // 添加这行
-}
-</script>
+**1. 添加导入（在 `<script setup>` 中）：**
+```typescript
+import YourToolConfig from '@/components/tools/YourToolConfig/index.vue'
 ```
 
-**注意：** 工具会自动从后端 API 加载并显示在工具列表和工具面板中，图标和元数据会使用 `web/src/config/tools.ts` 中的配置。无需手动在工具面板中添加。
-
-### 组件开发最佳实践
-
-#### 1. 使用受控组件
-
+**2. 添加组件使用：**
 ```vue
-<script setup lang="ts">
-// ✅ 正确：使用本地状态 + watch
-const localConfig = ref({ ...props.config })
-
-watch(
-  localConfig,
-  (newConfig) => {
-    emit('update:config', newConfig)
-  },
-  { deep: true }
-)
-
-// ❌ 错误：直接修改 props
-const updateParam = (value) => {
-  props.config.param1 = value // 这样做是错误的！
-}
-</script>
+<YourToolConfig 
+  v-else-if="props.toolCode === 'your_tool'"
+  :config="localConfig"
+  @update:config="syncConfig"
+/>
 ```
 
-#### 2. 提供输入验证
+#### 工作流编辑器
 
-```vue
-<template>
-  <div>
-    <input
-      v-model="localConfig.email"
-      type="email"
-      :class="{ 'border-error': !isValidEmail }"
-    />
-    <p v-if="!isValidEmail" class="text-xs text-error mt-1">
-      请输入有效的邮箱地址
-    </p>
-  </div>
-</template>
+⚠️ **注意：这里有两个文件都需要注册**
 
-<script setup lang="ts">
-import { computed } from 'vue'
+**A. `web/src/pages/Workflows/components/NodeConfigDrawer.vue`**
 
-const isValidEmail = computed(() => {
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-  return emailRegex.test(localConfig.value.email)
-})
-</script>
+**1. 添加导入：**
+```typescript
+import YourToolConfig from '@/components/tools/YourToolConfig/index.vue'
 ```
 
-#### 3. 添加帮助文本
-
+**2. 添加组件使用：**
 ```vue
-<template>
-  <div>
-    <label class="flex items-center gap-1">
-      参数名称
-      <Tooltip text="这是参数的详细说明" position="right">
-        <HelpCircle class="w-3.5 h-3.5 text-text-tertiary" />
-      </Tooltip>
-    </label>
-    <input v-model="localConfig.param" />
-    <p class="text-xs text-text-tertiary mt-1">
-      提示：这个参数的使用建议
-    </p>
-  </div>
-</template>
+<YourToolConfig
+  v-else-if="selectedNode?.toolCode === 'your_tool'"
+  :config="localNode.config"
+  :previous-nodes="props.previousNodes"
+  :env-vars="formattedEnvVars"
+  @update:config="handleConfigUpdate"
+/>
 ```
+
+**B. `web/src/pages/Workflows/editor.vue`（旧版编辑器）**
+
+在 `NodeConfigDrawer` 内嵌部分添加：
+```vue
+<YourToolConfig
+  v-else-if="selectedNode?.toolCode === 'your_tool'"
+  v-model:config="selectedNode.config"
+/>
+```
+
+**关键点：**
+- ⚠️ **必须使用完整路径** `@/components/tools/YourToolConfig/index.vue`（Vite 要求）
+- 使用 `toolCode`（不是 `tool_code`）
+- `NodeConfigDrawer.vue` 使用 `@update:config`
+- `editor.vue` 使用 `v-model:config`
 
 ---
 
-## 📝 完整示例：短信发送工具
+## 📐 开发规范
 
-让我们通过一个完整的示例来演示整个开发流程。
+### 后端规范
 
-### 后端实现
+#### 必须遵守
 
-`pkg/utools/sms/sms_tool.go`:
+1. **OutputFieldsSchema 必须包含 `response` 字段**
+   ```go
+   OutputFieldsSchema: map[string]utools.OutputFieldDef{
+       "response": {Type: "object", Label: "完整响应", Children: {...}},
+       // 可选：快捷访问字段
+   }
+   ```
+
+2. **敏感信息必须标记**
+   ```go
+   Properties: map[string]utools.PropertySchema{
+       "api_key": {Type: "string", Title: "API Key", Secret: true},
+   }
+   ```
+
+3. **返回结果必须包含 response**
+   ```go
+   Output: map[string]interface{}{
+       "response": fullResponse,  // 完整对象
+       "field":    quickAccess,   // 快捷字段
+   }
+   ```
+
+4. **文件参数处理（重要！）**
+   
+   当工具接收文件参数时，必须按以下顺序解析：
 
 ```go
-package sms
-
-import (
-    "auto-forge/pkg/utools"
-    "fmt"
-    "time"
-)
-
-type SMSTool struct {
-    *utools.BaseTool
-}
-
-func NewSMSTool() *SMSTool {
-    metadata := &utools.ToolMetadata{
-        Code:        "send_sms",
-        Name:        "发送短信",
-        Description: "通过短信服务商发送短信通知",
-        Category:    "notification",
-        Version:     "1.0.0",
-        Author:      "Cooper Team",
-        AICallable:  true,
-        Tags:        []string{"sms", "notification", "message"},
-    }
-
-    schema := &utools.ConfigSchema{
-        Type: "object",
-        Properties: map[string]utools.PropertySchema{
-            "phone": {
-                Type:        "string",
-                Title:       "手机号码",
-                Description: "接收短信的手机号码",
-                Pattern:     "^1[3-9]\\d{9}$",
-            },
-            "message": {
-                Type:        "string",
-                Title:       "短信内容",
-                Description: "要发送的短信内容",
-                MinLength:   func() *int { v := 1; return &v }(),
-                MaxLength:   func() *int { v := 500; return &v }(),
-            },
-            "provider": {
-                Type:        "string",
-                Title:       "服务商",
-                Description: "短信服务提供商",
-                Enum:        []interface{}{"阿里云", "腾讯云", "华为云"},
-                Default:     "阿里云",
-            },
-            "api_key": {
-                Type:        "string",
-                Title:       "API Key",
-                Description: "短信服务商的 API 密钥",
-                Secret:      true,
-            },
-        },
-        Required: []string{"phone", "message", "api_key"},
-    }
-
-    return &SMSTool{
-        BaseTool: utools.NewBaseTool(metadata, schema),
-    }
-}
-
-func (t *SMSTool) Execute(ctx *utools.ExecutionContext, config map[string]interface{}) (*utools.ExecutionResult, error) {
-    startTime := time.Now()
-
-    phone, _ := config["phone"].(string)
-    message, _ := config["message"].(string)
-    provider, _ := config["provider"].(string)
-    apiKey, _ := config["api_key"].(string)
-
-    // 模拟发送短信（实际应该调用短信服务商 API）
-    // ... 实际的短信发送代码 ...
-
+   var filePath string
+   
+   // 1. 优先检查文件对象（从外部API/工作流传入）
+   if fileObj, ok := toolConfig["file"].(map[string]interface{}); ok {
+       if path, ok := fileObj["path"].(string); ok && path != "" {
+           filePath = path
+       }
+   }
+   
+   // 2. 如果不是文件对象,再尝试字符串路径
+   if filePath == "" {
+       if strPath, ok := toolConfig["file"].(string); ok && strPath != "" {
+           filePath = strPath
+       }
+   }
+   
+   // 3. 最终验证
+   if filePath == "" {
     return &utools.ExecutionResult{
-        Success: true,
-        Message: fmt.Sprintf("短信已发送至 %s", phone),
-        Output: map[string]interface{}{
-            "phone":    phone,
-            "provider": provider,
-            "sent_at":  time.Now().Unix(),
-        },
-        DurationMs: time.Since(startTime).Milliseconds(),
-    }, nil
-}
+           Success: false,
+           Message: "文件参数无效",
+       }, fmt.Errorf("文件参数无效")
+   }
+   ```
+   
+   **为什么这样做？**
+   - 外部API触发器传入的是文件对象：`{"path": "/tmp/...", "filename": "...", "size": 123}`
+   - 用户手动输入的可能是字符串路径：`"/path/to/file"`
+   - 必须先检查对象，否则会误报"参数无效"
 
-func init() {
-    tool := NewSMSTool()
-    if err := utools.Register(tool); err != nil {
-        panic(fmt.Sprintf("Failed to register SMS tool: %v", err))
-    }
-}
-```
+### 前端规范
 
-### 前端图标配置
-
-`web/src/config/tools.ts` 中添加 SMS 工具配置：
+#### 组件接口标准
 
 ```typescript
-import { MessageSquare } from 'lucide-vue-next'
+// ✅ 正确
+const localConfig = ref({...props.config})
+watch(localConfig, (v) => emit('update:config', v), {deep: true})
 
-export const TOOL_CONFIGS: Record<string, ToolConfig> = {
-  // ... 其他工具
-
-  send_sms: {
-    code: 'send_sms',
-    title: '📱 发送短信',
-    description: '通过短信服务商发送短信通知',
-    icon: MessageSquare,
-    iconBg: 'bg-gradient-to-br from-green-500 to-emerald-600',
-    usageDescription: '支持多家短信服务商发送短信通知',
-    usageItems: [
-      { text: '支持阿里云、腾讯云、华为云等主流短信服务商' },
-      { text: '自动验证手机号格式' },
-      { text: 'API Key 加密存储，安全可靠' },
-      { text: '适用场景：验证码发送、通知提醒、营销推广等' },
-    ],
-    tags: ['SMS', 'Notification', 'Message', 'Alert'],
-  },
-}
+// ❌ 错误
+props.config.param = value  // 禁止直接修改 props
 ```
 
-### 前端配置组件实现
-
-`web/src/components/tools/SMSToolConfig.vue`:
+#### 样式规范（支持主题切换）
 
 ```vue
-<template>
-  <div class="space-y-4">
-    <h3 class="text-sm font-semibold text-text-primary mb-3">短信发送配置</h3>
+<!-- ✅ 使用语义化变量 -->
+<div class="text-text-primary bg-bg-primary border-border-primary">
 
-    <!-- 手机号 -->
-    <div>
-      <label class="block text-xs font-medium text-text-secondary mb-1.5">
-        手机号码 <span class="text-error">*</span>
-      </label>
+<!-- ❌ 禁止硬编码颜色 -->
+<div class="text-gray-900 bg-white border-gray-300">
+```
+
+**关键变量：**
+- `text-text-primary/secondary/tertiary` - 文本颜色
+- `bg-bg-primary/elevated/hover` - 背景色
+- `border-border-primary` - 边框色
+- `text-error` / `text-primary` - 状态色
+
+#### 表单元素标准
+
+```vue
+<!-- 标准输入框 -->
       <input
-        v-model="localConfig.phone"
-        type="tel"
-        placeholder="请输入手机号码"
-        :class="[
-          'w-full px-3 py-2 text-sm border rounded-md focus:ring-2 focus:ring-primary focus:border-primary',
-          !isValidPhone && localConfig.phone ? 'border-error' : 'border-border-primary'
-        ]"
-      />
-      <p v-if="!isValidPhone && localConfig.phone" class="text-xs text-error mt-1">
-        请输入有效的手机号码
-      </p>
-    </div>
+  v-model="localConfig.param"
+  class="w-full px-3 py-2 text-sm 
+         bg-bg-primary text-text-primary
+         border border-border-primary rounded-md
+         focus:ring-2 focus:ring-primary"
+/>
 
-    <!-- 短信内容 -->
-    <div>
-      <label class="block text-xs font-medium text-text-secondary mb-1.5">
-        短信内容 <span class="text-error">*</span>
-      </label>
-      <textarea
-        v-model="localConfig.message"
-        rows="4"
-        placeholder="请输入短信内容"
-        maxlength="500"
-        class="w-full px-3 py-2 text-sm border border-border-primary rounded-md focus:ring-2 focus:ring-primary focus:border-primary resize-none"
-      ></textarea>
-      <p class="text-xs text-text-tertiary mt-1">
-        {{ localConfig.message?.length || 0 }} / 500 字
-      </p>
-    </div>
+<!-- 敏感信息 -->
+<input type="password" />
 
-    <!-- 服务商选择 -->
-    <div>
-      <label class="block text-xs font-medium text-text-secondary mb-1.5">
-        服务商
-      </label>
-      <select
-        v-model="localConfig.provider"
-        class="w-full px-3 py-2 text-sm border border-border-primary rounded-md focus:ring-2 focus:ring-primary focus:border-primary"
-      >
-        <option value="阿里云">阿里云</option>
-        <option value="腾讯云">腾讯云</option>
-        <option value="华为云">华为云</option>
+<!-- 下拉选择 -->
+<select class="...同上">
+  <option value="">请选择</option>
       </select>
-    </div>
-
-    <!-- API Key -->
-    <div>
-      <label class="block text-xs font-medium text-text-secondary mb-1.5">
-        API Key <span class="text-error">*</span>
-      </label>
-      <input
-        v-model="localConfig.api_key"
-        type="password"
-        placeholder="输入短信服务商的 API Key"
-        class="w-full px-3 py-2 text-sm border border-border-primary rounded-md focus:ring-2 focus:ring-primary focus:border-primary"
-      />
-      <p class="text-xs text-text-tertiary mt-1">
-        <Lock class="w-3 h-3 inline" /> 此信息将被加密存储
-      </p>
-    </div>
-  </div>
-</template>
-
-<script setup lang="ts">
-import { ref, computed, watch } from 'vue'
-import { Lock } from 'lucide-vue-next'
-
-interface Props {
-  config: Record<string, any>
-}
-
-interface Emits {
-  (e: 'update:config', value: Record<string, any>): void
-}
-
-const props = defineProps<Props>()
-const emit = defineEmits<Emits>()
-
-const localConfig = ref({
-  phone: props.config.phone || '',
-  message: props.config.message || '',
-  provider: props.config.provider || '阿里云',
-  api_key: props.config.api_key || '',
-})
-
-// 手机号验证
-const isValidPhone = computed(() => {
-  if (!localConfig.value.phone) return true
-  return /^1[3-9]\d{9}$/.test(localConfig.value.phone)
-})
-
-watch(
-  localConfig,
-  (newConfig) => {
-    emit('update:config', newConfig)
-  },
-  { deep: true }
-)
-</script>
 ```
 
 ---
 
-## 🎯 最佳实践
+## 📋 检查清单
 
-### 1. 错误处理
+### 后端检查
 
-```go
-func (t *YourTool) Execute(ctx *utools.ExecutionContext, config map[string]interface{}) (*utools.ExecutionResult, error) {
-    startTime := time.Now()
+- [ ] 工具实现了 Tool 接口
+- [ ] **OutputFieldsSchema 已定义且包含 `response` 字段**
+- [ ] ConfigSchema 定义完整
+- [ ] 敏感信息标记为 Secret: true
+- [ ] **在 `cmd/main.go` 中导入（不是 `init.go`）**
+- [ ] Execute 方法有错误处理
+- [ ] **如果接收文件参数，先检查对象再检查字符串**
+- [ ] 如果需要后端配置：
+  - [ ] 在 `pkg/config/config.go` 中定义结构体
+  - [ ] 在 `config.yaml` 和 `config.example.yaml` 中添加配置
+  - [ ] Execute 中正确读取配置并验证
 
-    // 验证配置
-    if err := t.Validate(config); err != nil {
-        return &utools.ExecutionResult{
-            Success:    false,
-            Message:    "配置验证失败",
-            Error:      err.Error(),
-            DurationMs: time.Since(startTime).Milliseconds(),
-        }, err
-    }
+### 前端检查
 
-    // 检查上下文超时
-    select {
-    case <-ctx.Context.Done():
-        return &utools.ExecutionResult{
-            Success:    false,
-            Message:    "执行超时",
-            Error:      "context deadline exceeded",
-            DurationMs: time.Since(startTime).Milliseconds(),
-        }, ctx.Context.Err()
-    default:
-    }
+- [ ] 在 `web/src/config/tools.ts` 配置图标和元数据
+- [ ] 配置组件遵循标准接口（Props/Emits）
+- [ ] 使用本地状态 + watch 模式
+- [ ] 使用语义化 CSS 变量
+- [ ] **在两个位置都注册了组件**（⚠️ 最容易忘记）
+  - [ ] 任务编辑器: `pages/Tasks/components/ToolConfigDrawer/index.vue`
+  - [ ] **工作流编辑器: `pages/Workflows/editor.vue`**（使用 `toolCode`）
+- [ ] 必填字段有 `*` 标记
+- [ ] 敏感字段使用 `type="password"`
+- [ ] 代码通过 ESLint 和 TypeScript 检查
+- [ ] 在亮色和暗色主题下都测试过
 
-    // 执行业务逻辑...
-}
+### 测试检查
+
+- [ ] 后端启动成功，日志无报错
+- [ ] 工具出现在工具列表中
+- [ ] 拖入画布后配置面板正常显示
+- [ ] 配置项双向绑定正常工作
+- [ ] 执行工作流成功，输出符合预期
+- [ ] 变量引用正常工作（如 `{{nodes.xxx.response.field}}`）
+- [ ] 如果涉及文件上传，测试外部API触发器场景
+
+---
+
+## 🧪 测试与调试
+
+### 重启后端服务
+
+```bash
+# 方法1: 杀掉旧进程并重启
+lsof -ti:7777 | xargs kill -9 && sleep 1 && nohup go run cmd/main.go > /tmp/cooper-backend.log 2>&1 &
+
+# 方法2: 使用 pkill
+pkill -9 -f "cmd/main.go" && sleep 1 && nohup go run cmd/main.go > /tmp/cooper-backend.log 2>&1 &
 ```
 
-### 2. 日志记录
+### 查看后端日志
 
-```go
-import log "auto-forge/pkg/logger"
+```bash
+# 查看启动日志
+tail -20 /tmp/cooper-backend.log | grep "INFO.*服务启动成功"
 
-func (t *YourTool) Execute(ctx *utools.ExecutionContext, config map[string]interface{}) (*utools.ExecutionResult, error) {
-    log.Info("执行工具: %s, 任务ID: %s", t.GetMetadata().Name, ctx.TaskID)
+# 实时监控
+tail -f /tmp/cooper-backend.log
 
-    // ... 执行逻辑 ...
-
-    log.Info("工具执行成功: %s, 耗时: %dms", t.GetMetadata().Name, result.DurationMs)
-    return result, nil
-}
+# 查看错误
+tail -100 /tmp/cooper-backend.log | grep -i error
 ```
 
-### 3. 敏感信息处理
+### 调试步骤
 
-后端会自动加密标记为 `Secret: true` 的字段，前端使用 `type="password"` 输入框。
+1. **后端注册检查**
+   ```bash
+   # 启动后应该看到工具注册日志
+   tail /tmp/cooper-backend.log | grep "your_tool"
+   ```
 
-### 4. 测试覆盖
+2. **前端工具列表检查**
+   - 打开浏览器控制台
+   - 进入工作流编辑页面
+   - 查看 Network 中的 `/api/v1/tools` 响应
+   - 确认你的工具在列表中
 
-- 单元测试：测试工具的核心逻辑
-- 集成测试：测试工具在实际环境中的运行
-- 配置验证测试：测试各种配置参数的验证逻辑
+3. **配置组件检查**
+   - 在工作流中拖入工具
+   - 点击节点打开右侧配置面板
+   - 如果不显示：
+     * 打开控制台查看是否有 Vue 报错
+     * 检查 `selectedNode.toolCode` 的值
+     * 确认条件 `v-else-if` 中的 `toolCode` 是否匹配
+
+4. **执行失败排查**
+   - 查看执行详情中的 `resolved_config` 字段
+   - 检查变量是否正确替换
+   - 查看后端日志中的错误堆栈
 
 ---
 
 ## ❓ 常见问题
 
-### Q1: 工具未出现在工具列表中
+**Q: 工具未出现在列表中？**
+- ✅ 检查是否在 `cmd/main.go` 中导入（不是 `init.go`）
+- ✅ 重启后端：`lsof -ti:7777 | xargs kill -9 && go run cmd/main.go`
+- ✅ 查看日志确认工具已注册
 
-**原因**：工具未正确注册
+**Q: 配置组件不显示？**
+- ✅ 确认在 `editor.vue` 中注册（使用 `toolCode` 不是 `tool_code`）
+- ✅ 确认在 `ToolConfigDrawer/index.vue` 中注册
+- ✅ 检查浏览器控制台是否有 Vue 报错
+- ✅ 打印 `selectedNode.toolCode` 确认值是否匹配
 
-**解决方案**：
-1. 检查 `init()` 函数是否正确调用 `utools.Register()`
-2. 检查 `pkg/utools/init.go` 是否导入了你的工具包
-3. 重新编译后端：`go build ./cmd/main.go`
+**Q: 文件上传失败，提示"文件参数无效"？**
+- ✅ 检查是否先解析文件对象再解析字符串（见"文件参数处理"章节）
+- ✅ 查看执行详情中的 `resolved_config.file` 是对象还是字符串
+- ✅ 确认文件路径存在且可读
 
-### Q2: 配置组件不显示
+**Q: 外部服务返回 403/401？**
+- ✅ 检查 `config.yaml` 中的 API Key 是否正确
+- ✅ 检查 Endpoint/Region 是否匹配（如 OSS）
+- ✅ 查看后端日志中的完整错误响应
+- ✅ 使用 Postman 测试该 API 是否正常
 
-**原因**：组件未在编辑器中注册
-
-**解决方案**：
-在 `web/src/pages/Workflows/editor.vue` 的 `toolConfigComponents` 中添加你的组件映射。
-
-### Q3: 参数验证失败
-
-**原因**：Schema 定义与实际配置不匹配
-
-**解决方案**：
-1. 检查 `Required` 字段是否正确
-2. 检查字段类型是否匹配
-3. 检查枚举值、最小/最大值等约束
-
-### Q4: 如何调试工具执行
-
-**后端调试**：
-```go
-log.Debug("配置参数: %+v", config)
-log.Debug("执行上下文: TaskID=%s, UserID=%s", ctx.TaskID, ctx.UserID)
-```
-
-**前端调试**：
-```vue
-<script setup lang="ts">
-watch(localConfig, (newConfig) => {
-  console.log('配置更新:', newConfig)
-  emit('update:config', newConfig)
-}, { deep: true })
-</script>
-```
+**Q: 变量引用不工作？**
+- ✅ 确认后端 OutputFieldsSchema 中定义了该字段
+- ✅ 使用 `{{nodes.xxx.response.field}}` 访问嵌套字段
+- ✅ 检查执行详情中前置节点的 `output` 字段
 
 ---
 
-## 📚 参考资源
-
-- [JSON Schema 规范](https://json-schema.org/)
-- [Vue 3 组合式 API](https://cn.vuejs.org/guide/extras/composition-api-faq.html)
-- [Go 接口最佳实践](https://golang.org/doc/effective_go#interfaces)
-- [Cooper 组件开发规范](./COMPONENT_DEVELOPMENT.md)
-
----
-
-## 🤝 需要帮助？
-
-如果在工具开发过程中遇到问题：
-
-1. 查看现有工具的实现作为参考（`pkg/utools/http/`, `pkg/utools/email/`）
-2. 阅读核心接口定义（`pkg/utools/types.go`）
-3. 提交 Issue：[GitHub Issues](https://github.com/CooperJiang/Cooper/issues)
-
----
-
-**文档版本**: v1.1
-**最后更新**: 2025-01-15
+**文档版本**: v2.3  
+**最后更新**: 2025-01-17  
 **维护者**: Cooper Team
 
 ## 📝 更新日志
 
-### v1.1 (2025-01-15)
-- 移除后端工具元数据中的 `Icon` 字段
-- 新增前端工具图标配置系统 (`web/src/config/tools.ts`)
-- 支持 Lucide 图标组件和自定义图片路径
-- 添加工具图标配置最佳实践和常用图标列表
+### v2.3 (2025-01-17) - 📁 组件结构规范化
+**统一组件组织结构，提升可维护性和扩展性**
 
-### v1.0 (2025-01-13)
-- 初始版本发布
+- 🏗️ **工具配置组件统一为文件夹结构**：所有工具配置从单文件 `.vue` 改为 `ToolName/index.vue` 结构
+- 📂 **标准目录结构**：每个工具一个文件夹，支持 `types.ts`、`composables/`、`components/` 子目录
+- 🔄 **更新导入路径**：**必须使用完整路径** `@/components/tools/XxxConfig/index.vue`（Vite 要求）
+- ✨ **提升可扩展性**：便于后续拆分复杂组件、添加类型定义和 composables
+
+**目录结构示例：**
+```
+web/src/components/tools/
+  AliyunOSSConfig/
+    index.vue
+  FeishuBotConfig/
+    index.vue
+    types.ts
+    composables/
+      useFeishuState.ts
+      useFeishuActions.ts
+```
+
+**导入示例：**
+```typescript
+// ✅ 正确：使用完整路径
+import AliyunOSSConfig from '@/components/tools/AliyunOSSConfig/index.vue'
+
+// ❌ 错误：Vite 无法解析
+import AliyunOSSConfig from '@/components/tools/AliyunOSSConfig'
+```
+
+### v2.2 (2025-01-17) - 🔥 重要更新
+**基于阿里云 OSS 工具开发的实战经验优化**
+
+- ⚠️ **修正致命错误**：工具注册位置应为 `cmd/main.go`（不是 `init.go`）
+- ⚠️ **修正前端注册路径**：工作流编辑器应在 `editor.vue` 中注册（使用 `toolCode`）
+- 🆕 **新增后端配置管理章节**：详细说明如何管理工具的后端配置
+- 🆕 **新增文件参数处理规范**：必须先检查对象再检查字符串，避免"参数无效"错误
+- 🆕 **新增测试与调试章节**：完整的重启命令、日志查看、调试步骤
+- 🆕 **新增常见问题排查**：覆盖配置不显示、文件上传失败、403/401 错误等实际问题
+- ✨ **扩充检查清单**：新增后端配置、文件参数、测试验证等检查项
+
+**关键修复点：**
+1. 工具注册必须在 `cmd/main.go` 导入
+2. 工作流编辑器注册条件使用 `selectedNode?.toolCode`（不是 `tool_code`）
+3. 文件参数解析必须先检查对象（`map[string]interface{}`）再检查字符串
+4. 后端配置需要同步更新 `config.go` 和 `config.yaml`
+5. OSS 等云服务需确保 Endpoint 与 Region 匹配
+
+### v2.1 (2025-01-17)
+- 🎯 大幅精简文档，聚焦核心要点
+- 删除冗长示例代码，保留最精简模板
+- 移除测试相关内容
+- 保留最关键的规范和检查清单
+
+### v2.0 (2025-01-17)
+- 新增完整的前端配置组件开发规范
+- 明确双编辑器注册要求
+- 添加完整检查清单

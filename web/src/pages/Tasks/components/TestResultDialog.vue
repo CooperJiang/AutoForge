@@ -34,7 +34,7 @@
       <div v-if="result.error_message" class="space-y-1">
         <span class="text-sm font-medium text-text-secondary">错误信息:</span>
         <div class="bg-red-50 border border-red-200 rounded-lg p-3">
-          <pre class="text-xs text-red-800 whitespace-pre-wrap break-words">{{
+          <pre class="text-xs text-red-800 whitespace-pre-wrap break-all max-w-full overflow-x-auto">{{
             result.error_message
           }}</pre>
         </div>

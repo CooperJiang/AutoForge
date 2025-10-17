@@ -1,5 +1,5 @@
 <template>
-  <div class="space-y-6">
+  <div class="space-y-6 max-w-full overflow-x-hidden">
     <div class="flex items-center justify-between">
       <div class="flex items-center gap-3">
         <div>
@@ -64,10 +64,10 @@
       <div
         v-for="execution in filteredExecutions"
         :key="execution.id"
-        class="bg-bg-elevated rounded-lg border-2 border-border-primary p-4 hover:border-green-400 transition-all"
+        class="bg-bg-elevated rounded-lg border-2 border-border-primary p-4 hover:border-green-400 transition-all max-w-full overflow-hidden"
       >
         <div class="flex items-start justify-between">
-          <div class="flex-1 cursor-pointer" @click="handleViewExecution(execution)">
+          <div class="flex-1 min-w-0 cursor-pointer" @click="handleViewExecution(execution)">
             <div class="flex items-center gap-3 mb-2">
               <span
                 :class="[
@@ -129,9 +129,9 @@
 
             <div
               v-if="execution.error"
-              class="mt-2 text-sm text-red-600 bg-red-50 rounded px-2 py-1"
+              class="mt-2 text-sm text-red-600 bg-red-50 rounded px-2 py-1 break-words overflow-hidden"
             >
-              {{ execution.error }}
+              <div class="line-clamp-2">{{ execution.error }}</div>
             </div>
           </div>
 

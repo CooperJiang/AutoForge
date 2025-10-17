@@ -1,6 +1,6 @@
 <template>
   <div
-    class="group rounded-lg border-2 border-border-primary hover:border-primary transition-all duration-200 bg-bg-elevated shadow-sm hover:shadow-md"
+    class="group rounded-xl border-2 border-border-secondary hover:border-primary transition-all duration-200 bg-bg-elevated shadow-md hover:shadow-lg"
   >
     <div class="p-3.5 pb-3">
       <div class="flex items-start justify-between gap-2 mb-2">
@@ -39,7 +39,7 @@
     <div class="px-3.5 pb-3">
       <div
         v-if="hasSchedule"
-        class="flex items-center gap-2 text-xs bg-bg-hover text-info px-2.5 py-2 rounded-md border border-border-primary"
+        class="flex items-center gap-2 text-xs bg-info-light text-info-text px-2.5 py-2 rounded-md border border-info"
       >
         <Clock class="w-3.5 h-3.5 flex-shrink-0" />
         <span class="truncate font-medium">
@@ -51,7 +51,7 @@
       </div>
       <div
         v-else
-        class="text-xs text-text-placeholder bg-bg-hover px-2.5 py-2 rounded-md flex items-center gap-2"
+        class="text-xs text-text-placeholder bg-bg-hover px-2.5 py-2 rounded-md flex items-center gap-2 border border-border-primary"
       >
         <Clock class="w-3.5 h-3.5" />
         {{ getNoScheduleText(workflow) }}
@@ -84,7 +84,7 @@
     </div>
 
     <div
-      class="px-3.5 py-2.5 bg-bg-hover border-t-2 border-border-primary flex items-center justify-between"
+      class="px-3.5 py-2.5 bg-bg-secondary border-t-2 border-border-primary flex items-center justify-between rounded-b-xl"
     >
       <div class="flex items-center gap-1.5">
         <Power :class="['w-3.5 h-3.5', workflow.enabled ? 'text-success' : 'text-text-disabled']" />

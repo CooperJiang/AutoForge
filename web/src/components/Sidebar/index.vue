@@ -21,7 +21,7 @@
     <nav class="flex-1 overflow-y-auto py-2.5 px-2.5">
       <div class="space-y-0.5">
         <router-link
-          v-for="item in menuItems"
+          v-for="item in generalMenuItems"
           :key="item.path"
           :to="item.path"
           :class="[
@@ -34,6 +34,28 @@
           <component :is="item.icon" class="w-4 h-4 flex-shrink-0" />
           <span>{{ item.label }}</span>
         </router-link>
+      </div>
+
+      <div class="mt-5">
+        <div class="px-3 py-1.5 mb-1 text-xs font-bold text-text-tertiary uppercase tracking-wider">
+          我的
+        </div>
+        <div class="space-y-0.5">
+          <router-link
+            v-for="item in myMenuItems"
+            :key="item.path"
+            :to="item.path"
+            :class="[
+              'flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200',
+              isActive(item.path)
+                ? 'bg-[var(--color-primary)] text-white shadow-lg shadow-primary/30'
+                : 'text-text-secondary hover:bg-bg-hover hover:text-text-primary',
+            ]"
+          >
+            <component :is="item.icon" class="w-4 h-4 flex-shrink-0" />
+            <span>{{ item.label }}</span>
+          </router-link>
+        </div>
       </div>
 
       <div v-if="isAdmin" class="mt-5">
@@ -124,12 +146,16 @@ const isAdmin = computed(() => {
   return role === USER_ROLE.SUPER_ADMIN || role === USER_ROLE.ADMIN
 })
 
-// 菜单项
-const menuItems = [
+// 通用菜单项（不需要分组的）
+const generalMenuItems = [
+  { path: '/marketplace', label: '工作流市场', icon: Package },
+  { path: '/tools', label: '工具箱市场', icon: Wrench },
+]
+
+// 我的菜单项
+const myMenuItems = [
   { path: '/', label: '任务管理', icon: ListTodo },
   { path: '/workflows', label: '工作流', icon: Workflow },
-  { path: '/marketplace', label: '模板市场', icon: Package },
-  { path: '/tools', label: '工具箱', icon: Wrench },
   { path: '/profile', label: '个人中心', icon: User },
 ]
 

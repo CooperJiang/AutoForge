@@ -1,45 +1,103 @@
 <template>
-  <div>
-    <div class="flex items-center justify-between mb-6">
-      <div>
-        <h1 class="text-2xl font-bold text-text-primary mb-1">工作流管理</h1>
-        <p class="text-sm text-text-secondary">创建和管理自动化工作流程</p>
+  <div class="h-full flex flex-col">
+    <!-- 顶部操作栏 -->
+    <div class="flex-shrink-0 mb-4">
+      <div class="bg-bg-elevated rounded-xl border border-border-primary p-4 shadow-sm">
+        <div class="flex items-center justify-between gap-4">
+          <!-- 左侧筛选区域 -->
+          <div class="flex items-center gap-4">
+            <!-- 搜索框 -->
+            <BaseInput
+              v-model="searchKeyword"
+              placeholder="搜索工作流..."
+              style="width: 300px"
+              @keyup.enter="handleSearch"
+            >
+              <template #prefix>
+                <Search class="w-4 h-4" />
+              </template>
+            </BaseInput>
+
+            <!-- 状态筛选 -->
+            <div class="flex items-center gap-2">
+              <span class="text-xs" style="color: var(--color-text-secondary)">状态:</span>
+              <RadioGroup
+                v-model="filterStatus"
+                :options="statusOptions"
+                size="sm"
+                @change="handleFilterChange"
+              />
+            </div>
+          </div>
+
+          <!-- 右侧按钮 -->
+          <BaseButton size="md" @click="router.push('/workflows/create')">
+            <Plus class="w-4 h-4 mr-1" />
+            创建工作流
+          </BaseButton>
+        </div>
       </div>
-      <BaseButton size="md" @click="router.push('/workflows/create')">
-        <Plus class="w-4 h-4 mr-1" />
-        创建工作流
-      </BaseButton>
     </div>
 
+    <!-- 内容区域 - 带背景 -->
     <div
-      v-if="!loading && workflows.length > 0"
-      class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4"
+      class="flex-1 flex flex-col bg-bg-elevated rounded-xl border border-border-primary overflow-hidden shadow-sm"
     >
-      <WorkflowCard
-        v-for="workflow in workflows"
-        :key="workflow.id"
-        :workflow="workflow"
-        @edit="handleEdit"
-        @executions="handleViewExecutions"
-        @execute="handleExecute"
-        @delete="handleDelete"
-        @toggle="handleToggle"
-        @refresh="handleRefresh"
-      />
-    </div>
+      <!-- 可滚动的工作流网格 -->
+      <div class="flex-1 overflow-y-auto p-6">
+        <!-- 工作流卡片网格 -->
+        <div
+          v-if="!loading && workflows.length > 0"
+          class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4"
+        >
+          <WorkflowCard
+            v-for="workflow in workflows"
+            :key="workflow.id"
+            :workflow="workflow"
+            @edit="handleEdit"
+            @executions="handleViewExecutions"
+            @execute="handleExecute"
+            @delete="handleDelete"
+            @toggle="handleToggle"
+            @refresh="handleRefresh"
+          />
+        </div>
 
-    <div v-else-if="!loading && workflows.length === 0" class="text-center py-20">
-      <div class="text-text-placeholder mb-4">
-        <Workflow class="w-16 h-16 mx-auto mb-4" />
-        <p class="text-lg">暂无工作流</p>
-        <p class="text-sm">点击上方按钮创建第一个工作流</p>
+        <!-- 空状态 -->
+        <div
+          v-else-if="!loading && workflows.length === 0"
+          class="flex items-center justify-center h-full"
+        >
+          <div class="text-text-placeholder text-center">
+            <Workflow class="w-16 h-16 mx-auto mb-4 opacity-50" />
+            <p class="text-lg font-medium">暂无工作流</p>
+            <p class="text-sm">点击上方按钮创建第一个工作流</p>
+          </div>
+        </div>
+
+        <!-- 加载中 -->
+        <div v-else class="flex items-center justify-center h-full">
+          <div class="text-text-tertiary">加载中...</div>
+        </div>
+      </div>
+
+      <!-- 分页 - 固定在底部 -->
+      <div
+        v-if="!loading && totalWorkflows > pageSize"
+        class="border-t border-border-primary flex-shrink-0"
+      >
+        <Pagination
+          :current="currentPage"
+          :page-size="pageSize"
+          :total="totalWorkflows"
+          :show-range="true"
+          :show-jumper="totalWorkflows > 100"
+          @change="handlePageChange"
+        />
       </div>
     </div>
 
-    <div v-else class="flex justify-center items-center py-20">
-      <div class="text-text-tertiary">加载中...</div>
-    </div>
-
+    <!-- 对话框 -->
     <ExecuteWithParamsDialog
       :visible="executeDialogVisible"
       :workflow="selectedWorkflow"
@@ -52,8 +110,11 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { Plus, Workflow } from 'lucide-vue-next'
+import { Plus, Workflow, Search } from 'lucide-vue-next'
 import BaseButton from '@/components/BaseButton'
+import BaseInput from '@/components/BaseInput'
+import RadioGroup from '@/components/RadioGroup/index.vue'
+import Pagination from '@/components/Pagination'
 import WorkflowCard from './components/WorkflowCard.vue'
 import ExecuteWithParamsDialog from './components/ExecuteWithParamsDialog.vue'
 import { workflowApi } from '@/api/workflow'
@@ -65,19 +126,70 @@ const loading = ref(false)
 const workflows = ref<WorkflowType[]>([])
 const executeDialogVisible = ref(false)
 const selectedWorkflow = ref<WorkflowType | null>(null)
+const searchKeyword = ref('')
+const filterStatus = ref<string>('all')
+
+// 状态筛选选项
+const statusOptions = [
+  { label: '全部', value: 'all' },
+  { label: '启用', value: 'enabled' },
+  { label: '禁用', value: 'disabled' },
+]
+
+// 分页相关
+const currentPage = ref(1)
+const pageSize = ref(20)
+const totalWorkflows = ref(0)
 
 // 加载工作流列表
 const loadWorkflows = async () => {
   loading.value = true
   try {
-    const data = await workflowApi.list()
+    const params: any = {
+      page: currentPage.value,
+      page_size: pageSize.value,
+    }
+
+    // 添加搜索关键词
+    if (searchKeyword.value.trim()) {
+      params.keyword = searchKeyword.value.trim()
+    }
+
+    // 添加状态筛选
+    if (filterStatus.value === 'enabled') {
+      params.enabled = true
+    } else if (filterStatus.value === 'disabled') {
+      params.enabled = false
+    }
+    // 'all' 时不传 enabled 参数
+
+    const data = await workflowApi.list(params)
     workflows.value = data.items || []
+    totalWorkflows.value = data.total || 0
   } catch (error) {
     console.error('Failed to load workflows:', error)
     message.error('加载工作流列表失败')
   } finally {
     loading.value = false
   }
+}
+
+// 搜索处理
+const handleSearch = () => {
+  currentPage.value = 1 // 搜索时重置到第一页
+  loadWorkflows()
+}
+
+// 筛选变化处理
+const handleFilterChange = () => {
+  currentPage.value = 1 // 筛选时重置到第一页
+  loadWorkflows()
+}
+
+// 页码变化
+const handlePageChange = (page: number) => {
+  currentPage.value = page
+  loadWorkflows()
 }
 
 // 编辑工作流
@@ -145,15 +257,17 @@ const handleExecute = async (workflow: WorkflowType) => {
 }
 
 // 带参数执行工作流
-const handleExecuteWithParams = async (params: Record<string, any>) => {
+const handleExecuteWithParams = async (params: Record<string, any> | FormData) => {
   if (!selectedWorkflow.value) return
 
   const workflowId = selectedWorkflow.value.id
 
   try {
-    const data = await workflowApi.execute(workflowId, {
-      params,
-    })
+    // 如果是 FormData，直接传递；否则包装成 {params}
+    const data = await workflowApi.execute(
+      workflowId,
+      params instanceof FormData ? params : { params }
+    )
     message.success('工作流已开始执行')
     executeDialogVisible.value = false
     selectedWorkflow.value = null

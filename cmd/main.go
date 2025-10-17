@@ -20,14 +20,17 @@ import (
 	"github.com/gin-gonic/gin"
 
 	// 导入工具包以触发工具注册
+	_ "auto-forge/pkg/utools/aliyunoss"
+	_ "auto-forge/pkg/utools/context"
 	_ "auto-forge/pkg/utools/email"
 	_ "auto-forge/pkg/utools/feishu"
 	_ "auto-forge/pkg/utools/formatter"
-	_ "auto-forge/pkg/utools/context"
 	_ "auto-forge/pkg/utools/health"
 	_ "auto-forge/pkg/utools/http"
 	_ "auto-forge/pkg/utools/jsontransform"
 	_ "auto-forge/pkg/utools/openai"
+	_ "auto-forge/pkg/utools/pixelpunk"
+	_ "auto-forge/pkg/utools/tencentcos"
 	_ "auto-forge/pkg/utools/web"
 )
 

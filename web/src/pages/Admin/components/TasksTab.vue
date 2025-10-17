@@ -124,28 +124,13 @@
       </table>
     </div>
 
-    <div class="flex justify-between items-center mt-6">
-      <div class="text-sm text-text-secondary">共 {{ total }} 条记录</div>
-      <div class="flex gap-2">
-        <button
-          @click="$emit('prev-page')"
-          :disabled="currentPage === 1"
-          class="px-4 py-2 bg-bg-tertiary text-text-secondary text-sm font-medium rounded-lg hover:bg-bg-tertiary disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-        >
-          上一页
-        </button>
-        <span class="px-4 py-2 text-sm text-text-secondary">
-          {{ currentPage }} / {{ totalPages }}
-        </span>
-        <button
-          @click="$emit('next-page')"
-          :disabled="currentPage >= totalPages"
-          class="px-4 py-2 bg-bg-tertiary text-text-secondary text-sm font-medium rounded-lg hover:bg-bg-tertiary disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-        >
-          下一页
-        </button>
-      </div>
-    </div>
+    <Pagination
+      :current="currentPage"
+      :page-size="20"
+      :total="total"
+      :bordered="false"
+      @change="(page) => $emit('page-change', page)"
+    />
   </div>
 </template>
 
@@ -156,6 +141,7 @@ import type { Task } from '@/api/task'
 import BaseSelect from '@/components/BaseSelect'
 import BaseInput from '@/components/BaseInput'
 import BaseButton from '@/components/BaseButton'
+import Pagination from '@/components/Pagination'
 import NextRunCountdown from '@/components/NextRunCountdown'
 import { maskUserId, truncateId } from '@/utils/format'
 
@@ -173,8 +159,7 @@ defineEmits<{
   'toggle-status': [task: Task]
   execute: [task: Task]
   delete: [task: Task]
-  'prev-page': []
-  'next-page': []
+  'page-change': [page: number]
 }>()
 
 const filters = ref({

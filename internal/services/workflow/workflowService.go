@@ -16,37 +16,30 @@ import (
 	"gorm.io/gorm"
 )
 
-
 type WorkflowService struct{}
 
 var workflowChangeCallback func()
-
 
 func NewWorkflowService() *WorkflowService {
 	return &WorkflowService{}
 }
 
-
 func SetWorkflowChangeCallback(callback func()) {
 	workflowChangeCallback = callback
 }
 
-
 func (s *WorkflowService) CreateWorkflow(userID string, req *request.CreateWorkflowRequest) (*models.Workflow, error) {
 	db := database.GetDB()
-
 
 	if err := s.ValidateWorkflowConfig(req.Nodes, req.Edges); err != nil {
 		return nil, fmt.Errorf("工作流配置无效: %w", err)
 	}
-
 
 	var nextRunTime *int64
 	if req.Enabled && req.ScheduleType != "" && req.ScheduleType != "manual" {
 		t := s.CalculateNextRunTime(req.ScheduleType, req.ScheduleValue)
 		nextRunTime = &t
 	}
-
 
 	apiParams, err := s.ExtractExternalTriggerParams(req.Nodes, req.Edges)
 	if err != nil {
@@ -68,7 +61,6 @@ func (s *WorkflowService) CreateWorkflow(userID string, req *request.CreateWorkf
 		APIParams:     apiParams,
 	}
 
-
 	if workflow.APIKey == "" {
 		if key, err := utils.GenerateWorkflowAPIKey(); err == nil {
 			workflow.APIKey = key
@@ -82,14 +74,12 @@ func (s *WorkflowService) CreateWorkflow(userID string, req *request.CreateWorkf
 
 	log.Info("用户 %s 创建工作流: %s (ID: %s)", userID, workflow.Name, workflow.ID)
 
-
 	if workflow.Enabled && workflow.ScheduleType != "" && workflow.ScheduleType != "manual" {
 		s.reloadScheduler()
 	}
 
 	return workflow, nil
 }
-
 
 func (s *WorkflowService) GetWorkflowByID(workflowID, userID string) (*models.Workflow, error) {
 	db := database.GetDB()
@@ -105,10 +95,8 @@ func (s *WorkflowService) GetWorkflowByID(workflowID, userID string) (*models.Wo
 	return &workflow, nil
 }
 
-
 func (s *WorkflowService) GetWorkflowList(userID string, query *request.WorkflowListQuery) (*response.WorkflowListResponse, error) {
 	db := database.GetDB()
-
 
 	if query.Page == 0 {
 		query.Page = 1
@@ -117,26 +105,21 @@ func (s *WorkflowService) GetWorkflowList(userID string, query *request.Workflow
 		query.PageSize = 20
 	}
 
-
 	queryDB := db.Model(&models.Workflow{}).Where("user_id = ?", userID)
-
 
 	if query.Keyword != "" {
 		queryDB = queryDB.Where("name LIKE ? OR description LIKE ?",
 			"%"+query.Keyword+"%", "%"+query.Keyword+"%")
 	}
 
-
 	if query.Enabled != nil {
 		queryDB = queryDB.Where("enabled = ?", *query.Enabled)
 	}
-
 
 	var total int64
 	if err := queryDB.Count(&total).Error; err != nil {
 		return nil, err
 	}
-
 
 	var workflows []models.Workflow
 	offset := (query.Page - 1) * query.PageSize
@@ -146,7 +129,6 @@ func (s *WorkflowService) GetWorkflowList(userID string, query *request.Workflow
 		Find(&workflows).Error; err != nil {
 		return nil, err
 	}
-
 
 	items := make([]response.WorkflowResponse, len(workflows))
 	for i, wf := range workflows {
@@ -161,16 +143,13 @@ func (s *WorkflowService) GetWorkflowList(userID string, query *request.Workflow
 	}, nil
 }
 
-
 func (s *WorkflowService) UpdateWorkflow(workflowID, userID string, req *request.UpdateWorkflowRequest) (*models.Workflow, error) {
 	db := database.GetDB()
-
 
 	workflow, err := s.GetWorkflowByID(workflowID, userID)
 	if err != nil {
 		return nil, err
 	}
-
 
 	updates := make(map[string]interface{})
 
@@ -191,7 +170,6 @@ func (s *WorkflowService) UpdateWorkflow(workflowID, userID string, req *request
 		}
 		updates["nodes"] = models.WorkflowNodes(*req.Nodes)
 
-
 		apiParams, err := s.ExtractExternalTriggerParams(*req.Nodes, edges)
 		if err != nil {
 			return nil, fmt.Errorf("提取外部触发器参数失败: %w", err)
@@ -207,7 +185,6 @@ func (s *WorkflowService) UpdateWorkflow(workflowID, userID string, req *request
 			return nil, fmt.Errorf("工作流配置无效: %w", err)
 		}
 		updates["edges"] = models.WorkflowEdges(*req.Edges)
-
 
 		if req.Nodes == nil {
 			apiParams, err := s.ExtractExternalTriggerParams(nodes, *req.Edges)
@@ -232,7 +209,6 @@ func (s *WorkflowService) UpdateWorkflow(workflowID, userID string, req *request
 	if req.Enabled != nil {
 		updates["enabled"] = *req.Enabled
 	}
-
 
 	scheduleType := workflow.ScheduleType
 	scheduleValue := workflow.ScheduleValue
@@ -259,29 +235,24 @@ func (s *WorkflowService) UpdateWorkflow(workflowID, userID string, req *request
 		return nil, err
 	}
 
-
 	if err := db.First(workflow, "id = ?", workflowID).Error; err != nil {
 		return nil, err
 	}
 
 	log.Info("用户 %s 更新工作流: %s (ID: %s)", userID, workflow.Name, workflow.ID)
 
-
 	s.reloadScheduler()
 
 	return workflow, nil
 }
 
-
 func (s *WorkflowService) DeleteWorkflow(workflowID, userID string) error {
 	db := database.GetDB()
-
 
 	workflow, err := s.GetWorkflowByID(workflowID, userID)
 	if err != nil {
 		return err
 	}
-
 
 	if err := db.Delete(workflow).Error; err != nil {
 		return err
@@ -289,12 +260,10 @@ func (s *WorkflowService) DeleteWorkflow(workflowID, userID string) error {
 
 	log.Info("用户 %s 删除工作流: %s (ID: %s)", userID, workflow.Name, workflow.ID)
 
-
 	s.reloadScheduler()
 
 	return nil
 }
-
 
 func (s *WorkflowService) ToggleEnabled(workflowID, userID string, enabled bool) (*models.Workflow, error) {
 	db := database.GetDB()
@@ -316,18 +285,15 @@ func (s *WorkflowService) ToggleEnabled(workflowID, userID string, enabled bool)
 		workflow.ID,
 	)
 
-
 	s.reloadScheduler()
 
 	return workflow, nil
 }
 
-
 func (s *WorkflowService) ValidateWorkflowConfig(nodes []models.WorkflowNode, edges []models.WorkflowEdge) error {
 	if len(nodes) == 0 {
 		return errors.New("工作流至少需要一个节点")
 	}
-
 
 	nodeIDs := make(map[string]bool)
 	for _, node := range nodes {
@@ -340,7 +306,6 @@ func (s *WorkflowService) ValidateWorkflowConfig(nodes []models.WorkflowNode, ed
 		nodeIDs[node.ID] = true
 	}
 
-
 	for _, edge := range edges {
 		if !nodeIDs[edge.Source] {
 			return fmt.Errorf("连接线的源节点不存在: %s", edge.Source)
@@ -350,12 +315,8 @@ func (s *WorkflowService) ValidateWorkflowConfig(nodes []models.WorkflowNode, ed
 		}
 	}
 
-
-
-
 	return nil
 }
-
 
 func (s *WorkflowService) ExtractExternalTriggerParams(nodes []models.WorkflowNode, edges []models.WorkflowEdge) (models.WorkflowAPIParams, error) {
 
@@ -371,7 +332,6 @@ func (s *WorkflowService) ExtractExternalTriggerParams(nodes []models.WorkflowNo
 		}
 	}
 
-
 	var externalTriggerNode *models.WorkflowNode
 	for _, node := range startNodes {
 		if node.Type == "external_trigger" {
@@ -380,14 +340,11 @@ func (s *WorkflowService) ExtractExternalTriggerParams(nodes []models.WorkflowNo
 		}
 	}
 
-
 	if externalTriggerNode == nil {
 		return models.WorkflowAPIParams{}, nil
 	}
 
-
 	params := models.WorkflowAPIParams{}
-
 
 	if paramsInterface, ok := externalTriggerNode.Config["params"]; ok {
 		if paramsList, ok := paramsInterface.([]interface{}); ok {
@@ -399,7 +356,6 @@ func (s *WorkflowService) ExtractExternalTriggerParams(nodes []models.WorkflowNo
 						Required: getBoolValue(paramMap, "required"),
 					}
 
-
 					if desc := getStringValue(paramMap, "description"); desc != "" {
 						param.Description = desc
 					}
@@ -410,6 +366,16 @@ func (s *WorkflowService) ExtractExternalTriggerParams(nodes []models.WorkflowNo
 						param.Example = example
 					}
 
+					// 文件类型特有属性
+					if param.Type == "file" {
+						if accept := getStringValue(paramMap, "accept"); accept != "" {
+							param.Accept = accept
+						}
+						if maxSize, ok := paramMap["maxSize"].(float64); ok {
+							param.MaxSize = int(maxSize)
+						}
+					}
+
 					params = append(params, param)
 				}
 			}
@@ -418,7 +384,6 @@ func (s *WorkflowService) ExtractExternalTriggerParams(nodes []models.WorkflowNo
 
 	return params, nil
 }
-
 
 func getStringValue(m map[string]interface{}, key string) string {
 	if val, ok := m[key]; ok {
@@ -438,7 +403,6 @@ func getBoolValue(m map[string]interface{}, key string) bool {
 	return false
 }
 
-
 func (s *WorkflowService) GetWorkflowStats(workflowID, userID string) (*response.WorkflowStatsResponse, error) {
 	workflow, err := s.GetWorkflowByID(workflowID, userID)
 	if err != nil {
@@ -446,7 +410,6 @@ func (s *WorkflowService) GetWorkflowStats(workflowID, userID string) (*response
 	}
 
 	db := database.GetDB()
-
 
 	var avgDuration *int64
 	db.Model(&models.WorkflowExecution{}).
@@ -468,11 +431,9 @@ func (s *WorkflowService) GetWorkflowStats(workflowID, userID string) (*response
 	}, nil
 }
 
-
 func (s *WorkflowService) ToWorkflowResponse(workflow *models.Workflow) response.WorkflowResponse {
 	return s.toWorkflowResponse(workflow)
 }
-
 
 func (s *WorkflowService) toWorkflowResponse(workflow *models.Workflow) response.WorkflowResponse {
 	return response.WorkflowResponse{
@@ -502,11 +463,9 @@ func (s *WorkflowService) toWorkflowResponse(workflow *models.Workflow) response
 	}
 }
 
-
 func GetCurrentTime() int64 {
 	return time.Now().Unix()
 }
-
 
 func (s *WorkflowService) reloadScheduler() {
 	if workflowChangeCallback != nil {
@@ -516,7 +475,6 @@ func (s *WorkflowService) reloadScheduler() {
 		}()
 	}
 }
-
 
 func (s *WorkflowService) CalculateNextRunTime(scheduleType, scheduleValue string) int64 {
 	now := time.Now()
@@ -532,9 +490,7 @@ func (s *WorkflowService) CalculateNextRunTime(scheduleType, scheduleValue strin
 		minute, _ := strconv.Atoi(parts[1])
 		second, _ := strconv.Atoi(parts[2])
 
-
 		next := time.Date(now.Year(), now.Month(), now.Day(), hour, minute, second, 0, now.Location())
-
 
 		if next.Before(now) {
 			next = next.Add(24 * time.Hour)
@@ -552,17 +508,14 @@ func (s *WorkflowService) CalculateNextRunTime(scheduleType, scheduleValue strin
 		minute, _ := strconv.Atoi(parts[2])
 		second, _ := strconv.Atoi(parts[3])
 
-
 		var weekdays []int
 		for _, dayStr := range dayStrs {
 			day, _ := strconv.Atoi(dayStr)
 			weekdays = append(weekdays, day)
 		}
 
-
 		currentWeekday := int(now.Weekday())
 		next := time.Date(now.Year(), now.Month(), now.Day(), hour, minute, second, 0, now.Location())
-
 
 		minDaysToAdd := 7
 		for _, targetWeekday := range weekdays {
@@ -595,14 +548,11 @@ func (s *WorkflowService) CalculateNextRunTime(scheduleType, scheduleValue strin
 		minute, _ := strconv.Atoi(parts[2])
 		second, _ := strconv.Atoi(parts[3])
 
-
 		next := time.Date(now.Year(), now.Month(), day, hour, minute, second, 0, now.Location())
-
 
 		if next.Before(now) {
 			next = next.AddDate(0, 1, 0)
 		}
-
 
 		for next.Day() != day {
 			next = next.AddDate(0, 1, 0)
@@ -620,9 +570,7 @@ func (s *WorkflowService) CalculateNextRunTime(scheduleType, scheduleValue strin
 		minute, _ := strconv.Atoi(parts[0])
 		second, _ := strconv.Atoi(parts[1])
 
-
 		next := time.Date(now.Year(), now.Month(), now.Day(), now.Hour(), minute, second, 0, now.Location())
-
 
 		if next.Before(now) {
 			next = next.Add(1 * time.Hour)
@@ -636,7 +584,6 @@ func (s *WorkflowService) CalculateNextRunTime(scheduleType, scheduleValue strin
 
 	case "cron":
 
-
 		return now.Add(1 * time.Minute).Unix()
 
 	default:
@@ -644,27 +591,22 @@ func (s *WorkflowService) CalculateNextRunTime(scheduleType, scheduleValue strin
 	}
 }
 
-
 func (s *WorkflowService) EnableWorkflowAPI(workflowID, userID string) (string, error) {
 	db := database.GetDB()
-
 
 	var workflow models.Workflow
 	if err := db.Where("id = ? AND user_id = ?", workflowID, userID).First(&workflow).Error; err != nil {
 		return "", fmt.Errorf("工作流不存在")
 	}
 
-
 	if workflow.APIEnabled && workflow.APIKey != "" {
 		return workflow.APIKey, nil
 	}
-
 
 	apiKey, err := utils.GenerateWorkflowAPIKey()
 	if err != nil {
 		return "", fmt.Errorf("生成 API Key 失败: %w", err)
 	}
-
 
 	updates := map[string]interface{}{
 		"api_enabled": true,
@@ -679,16 +621,13 @@ func (s *WorkflowService) EnableWorkflowAPI(workflowID, userID string) (string, 
 	return apiKey, nil
 }
 
-
 func (s *WorkflowService) DisableWorkflowAPI(workflowID, userID string) error {
 	db := database.GetDB()
-
 
 	var workflow models.Workflow
 	if err := db.Where("id = ? AND user_id = ?", workflowID, userID).First(&workflow).Error; err != nil {
 		return fmt.Errorf("工作流不存在")
 	}
-
 
 	updates := map[string]interface{}{
 		"api_enabled": false,
@@ -702,10 +641,8 @@ func (s *WorkflowService) DisableWorkflowAPI(workflowID, userID string) error {
 	return nil
 }
 
-
 func (s *WorkflowService) RegenerateAPIKey(workflowID, userID string) (string, error) {
 	db := database.GetDB()
-
 
 	var workflow models.Workflow
 	if err := db.Where("id = ? AND user_id = ?", workflowID, userID).First(&workflow).Error; err != nil {
@@ -716,12 +653,10 @@ func (s *WorkflowService) RegenerateAPIKey(workflowID, userID string) (string, e
 		return "", fmt.Errorf("工作流 API 未启用")
 	}
 
-
 	apiKey, err := utils.GenerateWorkflowAPIKey()
 	if err != nil {
 		return "", fmt.Errorf("生成 API Key 失败: %w", err)
 	}
-
 
 	if err := db.Model(&workflow).Update("api_key", apiKey).Error; err != nil {
 		return "", fmt.Errorf("更新 API Key 失败: %w", err)
@@ -731,16 +666,13 @@ func (s *WorkflowService) RegenerateAPIKey(workflowID, userID string) (string, e
 	return apiKey, nil
 }
 
-
 func (s *WorkflowService) UpdateAPIParams(workflowID, userID string, params models.WorkflowAPIParams) error {
 	db := database.GetDB()
-
 
 	var workflow models.Workflow
 	if err := db.Where("id = ? AND user_id = ?", workflowID, userID).First(&workflow).Error; err != nil {
 		return fmt.Errorf("工作流不存在")
 	}
-
 
 	if err := db.Model(&workflow).Update("api_params", params).Error; err != nil {
 		return fmt.Errorf("更新 API 参数配置失败: %w", err)
@@ -750,16 +682,13 @@ func (s *WorkflowService) UpdateAPIParams(workflowID, userID string, params mode
 	return nil
 }
 
-
 func (s *WorkflowService) UpdateAPITimeout(workflowID, userID string, timeout int) error {
 	db := database.GetDB()
-
 
 	var workflow models.Workflow
 	if err := db.Where("id = ? AND user_id = ?", workflowID, userID).First(&workflow).Error; err != nil {
 		return fmt.Errorf("工作流不存在")
 	}
-
 
 	if err := db.Model(&workflow).Update("api_timeout", timeout).Error; err != nil {
 		return fmt.Errorf("更新 API 超时时间失败: %w", err)
@@ -768,7 +697,6 @@ func (s *WorkflowService) UpdateAPITimeout(workflowID, userID string, timeout in
 	log.Info("工作流 API 超时时间已更新: WorkflowID=%s, Timeout=%d", workflowID, timeout)
 	return nil
 }
-
 
 func (s *WorkflowService) GetWorkflowByAPIKey(apiKey string) (*models.Workflow, error) {
 	db := database.GetDB()
@@ -784,24 +712,27 @@ func (s *WorkflowService) GetWorkflowByAPIKey(apiKey string) (*models.Workflow, 
 	return &workflow, nil
 }
 
-
 func (s *WorkflowService) ValidateAPIParams(workflow *models.Workflow, userParams map[string]interface{}) error {
 	if len(workflow.APIParams) == 0 {
 		return nil
 	}
 
-
 	for _, param := range workflow.APIParams {
 		value, exists := userParams[param.Key]
 
-
 		if !exists {
+			// 如果参数不存在，尝试使用默认值
+			if param.DefaultValue != nil {
+				userParams[param.Key] = param.DefaultValue
+				continue
+			}
+
+			// 如果没有默认值且是必填，报错
 			if param.Required {
 				return fmt.Errorf("缺少必填参数: %s", param.Key)
 			}
 			continue
 		}
-
 
 		if err := validateParamType(value, param.Type); err != nil {
 			return fmt.Errorf("参数 %s 类型错误: %w", param.Key, err)
@@ -811,12 +742,10 @@ func (s *WorkflowService) ValidateAPIParams(workflow *models.Workflow, userParam
 	return nil
 }
 
-
 func (s *WorkflowService) ApplyAPIParams(workflow *models.Workflow, userParams map[string]interface{}) error {
 	if len(workflow.APIParams) == 0 {
 		return nil
 	}
-
 
 	nodesData := make([]interface{}, len(workflow.Nodes))
 	for i, node := range workflow.Nodes {
@@ -836,10 +765,8 @@ func (s *WorkflowService) ApplyAPIParams(workflow *models.Workflow, userParams m
 		"nodes": nodesData,
 	}
 
-
 	for _, param := range workflow.APIParams {
 		value, exists := userParams[param.Key]
-
 
 		if !exists {
 			if param.Required {
@@ -853,11 +780,9 @@ func (s *WorkflowService) ApplyAPIParams(workflow *models.Workflow, userParams m
 			}
 		}
 
-
 		if err := validateParamType(value, param.Type); err != nil {
 			return fmt.Errorf("参数 %s 类型错误: %w", param.Key, err)
 		}
-
 
 		if err := utils.SetValueByPath(workflowData, param.MappingPath, value); err != nil {
 			return fmt.Errorf("应用参数 %s 失败: %w", param.Key, err)
@@ -865,7 +790,6 @@ func (s *WorkflowService) ApplyAPIParams(workflow *models.Workflow, userParams m
 
 		log.Info("应用参数: %s = %v -> %s", param.Key, value, param.MappingPath)
 	}
-
 
 	if nodesInterface, ok := workflowData["nodes"].([]interface{}); ok {
 		for i, nodeInterface := range nodesInterface {
@@ -877,7 +801,6 @@ func (s *WorkflowService) ApplyAPIParams(workflow *models.Workflow, userParams m
 
 	return nil
 }
-
 
 func validateParamType(value interface{}, expectedType string) error {
 	switch expectedType {
@@ -908,20 +831,16 @@ func validateParamType(value interface{}, expectedType string) error {
 	return nil
 }
 
-
 func (s *WorkflowService) ExecuteWorkflowSync(executionID, userID string, timeoutSeconds int, externalParams map[string]interface{}) (map[string]interface{}, error) {
 	engineSvc := NewEngineService()
 	executionSvc := NewExecutionService()
 
-
 	done := make(chan error, 1)
-
 
 	go func() {
 		err := engineSvc.ExecuteWorkflow(executionID, nil, externalParams)
 		done <- err
 	}()
-
 
 	timeout := time.Duration(timeoutSeconds) * time.Second
 	select {
@@ -930,12 +849,10 @@ func (s *WorkflowService) ExecuteWorkflowSync(executionID, userID string, timeou
 			return nil, fmt.Errorf("执行失败: %w", err)
 		}
 
-
 		execution, err := executionSvc.GetExecutionByID(executionID, userID)
 		if err != nil {
 			return nil, fmt.Errorf("查询执行结果失败: %w", err)
 		}
-
 
 		var finalOutput map[string]interface{}
 		if len(execution.NodeLogs) > 0 {
@@ -943,11 +860,9 @@ func (s *WorkflowService) ExecuteWorkflowSync(executionID, userID string, timeou
 			finalOutput = lastNode.Output
 		}
 
-
 		if finalOutput == nil {
 			finalOutput = make(map[string]interface{})
 		}
-
 
 		return finalOutput, nil
 
@@ -956,13 +871,12 @@ func (s *WorkflowService) ExecuteWorkflowSync(executionID, userID string, timeou
 	}
 }
 
-
 func (s *WorkflowService) IncrementAPICallCount(workflowID string) error {
 	db := database.GetDB()
 	now := time.Now().Unix()
 
 	updates := map[string]interface{}{
-		"api_call_count":    gorm.Expr("api_call_count + 1"),
+		"api_call_count":     gorm.Expr("api_call_count + 1"),
 		"api_last_called_at": now,
 	}
 
@@ -973,7 +887,6 @@ func (s *WorkflowService) IncrementAPICallCount(workflowID string) error {
 
 	return nil
 }
-
 
 func (s *WorkflowService) UpdateAPIWebhook(workflowID, userID, webhookURL string) error {
 	db := database.GetDB()

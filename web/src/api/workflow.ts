@@ -98,7 +98,7 @@ export const workflowApi = {
   /**
    * 执行工作流
    */
-  execute: async (id: string, data?: ExecuteWorkflowDto) => {
+  execute: async (id: string, data?: ExecuteWorkflowDto | FormData) => {
     const response = await request.post<ExecuteWorkflowData>(
       `/api/v1/workflows/${id}/execute`,
       data

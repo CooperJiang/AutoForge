@@ -1,26 +1,30 @@
 <template>
-  <div>
-    <div class="grid grid-cols-1 xl:grid-cols-12 gap-6">
-      <div class="xl:col-span-3">
-        <ProfileSidebar
-          :active-tab="activeTab"
-          :user-name="userName"
-          :user-email="userEmail"
-          :role-text="roleText"
-          @tab-change="activeTab = $event"
-        />
-      </div>
+  <div class="h-full">
+    <div class="h-full bg-bg-elevated rounded-xl border border-border-primary shadow-sm overflow-hidden">
+      <div class="h-full p-6">
+        <div class="h-full grid grid-cols-1 xl:grid-cols-12 gap-6">
+          <div class="xl:col-span-3">
+            <ProfileSidebar
+              :active-tab="activeTab"
+              :user-name="userName"
+              :user-email="userEmail"
+              :role-text="roleText"
+              @tab-change="activeTab = $event"
+            />
+          </div>
 
-      <div class="xl:col-span-9">
-        <ProfileSection
-          v-show="activeTab === 'profile'"
-          :user-name="userName"
-          :user-email="userEmail"
-          @update-username="handleUpdateUsername"
-          @update-email="handleUpdateEmail"
-        />
+          <div class="xl:col-span-9">
+            <ProfileSection
+              v-show="activeTab === 'profile'"
+              :user-name="userName"
+              :user-email="userEmail"
+              @update-username="handleUpdateUsername"
+              @update-email="handleUpdateEmail"
+            />
 
-        <PasswordSection v-show="activeTab === 'password'" />
+            <PasswordSection v-show="activeTab === 'password'" />
+          </div>
+        </div>
       </div>
     </div>
   </div>

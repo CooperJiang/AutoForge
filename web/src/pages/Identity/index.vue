@@ -21,16 +21,17 @@
             class="inline-flex items-center gap-2 px-3 py-1.5 bg-bg-elevated/50 backdrop-blur-sm border border-green-200 rounded-full"
           >
             <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-            <span class="text-sm font-medium text-text-secondary">智能定时任务管理</span>
+            <span class="text-sm font-medium text-text-secondary">可视化工作流自动化</span>
           </div>
           <h1 class="text-5xl font-bold text-text-primary leading-tight">
-            让任务<br />
+            让工作流<br />
             <span class="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent"
-              >自动执行</span
+              >智能执行</span
             >
           </h1>
           <p class="text-lg text-text-secondary leading-relaxed max-w-md">
-            简单易用的定时任务系统，支持多种调度规则，轻松管理您的 HTTP 定时任务
+            拖拽式工作流设计器，集成 10+ 强大工具节点，支持定时、Webhook、API
+            触发，打造企业级自动化方案
           </p>
         </div>
 
@@ -65,7 +66,7 @@
               <img src="/logo.png" alt="Logo" class="w-full h-full object-contain" />
             </div>
             <h2 class="text-2xl font-bold text-text-primary mb-2">欢迎使用</h2>
-            <p class="text-sm text-text-secondary">定时任务管理系统</p>
+            <p class="text-sm text-text-secondary">工作流自动化平台</p>
           </div>
 
           <div class="flex bg-bg-tertiary rounded-lg p-1 mb-6">
@@ -113,35 +114,34 @@
               登录
             </BaseButton>
 
-            <template v-if="oauth2Config.linuxdo.enabled">
+            <template v-if="oauth2Config.linuxdo.enabled || oauth2Config.github.enabled">
               <div class="relative flex items-center justify-center my-4">
                 <div class="border-t border-border-primary w-full absolute"></div>
                 <span class="bg-bg-elevated px-3 text-sm text-text-tertiary relative z-10">或</span>
               </div>
 
-              <a
-                href="/api/v1/auth/linuxdo"
-                class="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-bg-elevated border-2 border-border-primary text-text-secondary font-medium rounded-lg hover:bg-bg-hover hover:border-slate-300 transition-all duration-200 shadow-sm"
-              >
-                <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none">
-                  <path d="M12 2L2 7L12 12L22 7L12 2Z" fill="currentColor" opacity="0.6" />
-                  <path
-                    d="M2 17L12 22L22 17"
-                    stroke="currentColor"
-                    stroke-width="2"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                  />
-                  <path
-                    d="M2 12L12 17L22 12"
-                    stroke="currentColor"
-                    stroke-width="2"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                  />
-                </svg>
-                使用 Linux.do 登录
-              </a>
+              <div class="flex items-center justify-center gap-4">
+                <Tooltip v-if="oauth2Config.linuxdo.enabled" text="使用 Linux.do 登录" position="bottom">
+                  <a
+                    href="/api/v1/auth/linuxdo"
+                    class="group relative flex items-center justify-center w-11 h-11 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl hover:border-orange-400 hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200"
+                  >
+                    <svg class="w-5 h-5 text-gray-600 dark:text-gray-400 group-hover:text-orange-500 transition-colors" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M12 2L2 7L12 12L22 7L12 2Z" opacity="0.7" />
+                      <path d="M2 12L12 17L22 12M2 17L12 22L22 17" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                  </a>
+                </Tooltip>
+
+                <Tooltip v-if="oauth2Config.github.enabled" text="使用 GitHub 登录" position="bottom">
+                  <a
+                    href="/api/v1/auth/github"
+                    class="group relative flex items-center justify-center w-11 h-11 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl hover:border-gray-400 hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200"
+                  >
+                    <Github class="w-5 h-5 text-gray-600 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-gray-100 transition-colors" />
+                  </a>
+                </Tooltip>
+              </div>
             </template>
           </form>
 
@@ -201,12 +201,13 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
-import { Zap, Shield, Gauge } from 'lucide-vue-next'
+import { Zap, Shield, Gauge, Github } from 'lucide-vue-next'
 import { message } from '@/utils/message'
 import * as userApi from '@/api/user'
 import * as configApi from '@/api/config'
 import BaseInput from '@/components/BaseInput'
 import BaseButton from '@/components/BaseButton'
+import Tooltip from '@/components/Tooltip'
 import SecureStorage, { STORAGE_KEYS } from '@/utils/storage'
 
 const router = useRouter()
@@ -220,24 +221,27 @@ const oauth2Config = ref({
   linuxdo: {
     enabled: false,
   },
+  github: {
+    enabled: false,
+  },
 })
 
 // 功能亮点
 const features = [
   {
     icon: Zap,
-    title: '灵活调度',
-    description: '支持每天、每周、每月、间隔、Cron表达式等多种调度方式',
+    title: '可视化编排',
+    description: '拖拽式工作流设计器，支持条件分支、循环控制，轻松构建复杂自动化场景',
   },
   {
     icon: Shield,
-    title: '可靠执行',
-    description: '自动执行HTTP任务，完整记录执行日志和响应结果',
+    title: '丰富工具集',
+    description: '内置 HTTP、邮件、飞书、OpenAI、Redis 等 10+ 工具节点，可扩展自定义',
   },
   {
     icon: Gauge,
-    title: '实时监控',
-    description: '查看任务执行状态、响应时间和详细的执行记录',
+    title: '灵活触发',
+    description: '支持 Cron 定时、Webhook 回调、外部 API 调用等多种触发方式',
   },
 ]
 
@@ -343,11 +347,12 @@ const handleOAuth2Callback = async () => {
   const code = route.query.code as string
   const state = route.query.state as string
   const error = route.query.error
+  const provider = route.query.provider as string // 用于区分提供商
 
   // 处理OAuth2错误
   if (error) {
     message.error('授权失败，请重试')
-    router.replace('/')
+    router.replace('/auth')
     return
   }
 
@@ -355,11 +360,20 @@ const handleOAuth2Callback = async () => {
   if (code) {
     loading.value = true
     try {
-      // 调用封装好的API
-      const res = await userApi.linuxdoCallback({
-        code,
-        state: state || '',
-      })
+      let res
+      // 根据 provider 参数判断是哪个 OAuth2 提供商
+      // 如果没有 provider 参数，默认使用 linuxdo（向后兼容）
+      if (provider === 'github') {
+        res = await userApi.githubCallback({
+          code,
+          state: state || '',
+        })
+      } else {
+        res = await userApi.linuxdoCallback({
+          code,
+          state: state || '',
+        })
+      }
 
       // 保存token和用户信息到SecureStorage（与普通登录相同）
       SecureStorage.setItem(STORAGE_KEYS.AUTH_TOKEN, res.data.token)
@@ -369,7 +383,7 @@ const handleOAuth2Callback = async () => {
       await router.replace('/')
     } catch (error: any) {
       message.error(error.message || 'OAuth2登录失败')
-      router.replace('/')
+      router.replace('/auth')
     } finally {
       loading.value = false
     }

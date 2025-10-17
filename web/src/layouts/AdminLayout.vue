@@ -25,8 +25,8 @@ const tabs = [
   { label: '执行记录', value: 'executions' },
   { label: '任务管理', value: 'tasks' },
   { label: '用户管理', value: 'users' },
-  { label: '模板管理', value: 'workflows' },
-  { label: '模板分类', value: 'categories' },
+  { label: '工作流管理', value: 'workflows' },
+  { label: '工作流分类', value: 'categories' },
 ]
 
 const handleTabChange = (value: string) => {

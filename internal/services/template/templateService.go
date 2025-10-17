@@ -55,6 +55,7 @@ func (s *TemplateService) CreateTemplate(userID string, req *request.CreateTempl
 		CoverImage:    req.CoverImage,
 		Icon:          req.Icon,
 		RequiredTools: requiredTools,
+		CaseImages:    req.CaseImages,
 		Status:        "published",
 		IsOfficial:    true,
 		IsFeatured:    req.IsFeatured,
@@ -87,7 +88,16 @@ func (s *TemplateService) GetTemplateList(req *request.ListTemplatesRequest) (*r
 	}
 
 	// 构建查询
-	queryDB := db.Model(&models.WorkflowTemplate{}).Where("status = ?", "published")
+	queryDB := db.Model(&models.WorkflowTemplate{})
+
+	// 如果指定了状态筛选，则使用指定的状态；否则只显示已发布的模板
+	if req.Status != "" {
+		queryDB = queryDB.Where("status = ?", req.Status)
+	} else if !req.ShowAll {
+		// 默认只显示已发布的模板（用于普通用户浏览）
+		queryDB = queryDB.Where("status = ?", "published")
+	}
+	// 如果 ShowAll = true，则不过滤状态（用于管理后台）
 
 	// 分类筛选
 	if req.Category != "" {
@@ -114,7 +124,7 @@ func (s *TemplateService) GetTemplateList(req *request.ListTemplatesRequest) (*r
 	// 查询数据
 	var templates []models.WorkflowTemplate
 	offset := (req.Page - 1) * req.PageSize
-	if err := queryDB.Order("is_featured DESC, install_count DESC, created_at DESC").
+	if err := queryDB.Order("created_at DESC").
 		Offset(offset).
 		Limit(req.PageSize).
 		Find(&templates).Error; err != nil {
@@ -130,13 +140,13 @@ func (s *TemplateService) GetTemplateList(req *request.ListTemplatesRequest) (*r
 			Description:   tpl.Description,
 			Category:      tpl.Category,
 			CoverImage:    tpl.CoverImage,
-			Icon:          tpl.Icon,
 			InstallCount:  tpl.InstallCount,
 			ViewCount:     tpl.ViewCount,
 			IsOfficial:    tpl.IsOfficial,
 			IsFeatured:    tpl.IsFeatured,
 			AuthorName:    tpl.AuthorName,
 			RequiredTools: tpl.RequiredTools,
+			Status:        tpl.Status,
 			CreatedAt:     tpl.CreatedAt,
 		}
 	}
@@ -176,13 +186,13 @@ func (s *TemplateService) GetTemplateDetail(templateID string) (*response.Templa
 		Description:   template.Description,
 		Category:      template.Category,
 		CoverImage:    template.CoverImage,
-		Icon:          template.Icon,
 		InstallCount:  template.InstallCount,
 		ViewCount:     template.ViewCount,
 		IsOfficial:    template.IsOfficial,
 		IsFeatured:    template.IsFeatured,
 		AuthorName:    template.AuthorName,
 		RequiredTools: template.RequiredTools,
+		CaseImages:    template.CaseImages,
 		UsageGuide:    template.UsageGuide,
 		TemplateData:  template.TemplateData,
 		Status:        template.Status,
@@ -282,9 +292,10 @@ func (s *TemplateService) UpdateTemplate(templateID, userID string, req *request
 		return nil, err
 	}
 
-	// 构建更新
-	updates := make(map[string]interface{})
+	// 构建更新 - 允许空字符串更新
+	updates := make(map[string]any)
 
+	// 这些字段不允许为空
 	if req.Name != "" {
 		updates["name"] = req.Name
 	}
@@ -294,19 +305,14 @@ func (s *TemplateService) UpdateTemplate(templateID, userID string, req *request
 	if req.Category != "" {
 		updates["category"] = req.Category
 	}
-	if req.CoverImage != "" {
-		updates["cover_image"] = req.CoverImage
-	}
-	if req.Icon != "" {
-		updates["icon"] = req.Icon
-	}
-	if req.UsageGuide != "" {
-		updates["usage_guide"] = req.UsageGuide
-	}
 	if req.Status != "" {
 		updates["status"] = req.Status
 	}
 
+	// 这些字段允许设置为空字符串或空数组
+	updates["cover_image"] = req.CoverImage
+	updates["usage_guide"] = req.UsageGuide
+	updates["case_images"] = models.StringArray(req.CaseImages)
 	updates["is_featured"] = req.IsFeatured
 
 	if err := db.Model(&template).Updates(updates).Error; err != nil {

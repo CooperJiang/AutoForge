@@ -152,7 +152,7 @@ const tools = ref<any[]>([])
 const loadTools = async () => {
   try {
     tools.value = await toolApi.getToolList()
-  } catch {
+  } catch (error) {
     console.error('Failed to load tools:', error)
   }
 }

@@ -10,7 +10,7 @@ import (
 // WorkflowNode 工作流节点
 type WorkflowNode struct {
 	ID       string                 `json:"id"`
-	Type     string                 `json:"type"` // tool/trigger/condition/delay/switch
+	Type     string                 `json:"type"`     // tool/trigger/condition/delay/switch
 	ToolCode string                 `json:"toolCode"` // 工具代码（仅当type=tool时）
 	Name     string                 `json:"name"`
 	Config   map[string]interface{} `json:"config"`
@@ -46,12 +46,14 @@ type WorkflowEnvVar struct {
 // WorkflowAPIParam 工作流 API 参数配置
 type WorkflowAPIParam struct {
 	Key          string      `json:"key"`                    // 参数名
-	Type         string      `json:"type"`                   // string/number/boolean/object/array
+	Type         string      `json:"type"`                   // string/number/boolean/object/array/file
 	Required     bool        `json:"required"`               // 是否必填
 	DefaultValue interface{} `json:"defaultValue,omitempty"` // 默认值
 	Description  string      `json:"description,omitempty"`  // 描述
 	Example      interface{} `json:"example,omitempty"`      // 示例值
 	MappingPath  string      `json:"mappingPath"`            // 映射路径，如 "nodes.0.config.prompt"
+	Accept       string      `json:"accept,omitempty"`       // 文件类型限制（仅file类型），如 "image/*"
+	MaxSize      int         `json:"maxSize,omitempty"`      // 文件大小限制（MB，仅file类型）
 }
 
 // WorkflowNodes 节点数组类型
@@ -177,13 +179,13 @@ func (wv WorkflowViewport) Value() (driver.Value, error) {
 // Workflow 工作流模型
 type Workflow struct {
 	BaseModel
-	UserID      string          `gorm:"type:char(36);not null;index:idx_user_id" json:"user_id"`
-	User        *User           `gorm:"-" json:"user,omitempty"`
-	Name        string          `gorm:"size:255;not null" json:"name"`
-	Description string          `gorm:"type:text" json:"description"`
-	Nodes       WorkflowNodes   `gorm:"type:json;not null" json:"nodes"`
-	Edges       WorkflowEdges   `gorm:"type:json;not null" json:"edges"`
-	EnvVars     WorkflowEnvVars `gorm:"type:json" json:"env_vars"`
+	UserID      string            `gorm:"type:char(36);not null;index:idx_user_id" json:"user_id"`
+	User        *User             `gorm:"-" json:"user,omitempty"`
+	Name        string            `gorm:"size:255;not null" json:"name"`
+	Description string            `gorm:"type:text" json:"description"`
+	Nodes       WorkflowNodes     `gorm:"type:json;not null" json:"nodes"`
+	Edges       WorkflowEdges     `gorm:"type:json;not null" json:"edges"`
+	EnvVars     WorkflowEnvVars   `gorm:"type:json" json:"env_vars"`
 	Viewport    *WorkflowViewport `gorm:"type:json" json:"viewport,omitempty"`
 
 	// 调度配置
@@ -193,13 +195,13 @@ type Workflow struct {
 	NextRunTime   *int64 `gorm:"index:idx_enabled_next_run" json:"next_run_time"`
 
 	// API 调用配置
-	APIEnabled      bool              `gorm:"default:false" json:"api_enabled"`                           // 是否启用 API 调用
-	APIKey          string            `gorm:"size:64;uniqueIndex:idx_api_key" json:"api_key,omitempty"`  // API Key (仅查询时返回，敏感信息)
-	APIParams       WorkflowAPIParams `gorm:"type:json" json:"api_params"`                                // API 参数配置
-	APITimeout      int               `gorm:"default:300" json:"api_timeout"`                             // API 超时时间（秒）
-	APICallCount    int               `gorm:"default:0" json:"api_call_count"`                            // API 调用次数统计
-	APILastCalledAt *int64            `gorm:"index" json:"api_last_called_at"`                            // 最后一次 API 调用时间
-	APIWebhookURL   string            `gorm:"size:500" json:"api_webhook_url,omitempty"`                  // Webhook 回调地址（异步模式）
+	APIEnabled      bool              `gorm:"default:false" json:"api_enabled"`                         // 是否启用 API 调用
+	APIKey          string            `gorm:"size:64;uniqueIndex:idx_api_key" json:"api_key,omitempty"` // API Key (仅查询时返回，敏感信息)
+	APIParams       WorkflowAPIParams `gorm:"type:json" json:"api_params"`                              // API 参数配置
+	APITimeout      int               `gorm:"default:300" json:"api_timeout"`                           // API 超时时间（秒）
+	APICallCount    int               `gorm:"default:0" json:"api_call_count"`                          // API 调用次数统计
+	APILastCalledAt *int64            `gorm:"index" json:"api_last_called_at"`                          // 最后一次 API 调用时间
+	APIWebhookURL   string            `gorm:"size:500" json:"api_webhook_url,omitempty"`                // Webhook 回调地址（异步模式）
 
 	// 统计信息
 	TotalExecutions int    `gorm:"default:0" json:"total_executions"`

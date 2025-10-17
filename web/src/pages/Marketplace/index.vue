@@ -1,79 +1,81 @@
 <template>
-  <div>
-    <!-- Header -->
-    <div class="flex items-center justify-between mb-6">
-      <div>
-        <h1 class="text-2xl font-bold text-text-primary mb-1">模板市场</h1>
-        <p class="text-sm text-text-secondary">浏览和安装官方工作流模板</p>
-      </div>
-    </div>
-
+  <div class="flex flex-col h-full">
     <!-- Filters -->
-    <div class="flex gap-4 mb-6">
-      <!-- Category Filter -->
-      <BaseSelect
-        v-model="selectedCategory"
-        :options="categoryOptions"
-        style="width: 260px"
-        placeholder="选择分类"
-        @update:modelValue="handleFilterChange"
-      />
+    <div class="bg-bg-elevated rounded-xl border border-border-primary p-4 mb-4 shadow-sm flex-shrink-0">
+      <div class="flex gap-4">
+        <!-- Category Filter -->
+        <BaseSelect
+          v-model="selectedCategory"
+          :options="categoryOptions"
+          style="width: 260px"
+          placeholder="选择分类"
+          @update:modelValue="handleFilterChange"
+        />
 
-      <!-- Featured Filter -->
-      <BaseButton :variant="showFeatured ? 'primary' : 'outline'" @click="toggleFeatured">
-        <Star :class="['w-4 h-4 mr-1', showFeatured && 'fill-current']" />
-        精选模板
-      </BaseButton>
+        <!-- Search -->
+        <BaseInput
+          v-model="searchKeyword"
+          placeholder="搜索模板..."
+          style="width: 260px"
+          @keyup.enter="handleFilterChange"
+        >
+          <template #prefix>
+            <Search class="w-4 h-4" />
+          </template>
+        </BaseInput>
 
-      <!-- Search -->
-      <BaseInput
-        v-model="searchKeyword"
-        placeholder="搜索模板..."
-        style="width: 260px"
-        @keyup.enter="handleFilterChange"
-      >
-        <template #prefix>
-          <Search class="w-4 h-4" />
-        </template>
-      </BaseInput>
-    </div>
-
-    <!-- Template Grid -->
-    <div
-      v-if="!loading && templates.length > 0"
-      class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4"
-    >
-      <TemplateCard
-        v-for="template in templates"
-        :key="template.id"
-        :template="template"
-        @view="handleViewDetail"
-        @install="handleInstall"
-      />
-    </div>
-
-    <!-- Empty State -->
-    <div v-else-if="!loading && templates.length === 0" class="text-center py-20">
-      <div class="text-text-placeholder mb-4">
-        <Package class="w-16 h-16 mx-auto mb-4" />
-        <p class="text-lg">暂无模板</p>
-        <p class="text-sm">暂时没有符合条件的模板</p>
+        <!-- Featured Filter - 放到最后 -->
+        <BaseButton :variant="showFeatured ? 'primary' : 'outline'" @click="toggleFeatured">
+          <Star :class="['w-4 h-4 mr-1', showFeatured && 'fill-current']" />
+          精选工作流
+        </BaseButton>
       </div>
     </div>
 
-    <!-- Loading -->
-    <div v-else class="flex justify-center items-center py-20">
-      <div class="text-text-tertiary">加载中...</div>
-    </div>
+    <!-- Content Area with Background -->
+    <div class="flex-1 flex flex-col bg-bg-elevated rounded-xl border border-border-primary overflow-hidden shadow-sm">
+      <!-- Template Grid - Scrollable -->
+      <div class="flex-1 overflow-y-auto p-4">
+        <div
+          v-if="!loading && templates.length > 0"
+          class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-3"
+        >
+          <TemplateCard
+            v-for="template in templates"
+            :key="template.id"
+            :template="template"
+            @view="handleViewDetail"
+            @install="handleInstall"
+          />
+        </div>
 
-    <!-- Pagination -->
-    <div v-if="!loading && templates.length > 0" class="mt-8">
-      <Pagination
-        :current="currentPage"
-        :total="totalItems"
-        :page-size="pageSize"
-        @change="handlePageChange"
-      />
+        <!-- Empty State -->
+        <div v-else-if="!loading && templates.length === 0" class="flex items-center justify-center h-full">
+          <div class="text-text-placeholder text-center">
+            <Package class="w-16 h-16 mx-auto mb-4" />
+            <p class="text-lg">暂无模板</p>
+            <p class="text-sm">暂时没有符合条件的模板</p>
+          </div>
+        </div>
+
+        <!-- Loading -->
+        <div v-else class="flex items-center justify-center h-full">
+          <div class="text-text-tertiary">加载中...</div>
+        </div>
+      </div>
+
+      <!-- Pagination - Fixed at Bottom -->
+      <div
+        v-if="!loading && templates.length > 0"
+        class="border-t border-border-primary px-4 py-3 flex-shrink-0"
+      >
+        <Pagination
+          :current="currentPage"
+          :total="totalItems"
+          :page-size="pageSize"
+          @change="handlePageChange"
+        />
+      </div>
     </div>
 
     <!-- Template Detail Dialog -->

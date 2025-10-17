@@ -88,6 +88,24 @@ mail:
   max_retries: 3                   # 发送失败最大重试次数
   retry_interval: 5                # 重试间隔(秒)
 
+# OAuth2配置
+oauth2:
+  linuxdo:
+    client_id: ""                                              # Linux.do Client ID（在 https://connect.linux.do 创建应用）
+    client_secret: ""                                          # Linux.do Client Secret
+    authorize_url: "https://connect.linux.do/oauth2/authorize"
+    token_url: "https://connect.linux.do/oauth2/token"
+    user_info_url: "https://connect.linux.do/api/user"
+    redirect_url: "https://yourdomain.com/auth"               # 回调地址（修改为你的域名）
+    scopes:
+      - "read"
+    enabled: false                                             # 配置完 Client ID/Secret 后改为 true
+  github:
+    client_id: ""                                              # GitHub Client ID（在 https://github.com/settings/developers 创建 OAuth App）
+    client_secret: ""                                          # GitHub Client Secret
+    redirect_url: "https://yourdomain.com/auth?provider=github"  # 回调地址（修改为你的域名）
+    enabled: false                                             # 配置完 Client ID/Secret 后改为 true
+
 # 跨域配置
 cors:
   enabled: true                    # 是否启用CORS
@@ -109,3 +127,32 @@ cors:
   expose_headers:                  # 允许访问的响应头
     - "Content-Length"
     - "Content-Type"
+
+# OpenAI配置（可选）
+openai:
+  api_key: ""                      # OpenAI API Key
+  api_base: "https://api.openai.com/v1"  # API Base URL（使用代理时可修改）
+  enabled: false                   # 是否启用OpenAI功能
+
+# PixelPunk图床配置（可选）
+pixelpunk:
+  base_url: ""                     # PixelPunk API 基础地址
+  api_key: ""                      # PixelPunk API 密钥
+  enabled: false                   # 是否启用PixelPunk图床功能
+
+# 阿里云OSS配置（可选）
+aliyun_oss:
+  endpoint: "oss-cn-hangzhou.aliyuncs.com"  # OSS Endpoint地址（不含bucket）
+  access_key_id: ""                         # 阿里云AccessKey ID
+  access_key_secret: ""                     # 阿里云AccessKey Secret
+  bucket: ""                                # OSS Bucket名称
+  region: "cn-hangzhou"                     # OSS区域
+  enabled: false                            # 是否启用阿里云OSS功能
+
+# 腾讯云COS配置（可选）
+tencent_cos:
+  secret_id: ""                             # 腾讯云SecretId
+  secret_key: ""                            # 腾讯云SecretKey
+  bucket: ""                                # COS Bucket名称（格式：name-appid）
+  region: "ap-guangzhou"                    # COS区域
+  enabled: false                            # 是否启用腾讯云COS功能

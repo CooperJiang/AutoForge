@@ -71,3 +71,7 @@ export interface OAuth2CallbackRequest {
 export const linuxdoCallback = (data: OAuth2CallbackRequest) => {
   return request.post<LoginResponse>('/api/v1/auth/linuxdo/callback', data)
 }
+
+export const githubCallback = (data: OAuth2CallbackRequest) => {
+  return request.post<LoginResponse>('/api/v1/auth/github/callback', data)
+}

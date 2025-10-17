@@ -9,10 +9,8 @@
         <AppHeader />
       </div>
 
-      <div class="flex-1 overflow-y-auto bg-bg-secondary">
-        <div class="max-w-[1920px] mx-auto p-6">
-          <router-view />
-        </div>
+      <div class="flex-1 overflow-y-auto bg-bg-secondary p-6">
+        <router-view />
       </div>
     </div>
   </div>

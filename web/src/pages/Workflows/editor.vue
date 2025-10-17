@@ -695,8 +695,12 @@ const handleSave = async () => {
       // 清除创建页面的草稿和未保存标记
       clearDraft()
       hasUnsavedChanges.value = false
+      // 更新 workflow 对象的 id
+      workflow.value.id = data.id
       // 跳转到编辑页面
-      router.replace(`/workflows/${data.id}/edit`)
+      await router.replace(`/workflows/${data.id}/edit`)
+      // 跳转后重新加载工作流数据以确保所有字段都是最新的
+      await loadWorkflow()
     }
   } catch (error: any) {
     console.error('Save workflow failed:', error)
@@ -897,19 +901,16 @@ const loadWorkflow = async () => {
 
 // 路由守卫相关
 const showLeaveDialog = ref(false)
-const pendingNavigation = ref<any>(null)
+const isLeavingConfirmed = ref(false) // 标记是否已确认离开
 
 const handleSaveAndLeave = async () => {
   try {
     await handleSave()
     showLeaveDialog.value = false
-    // 保存成功后，清除未保存标记，然后继续导航
+    // 保存成功后，清除未保存标记并返回
     hasUnsavedChanges.value = false
-    if (pendingNavigation.value) {
-      // 使用 nextTick 确保状态更新后再导航
-      await nextTick()
-      pendingNavigation.value()
-    }
+    isLeavingConfirmed.value = true
+    router.back()
   } catch (error) {
     // 保存失败，不离开
     console.error('Save failed:', error)
@@ -918,21 +919,27 @@ const handleSaveAndLeave = async () => {
 
 const handleDiscardAndLeave = () => {
   showLeaveDialog.value = false
-  if (pendingNavigation.value) {
-    pendingNavigation.value()
-  }
+  // 清除未保存标记并返回
+  hasUnsavedChanges.value = false
+  isLeavingConfirmed.value = true
+  router.back()
 }
 
 const handleCancelLeave = () => {
   showLeaveDialog.value = false
-  pendingNavigation.value = null
 }
 
 // 路由守卫 - 阻止用户在有未保存更改时离开
-onBeforeRouteLeave(async (to, from, next) => {
+onBeforeRouteLeave((to, from, next) => {
+  // 如果已经确认离开，直接放行
+  if (isLeavingConfirmed.value) {
+    isLeavingConfirmed.value = false
+    next()
+    return
+  }
+
   if (hasUnsavedChanges.value) {
     showLeaveDialog.value = true
-    pendingNavigation.value = () => next()
     next(false)
   } else {
     next()

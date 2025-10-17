@@ -19,13 +19,13 @@ type TemplateBasicInfo struct {
 	Description   string    `json:"description"`
 	Category      string    `json:"category"`
 	CoverImage    string    `json:"cover_image"`
-	Icon          string    `json:"icon"`
 	InstallCount  int       `json:"install_count"`
 	ViewCount     int       `json:"view_count"`
 	IsOfficial    bool      `json:"is_official"`
 	IsFeatured    bool      `json:"is_featured"`
 	AuthorName    string    `json:"author_name"`
 	RequiredTools []string  `json:"required_tools"`
+	Status        string    `json:"status"`
 	CreatedAt     time.Time `json:"created_at"`
 }
 
@@ -35,13 +35,13 @@ type TemplateDetailResponse struct {
 	Description   string                `json:"description"`
 	Category      string                `json:"category"`
 	CoverImage    string                `json:"cover_image"`
-	Icon          string                `json:"icon"`
 	InstallCount  int                   `json:"install_count"`
 	ViewCount     int                   `json:"view_count"`
 	IsOfficial    bool                  `json:"is_official"`
 	IsFeatured    bool                  `json:"is_featured"`
 	AuthorName    string                `json:"author_name"`
 	RequiredTools []string              `json:"required_tools"`
+	CaseImages    []string              `json:"case_images"`
 	UsageGuide    string                `json:"usage_guide"`
 	TemplateData  models.TemplateData   `json:"template_data"`
 	Status        string                `json:"status"`

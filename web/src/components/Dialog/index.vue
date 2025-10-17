@@ -10,23 +10,26 @@
 
         <div
           :class="[
-            'relative bg-bg-elevated rounded-lg shadow-xl border-2 border-border-primary w-full max-h-[90vh] flex flex-col transform transition-all',
+            'relative bg-bg-primary rounded-lg shadow-xl border-2 border-border-primary w-full max-h-[90vh] flex flex-col transform transition-all',
             maxWidth,
           ]"
         >
           <div
-            class="px-5 py-4 border-b-2 border-border-primary flex items-center justify-between flex-shrink-0"
+            class="px-5 py-4 bg-bg-secondary border-b-2 border-border-primary flex items-center justify-between flex-shrink-0 rounded-t-lg"
           >
             <h3 class="text-base font-semibold text-text-primary">{{ title }}</h3>
-            <button
-              @click="onCancel"
-              class="text-text-tertiary hover:text-text-secondary transition-colors"
-            >
-              <X :size="20" />
-            </button>
+            <div class="flex items-center gap-2">
+              <slot name="header-actions"></slot>
+              <button
+                @click="onCancel"
+                class="text-text-tertiary hover:text-text-secondary transition-colors"
+              >
+                <X :size="20" />
+              </button>
+            </div>
           </div>
 
-          <div class="px-5 py-4 overflow-y-auto flex-1">
+          <div class="px-5 py-4 overflow-y-auto flex-1 bg-bg-elevated">
             <slot>
               <p class="text-sm text-text-secondary">{{ message }}</p>
             </slot>
@@ -34,7 +37,7 @@
 
           <div
             v-if="!hideFooter"
-            class="px-5 py-4 border-t-2 border-border-primary flex gap-2 justify-end flex-shrink-0"
+            class="px-5 py-4 bg-bg-secondary border-t-2 border-border-primary flex gap-2 justify-end flex-shrink-0 rounded-b-lg"
           >
             <slot name="footer">
               <BaseButton v-if="cancelText" variant="secondary" @click="onCancel">

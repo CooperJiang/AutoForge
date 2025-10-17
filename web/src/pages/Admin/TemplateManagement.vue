@@ -40,90 +40,148 @@
       <div
         v-for="template in templates"
         :key="template.id"
-        class="bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden hover:border-primary hover:shadow-xl transition-all shadow-md"
+        class="border-2 rounded-xl overflow-hidden hover:shadow-xl transition-all shadow-md"
+        :style="{
+          backgroundColor: 'var(--color-bg-elevated)',
+          borderColor: 'var(--color-border-primary)',
+        }"
+        @mouseenter="(e) => (e.currentTarget as HTMLElement).style.borderColor = 'var(--color-primary)'"
+        @mouseleave="(e) => (e.currentTarget as HTMLElement).style.borderColor = 'var(--color-border-primary)'"
       >
         <div
           v-if="template.cover_image"
-          class="h-28 bg-cover bg-center"
+          class="h-40 bg-cover bg-center"
           :style="`background-image: url(${template.cover_image});`"
         ></div>
-        <div v-else class="h-28 bg-gradient-to-br from-green-400 to-primary"></div>
-        <div class="p-4">
-          <div class="flex items-start justify-between mb-2">
-            <h4 class="text-sm font-semibold text-text-primary flex-1 line-clamp-1">{{ template.name }}</h4>
-            <div class="flex items-center gap-1 ml-2">
+        <div
+          v-else
+          class="h-40 flex items-center justify-center p-4"
+          :style="{
+            background: 'var(--gradient-primary)',
+          }"
+        >
+          <h3
+            class="text-xl font-bold text-center line-clamp-3 max-w-[200px] drop-shadow-lg"
+            :style="{ color: 'var(--color-primary-text)' }"
+          >
+            {{ template.name }}
+          </h3>
+        </div>
+        <div class="p-3">
+          <div class="flex items-start justify-between mb-1.5 gap-2">
+            <h4
+              class="text-sm font-semibold line-clamp-1 flex-1 min-w-0"
+              :style="{ color: 'var(--color-text-primary)' }"
+            >
+              {{ template.name }}
+            </h4>
+            <div class="flex items-center gap-2 flex-shrink-0">
+              <div class="flex items-center gap-2 text-xs">
+                <div class="flex items-center gap-1" :style="{ color: 'var(--color-success)' }">
+                  <Download class="w-3.5 h-3.5" />
+                  <span>{{ template.install_count }}</span>
+                </div>
+                <div class="flex items-center gap-1" :style="{ color: 'var(--color-info)' }">
+                  <Eye class="w-3.5 h-3.5" />
+                  <span>{{ template.view_count }}</span>
+                </div>
+              </div>
+              <div class="flex items-center gap-1">
+                <span
+                  v-if="template.status === 'draft'"
+                  class="text-xs px-1.5 py-0.5 rounded"
+                  :style="{
+                    backgroundColor: 'var(--color-bg-tertiary)',
+                    color: 'var(--color-text-secondary)',
+                  }"
+                >
+                  草稿
+                </span>
+                <span
+                  v-if="template.status === 'archived'"
+                  class="text-xs px-1.5 py-0.5 rounded"
+                  :style="{
+                    backgroundColor: 'var(--color-error-light)',
+                    color: 'var(--color-error-text)',
+                  }"
+                >
+                  已下架
+                </span>
+              </div>
+            </div>
+          </div>
+          <p class="text-xs mb-2 line-clamp-2 min-h-[2rem]" :style="{ color: 'var(--color-text-secondary)' }">
+            {{ template.description }}
+          </p>
+          <div class="flex items-center justify-between text-xs">
+            <div class="flex items-center gap-1.5">
               <span
                 v-if="template.is_official"
-                class="text-xs px-1.5 py-0.5 bg-blue-500/10 text-blue-600 dark:text-blue-400 rounded"
+                class="text-xs px-1.5 py-0.5 rounded"
+                :style="{
+                  backgroundColor: 'var(--color-info-light)',
+                  color: 'var(--color-info-text)',
+                }"
               >
                 官方
               </span>
               <span
                 v-if="template.is_featured"
-                class="text-xs px-1.5 py-0.5 bg-yellow-500/10 text-yellow-600 dark:text-yellow-400 rounded"
+                class="text-xs px-1.5 py-0.5 rounded"
+                :style="{
+                  backgroundColor: 'var(--color-warning-light)',
+                  color: 'var(--color-warning-text)',
+                }"
               >
                 精选
               </span>
+              <span
+                class="inline-block px-2 py-0.5 rounded-md text-xs font-medium border"
+                :style="{
+                  backgroundColor: 'var(--color-primary-light)',
+                  color: 'var(--color-primary)',
+                  borderColor: 'var(--color-primary)',
+                  opacity: '0.8',
+                }"
+              >
+                {{ template.category }}
+              </span>
             </div>
-          </div>
-          <p class="text-xs text-text-secondary mb-3 line-clamp-2 min-h-[2.5rem]">
-            {{ template.description }}
-          </p>
-          <div class="flex items-center justify-between text-xs mb-3 pb-3 border-b border-gray-200 dark:border-gray-700">
-            <span class="inline-block px-2 py-1 rounded-md text-xs font-medium bg-primary/10 text-primary border border-primary/20">{{ template.category }}</span>
-            <div class="flex items-center gap-3 text-text-tertiary">
-              <div class="flex items-center gap-1">
-                <Download class="w-3.5 h-3.5" />
-                <span>{{ template.install_count }}</span>
-              </div>
-              <div class="flex items-center gap-1">
-                <Eye class="w-3.5 h-3.5" />
-                <span>{{ template.view_count }}</span>
-              </div>
+            <div class="flex items-center gap-2">
+              <button
+                @click="editTemplate(template)"
+                class="p-1 rounded transition-colors"
+                :style="{ color: 'var(--color-info)' }"
+                @mouseenter="(e) => (e.currentTarget as HTMLElement).style.backgroundColor = 'var(--color-info-light)'"
+                @mouseleave="(e) => (e.currentTarget as HTMLElement).style.backgroundColor = 'transparent'"
+                title="编辑"
+              >
+                <Settings class="w-3.5 h-3.5" />
+              </button>
+              <button
+                @click="deleteTemplateConfirm(template)"
+                class="p-1 rounded transition-colors"
+                :style="{ color: 'var(--color-error)' }"
+                @mouseenter="(e) => (e.currentTarget as HTMLElement).style.backgroundColor = 'var(--color-error-light)'"
+                @mouseleave="(e) => (e.currentTarget as HTMLElement).style.backgroundColor = 'transparent'"
+                title="删除"
+              >
+                <Trash2 class="w-3.5 h-3.5" />
+              </button>
             </div>
-          </div>
-          <div class="flex items-center gap-2">
-            <button
-              @click="editTemplate(template)"
-              class="flex-1 px-3 py-2 bg-blue-500/10 hover:bg-blue-500/20 text-blue-600 dark:text-blue-400 rounded-lg transition-colors border border-blue-500/20 flex items-center justify-center gap-1.5 text-xs font-medium"
-            >
-              <Edit2 class="w-3.5 h-3.5" />
-              编辑
-            </button>
-            <button
-              @click="deleteTemplateConfirm(template)"
-              class="flex-1 px-3 py-2 bg-red-500/10 hover:bg-red-500/20 text-red-600 dark:text-red-400 rounded-lg transition-colors border border-red-500/20 flex items-center justify-center gap-1.5 text-xs font-medium"
-            >
-              <Trash2 class="w-3.5 h-3.5" />
-              删除
-            </button>
           </div>
         </div>
       </div>
     </div>
 
-    <div v-if="total > 0" class="flex justify-between items-center mt-6">
-      <div class="text-sm text-text-secondary">共 {{ total }} 条记录</div>
-      <div class="flex gap-2">
-        <button
-          @click="prevPage"
-          :disabled="currentPage === 1"
-          class="px-4 py-2 bg-bg-tertiary text-text-secondary text-sm font-medium rounded-lg hover:bg-bg-tertiary disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-        >
-          上一页
-        </button>
-        <span class="px-4 py-2 text-sm text-text-secondary">
-          {{ currentPage }} / {{ totalPages }}
-        </span>
-        <button
-          @click="nextPage"
-          :disabled="currentPage >= totalPages"
-          class="px-4 py-2 bg-bg-tertiary text-text-secondary text-sm font-medium rounded-lg hover:bg-bg-tertiary disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-        >
-          下一页
-        </button>
-      </div>
-    </div>
+    <Pagination
+      v-if="total > 0"
+      :current="currentPage"
+      :page-size="12"
+      :total="total"
+      :bordered="false"
+      @change="handlePageChange"
+    />
 
     <Dialog
       v-model="showEditDialog"
@@ -166,6 +224,43 @@
             class="w-full px-3 py-2 bg-bg-primary border border-border-primary rounded-lg text-text-primary placeholder-text-tertiary focus:outline-none focus:ring-2 focus:ring-green-500"
           />
         </div>
+        <div>
+          <label class="block text-sm font-medium text-text-primary mb-2">
+            案例展示图片
+          </label>
+          <div class="space-y-2">
+            <div
+              v-for="(url, index) in form.case_images"
+              :key="index"
+              class="flex items-center gap-2"
+            >
+              <BaseInput
+                v-model="form.case_images[index]"
+                placeholder="请输入案例图片 URL"
+                class="flex-1"
+              />
+              <BaseButton
+                variant="outline"
+                size="sm"
+                @click="removeCaseImage(index)"
+              >
+                删除
+              </BaseButton>
+            </div>
+            <BaseButton
+              variant="outline"
+              size="sm"
+              @click="addCaseImage"
+              class="w-full"
+            >
+              <Plus class="w-4 h-4 mr-1" />
+              添加案例图片
+            </BaseButton>
+          </div>
+          <p class="text-xs text-text-tertiary mt-1">
+            添加工作流运行结果的案例图片，帮助用户了解效果
+          </p>
+        </div>
         <div class="flex items-center space-x-2">
           <input
             type="checkbox"
@@ -199,7 +294,7 @@
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
-import { Search, Edit2, Trash2, Plus, Download, Eye } from 'lucide-vue-next'
+import { Search, Settings, Trash2, Plus, Download, Eye } from 'lucide-vue-next'
 import { templateApi } from '@/api/template'
 import type {
   TemplateBasicInfo,
@@ -210,6 +305,7 @@ import { message } from '@/utils/message'
 import BaseButton from '@/components/BaseButton'
 import BaseInput from '@/components/BaseInput'
 import BaseSelect from '@/components/BaseSelect'
+import Pagination from '@/components/Pagination'
 import RadioGroup from '@/components/RadioGroup/index.vue'
 import Dialog from '@/components/Dialog'
 
@@ -235,8 +331,9 @@ const form = ref({
   category: '',
   cover_image: '',
   usage_guide: '',
+  case_images: [] as string[],
   is_featured: false,
-  status: 'active',
+  status: 'published',
 })
 
 // 分类筛选选项
@@ -272,8 +369,9 @@ const categoryOptions = computed(() => {
 
 // 状态选项
 const statusOptions = [
-  { label: '启用', value: 'active' },
-  { label: '禁用', value: 'inactive' },
+  { label: '已发布', value: 'published' },
+  { label: '草稿', value: 'draft' },
+  { label: '已下架', value: 'archived' },
 ]
 
 const loadCategories = async () => {
@@ -291,6 +389,7 @@ const loadTemplates = async () => {
     const params: any = {
       page: currentPage.value,
       page_size: 12,
+      show_all: true, // 管理后台显示所有状态的模板
     }
     if (searchKeyword.value) params.search = searchKeyword.value
     if (filterCategory.value) params.category = filterCategory.value
@@ -311,18 +410,26 @@ const createTemplate = () => {
   router.push('/workflows/new')
 }
 
-const editTemplate = (template: TemplateBasicInfo) => {
-  editingTemplate.value = template
-  form.value = {
-    name: template.name,
-    description: template.description,
-    category: template.category,
-    cover_image: template.cover_image || '',
-    usage_guide: '',
-    is_featured: template.is_featured,
-    status: 'active',
+const editTemplate = async (template: TemplateBasicInfo) => {
+  try {
+    // 获取模板详情以获得 usage_guide 和 case_images
+    const detail = await templateApi.getById(template.id)
+
+    editingTemplate.value = template
+    form.value = {
+      name: template.name,
+      description: template.description,
+      category: template.category,
+      cover_image: template.cover_image || '',
+      usage_guide: detail.usage_guide || '',
+      case_images: detail.case_images || [],
+      is_featured: template.is_featured,
+      status: template.status || 'published',
+    }
+    showEditDialog.value = true
+  } catch (error: any) {
+    message.error(error.response?.data?.message || '获取模板详情失败')
   }
-  showEditDialog.value = true
 }
 
 const cancelEdit = () => {
@@ -333,9 +440,18 @@ const cancelEdit = () => {
     category: '',
     cover_image: '',
     usage_guide: '',
+    case_images: [],
     is_featured: false,
-    status: 'active',
+    status: 'published',
   }
+}
+
+const addCaseImage = () => {
+  form.value.case_images.push('')
+}
+
+const removeCaseImage = (index: number) => {
+  form.value.case_images.splice(index, 1)
 }
 
 const saveTemplate = async () => {
@@ -346,12 +462,16 @@ const saveTemplate = async () => {
   }
 
   try {
+    // 过滤掉空的案例图片 URL
+    const caseImages = form.value.case_images.filter((url) => url.trim() !== '')
+
     const updateData: UpdateTemplateDto = {
       name: form.value.name,
       description: form.value.description,
       category: form.value.category,
       cover_image: form.value.cover_image,
       usage_guide: form.value.usage_guide,
+      case_images: caseImages,
       is_featured: form.value.is_featured,
       status: form.value.status,
     }
@@ -382,18 +502,10 @@ const deleteTemplate = async () => {
   }
 }
 
-const prevPage = () => {
-  if (currentPage.value > 1) {
-    currentPage.value--
-    loadTemplates()
-  }
-}
-
-const nextPage = () => {
-  if (currentPage.value < totalPages.value) {
-    currentPage.value++
-    loadTemplates()
-  }
+// 页码变化
+const handlePageChange = (page: number) => {
+  currentPage.value = page
+  loadTemplates()
 }
 
 onMounted(() => {

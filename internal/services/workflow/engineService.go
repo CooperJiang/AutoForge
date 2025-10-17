@@ -9,17 +9,17 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"os"
+	"path/filepath"
 	"regexp"
 	"strconv"
 	"strings"
 	"time"
 )
 
-
 type EngineService struct {
 	executionService *ExecutionService
 }
-
 
 func NewEngineService() *EngineService {
 	return &EngineService{
@@ -27,30 +27,24 @@ func NewEngineService() *EngineService {
 	}
 }
 
-
 func (s *EngineService) ExecuteWorkflow(executionID string, envVars map[string]string, externalParams map[string]interface{}) error {
 	db := database.GetDB()
-
 
 	var execution models.WorkflowExecution
 	if err := db.First(&execution, "id = ?", executionID).Error; err != nil {
 		return fmt.Errorf("执行记录不存在: %w", err)
 	}
 
-
 	var workflow models.Workflow
 	if err := db.First(&workflow, "id = ?", execution.WorkflowID).Error; err != nil {
 		return fmt.Errorf("工作流不存在: %w", err)
 	}
 
-
 	if err := s.executionService.UpdateExecutionStatus(executionID, models.ExecutionStatusRunning, ""); err != nil {
 		return err
 	}
 
-
 	envMap := s.buildEnvMap(workflow.EnvVars, envVars)
-
 
 	if externalParams != nil {
 		for key, value := range externalParams {
@@ -58,17 +52,14 @@ func (s *EngineService) ExecuteWorkflow(executionID string, envVars map[string]s
 		}
 	}
 
-
 	success := true
 	var execError error
-
 
 	sortedNodes, err := s.topologicalSort(workflow.Nodes, workflow.Edges)
 	if err != nil {
 		s.executionService.UpdateExecutionStatus(executionID, models.ExecutionStatusFailed, err.Error())
 		return err
 	}
-
 
 	nodeOutputs := make(map[string]map[string]interface{})
 	shouldSkipNext := false
@@ -81,7 +72,6 @@ func (s *EngineService) ExecuteWorkflow(executionID string, envVars map[string]s
 				break
 			}
 		}
-
 
 		if shouldSkipNext {
 			nodeLog := &models.NodeExecutionLog{
@@ -105,8 +95,7 @@ func (s *EngineService) ExecuteWorkflow(executionID string, envVars map[string]s
 			continue
 		}
 
-
-		nodeLog, output, err := s.executeNode(executionID, node, envMap, nodeOutputs)
+		nodeLog, output, err := s.executeNode(executionID, node, envMap, nodeOutputs, externalParams)
 		if err != nil {
 			success = false
 			execError = err
@@ -116,7 +105,6 @@ func (s *EngineService) ExecuteWorkflow(executionID string, envVars map[string]s
 			nodeLog.Status = models.ExecutionStatusSuccess
 			nodeOutputs[node.ID] = output
 
-
 			if node.Type == "condition" {
 				if result, ok := output["result"].(bool); ok && !result {
 					shouldSkipNext = true
@@ -125,17 +113,14 @@ func (s *EngineService) ExecuteWorkflow(executionID string, envVars map[string]s
 			}
 		}
 
-
 		if err := s.executionService.AddNodeLog(executionID, *nodeLog); err != nil {
 			log.Error("添加节点日志失败: %v", err)
 		}
-
 
 		if !success {
 			break
 		}
 	}
-
 
 	var finalStatus string
 	var finalError string
@@ -153,41 +138,39 @@ func (s *EngineService) ExecuteWorkflow(executionID string, envVars map[string]s
 		log.Error("更新执行状态失败: %v", err)
 	}
 
-
 	if err := s.executionService.UpdateWorkflowStats(workflow.GetID(), success); err != nil {
 		log.Error("更新工作流统计失败: %v", err)
 	}
 
+	// 清理临时文件（如果有上传的文件）
+	s.cleanupExecutionFiles(executionID)
+
 	return execError
 }
-
 
 func (s *EngineService) executeNode(
 	executionID string,
 	node models.WorkflowNode,
 	envMap map[string]string,
 	nodeOutputs map[string]map[string]interface{},
+	externalParams map[string]interface{},
 ) (*models.NodeExecutionLog, map[string]interface{}, error) {
 	startTime := time.Now().Unix()
 
-
 	inputData := make(map[string]interface{})
-
 
 	if node.Config != nil && len(node.Config) > 0 {
 		inputData["config"] = node.Config
 	}
 
-
-	externalParams := make(map[string]string)
-	for key, value := range envMap {
-		if strings.HasPrefix(key, "external.") {
-			paramName := strings.TrimPrefix(key, "external.")
-			externalParams[paramName] = value
+	externalParamsForLog := make(map[string]interface{})
+	if externalParams != nil {
+		for key, value := range externalParams {
+			externalParamsForLog[key] = value
 		}
 	}
-	if len(externalParams) > 0 {
-		inputData["external_params"] = externalParams
+	if len(externalParamsForLog) > 0 {
+		inputData["external_params"] = externalParamsForLog
 	}
 
 	nodeLog := &models.NodeExecutionLog{
@@ -206,7 +189,7 @@ func (s *EngineService) executeNode(
 	var err error
 
 	if node.Type == "tool" {
-		replacedConfig := s.replaceVariables(node.Config, envMap, nodeOutputs)
+		replacedConfig := s.replaceVariables(node.Config, envMap, nodeOutputs, externalParams)
 		if len(replacedConfig) > 0 {
 			inputData["resolved_config"] = replacedConfig
 		}
@@ -218,15 +201,15 @@ func (s *EngineService) executeNode(
 
 	switch node.Type {
 	case "tool":
-		output, outputRender, err = s.executeToolNode(node, envMap, nodeOutputs)
+		output, outputRender, err = s.executeToolNode(node, envMap, nodeOutputs, externalParams)
 	case "trigger", "external_trigger":
 		output, err = s.executeTriggerNode(node)
 	case "condition":
 		output, err = s.executeConditionNode(node, nodeOutputs)
 	case "delay":
-		output, err = s.executeDelayNode(node, envMap, nodeOutputs)
+		output, err = s.executeDelayNode(node, envMap, nodeOutputs, externalParams)
 	case "switch":
-		output, err = s.executeSwitchNode(node, envMap, nodeOutputs)
+		output, err = s.executeSwitchNode(node, envMap, nodeOutputs, externalParams)
 	default:
 		err = fmt.Errorf("不支持的节点类型: %s", node.Type)
 	}
@@ -240,11 +223,11 @@ func (s *EngineService) executeNode(
 	return nodeLog, output, err
 }
 
-
 func (s *EngineService) executeToolNode(
 	node models.WorkflowNode,
 	envMap map[string]string,
 	nodeOutputs map[string]map[string]interface{},
+	externalParams map[string]interface{},
 ) (map[string]interface{}, *models.OutputRenderConfig, error) {
 	toolCode := node.ToolCode
 	if toolCode == "" {
@@ -266,7 +249,7 @@ func (s *EngineService) executeToolNode(
 		return nil, nil, errors.New("工具配置格式错误")
 	}
 
-	config = s.replaceVariables(config, envMap, nodeOutputs)
+	config = s.replaceVariables(config, envMap, nodeOutputs, externalParams)
 
 	tool, err := utools.Get(toolCode)
 	if err != nil {
@@ -293,6 +276,11 @@ func (s *EngineService) executeToolNode(
 	}
 	ctx.Variables["env"] = envVars
 
+	// 将外部参数作为对象传递，保留原始类型
+	if externalParams != nil {
+		ctx.Variables["external"] = externalParams
+	}
+
 	ctx.Metadata["current"] = map[string]interface{}{
 		"nodeId":   node.ID,
 		"nodeType": node.Type,
@@ -309,12 +297,10 @@ func (s *EngineService) executeToolNode(
 		return result.Output, nil, fmt.Errorf("工具执行失败: %s", result.Message)
 	}
 
-
 	output := result.Output
 	if output == nil {
 		output = make(map[string]interface{})
 	}
-
 
 	var outputRender *models.OutputRenderConfig
 	if result.OutputRender != nil {
@@ -336,14 +322,12 @@ func (s *EngineService) executeToolNode(
 	return output, outputRender, nil
 }
 
-
 func (s *EngineService) executeTriggerNode(node models.WorkflowNode) (map[string]interface{}, error) {
 
 	return map[string]interface{}{
 		"triggered": true,
 	}, nil
 }
-
 
 func (s *EngineService) executeConditionNode(
 	node models.WorkflowNode,
@@ -355,7 +339,6 @@ func (s *EngineService) executeConditionNode(
 	}
 
 	conditionType, _ := config["conditionType"].(string)
-
 
 	switch conditionType {
 	case "simple":
@@ -370,7 +353,6 @@ func (s *EngineService) executeConditionNode(
 	}
 }
 
-
 func (s *EngineService) evaluateSimpleCondition(
 	config map[string]interface{},
 	nodeOutputs map[string]map[string]interface{},
@@ -382,8 +364,6 @@ func (s *EngineService) evaluateSimpleCondition(
 	if field == "" || operator == "" {
 		return nil, errors.New("条件配置不完整：缺少field或operator")
 	}
-
-
 
 	var actualValue interface{}
 	var sourceNode string
@@ -413,7 +393,6 @@ func (s *EngineService) evaluateSimpleCondition(
 		}
 	}
 
-
 	result := s.compareValues(actualValue, operator, expectedValue)
 
 	return map[string]interface{}{
@@ -427,7 +406,6 @@ func (s *EngineService) evaluateSimpleCondition(
 	}, nil
 }
 
-
 func (s *EngineService) evaluateExpressionCondition(
 	config map[string]interface{},
 	nodeOutputs map[string]map[string]interface{},
@@ -438,7 +416,6 @@ func (s *EngineService) evaluateExpressionCondition(
 		"message": "表达式条件判断暂未实现",
 	}, nil
 }
-
 
 func (s *EngineService) getNestedField(data map[string]interface{}, field string) interface{} {
 	parts := strings.Split(field, ".")
@@ -456,12 +433,10 @@ func (s *EngineService) getNestedField(data map[string]interface{}, field string
 	return current
 }
 
-
 func (s *EngineService) compareValues(actual interface{}, operator string, expected interface{}) bool {
 
 	actualStr := fmt.Sprintf("%v", actual)
 	expectedStr := fmt.Sprintf("%v", expected)
-
 
 	actualNum, actualIsNum := s.toFloat64(actual)
 	expectedNum, expectedIsNum := s.toFloat64(expected)
@@ -520,7 +495,6 @@ func (s *EngineService) compareValues(actual interface{}, operator string, expec
 	}
 }
 
-
 func (s *EngineService) toFloat64(value interface{}) (float64, bool) {
 	switch v := value.(type) {
 	case float64:
@@ -543,19 +517,17 @@ func (s *EngineService) toFloat64(value interface{}) (float64, bool) {
 	return 0, false
 }
 
-
 func (s *EngineService) executeDelayNode(
 	node models.WorkflowNode,
 	envMap map[string]string,
 	nodeOutputs map[string]map[string]interface{},
+	externalParams map[string]interface{},
 ) (map[string]interface{}, error) {
 
-	config := s.replaceVariables(node.Config, envMap, nodeOutputs)
-
+	config := s.replaceVariables(node.Config, envMap, nodeOutputs, externalParams)
 
 	var duration float64 = 5
 	unit := "seconds"
-
 
 	if durationVal, ok := config["duration"]; ok {
 		switch v := durationVal.(type) {
@@ -572,7 +544,6 @@ func (s *EngineService) executeDelayNode(
 	if unitVal, ok := config["unit"].(string); ok {
 		unit = unitVal
 	}
-
 
 	var delaySeconds float64
 	switch unit {
@@ -593,21 +564,19 @@ func (s *EngineService) executeDelayNode(
 	}, nil
 }
 
-
 func (s *EngineService) executeSwitchNode(
 	node models.WorkflowNode,
 	envMap map[string]string,
 	nodeOutputs map[string]map[string]interface{},
+	externalParams map[string]interface{},
 ) (map[string]interface{}, error) {
 
-	config := s.replaceVariables(node.Config, envMap, nodeOutputs)
-
+	config := s.replaceVariables(node.Config, envMap, nodeOutputs, externalParams)
 
 	fieldValue := ""
 	if field, ok := config["field"].(string); ok {
 		fieldValue = field
 	}
-
 
 	cases := []map[string]interface{}{}
 	if casesVal, ok := config["cases"].([]interface{}); ok {
@@ -618,7 +587,6 @@ func (s *EngineService) executeSwitchNode(
 		}
 	}
 
-
 	matchedBranch := "default"
 	matchedValue := ""
 
@@ -627,7 +595,6 @@ func (s *EngineService) executeSwitchNode(
 		if v, ok := caseItem["value"].(string); ok {
 			caseValue = v
 		}
-
 
 		if fieldValue == caseValue {
 			matchedBranch = fmt.Sprintf("case_%d", i)
@@ -646,7 +613,6 @@ func (s *EngineService) executeSwitchNode(
 	}, nil
 }
 
-
 func (s *EngineService) topologicalSort(nodes []models.WorkflowNode, edges []models.WorkflowEdge) ([]models.WorkflowNode, error) {
 
 	inDegree := make(map[string]int)
@@ -663,14 +629,12 @@ func (s *EngineService) topologicalSort(nodes []models.WorkflowNode, edges []mod
 		adjList[edge.Source] = append(adjList[edge.Source], edge.Target)
 	}
 
-
 	queue := []string{}
 	for nodeID, degree := range inDegree {
 		if degree == 0 {
 			queue = append(queue, nodeID)
 		}
 	}
-
 
 	result := []models.WorkflowNode{}
 	for len(queue) > 0 {
@@ -680,7 +644,6 @@ func (s *EngineService) topologicalSort(nodes []models.WorkflowNode, edges []mod
 
 		result = append(result, nodeMap[nodeID])
 
-
 		for _, nextID := range adjList[nodeID] {
 			inDegree[nextID]--
 			if inDegree[nextID] == 0 {
@@ -689,7 +652,6 @@ func (s *EngineService) topologicalSort(nodes []models.WorkflowNode, edges []mod
 		}
 	}
 
-
 	if len(result) != len(nodes) {
 		return nil, errors.New("工作流存在循环依赖")
 	}
@@ -697,15 +659,12 @@ func (s *EngineService) topologicalSort(nodes []models.WorkflowNode, edges []mod
 	return result, nil
 }
 
-
 func (s *EngineService) buildEnvMap(envVars []models.WorkflowEnvVar, runtimeEnvVars map[string]string) map[string]string {
 	envMap := make(map[string]string)
-
 
 	for _, envVar := range envVars {
 		envMap[envVar.Key] = envVar.Value
 	}
-
 
 	for key, value := range runtimeEnvVars {
 		envMap[key] = value
@@ -714,11 +673,11 @@ func (s *EngineService) buildEnvMap(envVars []models.WorkflowEnvVar, runtimeEnvV
 	return envMap
 }
 
-
 func (s *EngineService) replaceVariables(
 	config map[string]interface{},
 	envMap map[string]string,
 	nodeOutputs map[string]map[string]interface{},
+	externalParams map[string]interface{},
 ) map[string]interface{} {
 	result := make(map[string]interface{})
 
@@ -728,13 +687,21 @@ func (s *EngineService) replaceVariables(
 			if key == "data_source" {
 				result[key] = v
 			} else {
-				result[key] = s.replaceStringVariables(v, envMap, nodeOutputs)
+				// 检查是否是完整的变量引用（如 "{{external.image}}"）
+				if s.isCompleteVariableRef(v) {
+					// 直接解析变量，返回对象（不转字符串）
+					resolved := s.resolveVariable(v, envMap, nodeOutputs, externalParams)
+					result[key] = resolved
+				} else {
+					// 普通字符串，进行模板替换
+					result[key] = s.replaceStringVariables(v, envMap, nodeOutputs, externalParams)
+				}
 			}
 		case map[string]interface{}:
-			result[key] = s.replaceVariables(v, envMap, nodeOutputs)
+			result[key] = s.replaceVariables(v, envMap, nodeOutputs, externalParams)
 		case []interface{}:
 
-			result[key] = s.replaceArray(v, envMap, nodeOutputs)
+			result[key] = s.replaceArray(v, envMap, nodeOutputs, externalParams)
 		default:
 			result[key] = value
 		}
@@ -743,21 +710,21 @@ func (s *EngineService) replaceVariables(
 	return result
 }
 
-
 func (s *EngineService) replaceArray(
 	arr []interface{},
 	envMap map[string]string,
 	nodeOutputs map[string]map[string]interface{},
+	externalParams map[string]interface{},
 ) []interface{} {
 	result := make([]interface{}, len(arr))
 	for i, item := range arr {
 		switch v := item.(type) {
 		case string:
-			result[i] = s.replaceStringVariables(v, envMap, nodeOutputs)
+			result[i] = s.replaceStringVariables(v, envMap, nodeOutputs, externalParams)
 		case map[string]interface{}:
-			result[i] = s.replaceVariables(v, envMap, nodeOutputs)
+			result[i] = s.replaceVariables(v, envMap, nodeOutputs, externalParams)
 		case []interface{}:
-			result[i] = s.replaceArray(v, envMap, nodeOutputs)
+			result[i] = s.replaceArray(v, envMap, nodeOutputs, externalParams)
 		default:
 			result[i] = item
 		}
@@ -765,20 +732,34 @@ func (s *EngineService) replaceArray(
 	return result
 }
 
-
 func (s *EngineService) replaceStringVariables(
 	str string,
 	envMap map[string]string,
 	nodeOutputs map[string]map[string]interface{},
+	externalParams map[string]interface{},
 ) string {
+	// 处理环境变量 {{env.xxx}}
 	for key, value := range envMap {
 		str = strings.ReplaceAll(str, fmt.Sprintf("{{env.%s}}", key), value)
-		if strings.HasPrefix(key, "external.") {
-			paramName := strings.TrimPrefix(key, "external.")
-			str = strings.ReplaceAll(str, fmt.Sprintf("{{external.%s}}", paramName), value)
-		}
 	}
 
+	// 处理外部参数 {{external.xxx}}，支持嵌套路径
+	if externalParams != nil {
+		re := regexp.MustCompile(`\{\{external\.([^}]+)\}\}`)
+		str = re.ReplaceAllStringFunc(str, func(match string) string {
+			path := strings.TrimPrefix(match, "{{external.")
+			path = strings.TrimSuffix(path, "}}")
+
+			value := s.getNestedValue(externalParams, path)
+			if value == nil {
+				return match
+			}
+
+			return fmt.Sprintf("%v", value)
+		})
+	}
+
+	// 处理节点输出 {{nodes.xxx.yyy}}
 	re := regexp.MustCompile(`\{\{nodes\.([^}]+)\}\}`)
 	str = re.ReplaceAllStringFunc(str, func(match string) string {
 		path := strings.TrimPrefix(match, "{{nodes.")
@@ -870,8 +851,75 @@ func (s *EngineService) getNodeName(node models.WorkflowNode) string {
 	return node.Type
 }
 
+// isCompleteVariableRef 检查字符串是否是完整的变量引用（如 "{{external.image}}"）
+func (s *EngineService) isCompleteVariableRef(str string) bool {
+	str = strings.TrimSpace(str)
+	return strings.HasPrefix(str, "{{") && strings.HasSuffix(str, "}}") && strings.Count(str, "{{") == 1
+}
+
+// resolveVariable 解析变量引用，返回实际值（可能是对象、字符串等）
+func (s *EngineService) resolveVariable(
+	varRef string,
+	envMap map[string]string,
+	nodeOutputs map[string]map[string]interface{},
+	externalParams map[string]interface{},
+) interface{} {
+	// 去掉 {{ 和 }}
+	varRef = strings.TrimSpace(varRef)
+	varRef = strings.TrimPrefix(varRef, "{{")
+	varRef = strings.TrimSuffix(varRef, "}}")
+	varRef = strings.TrimSpace(varRef)
+
+	// 解析变量路径
+	if strings.HasPrefix(varRef, "external.") {
+		// {{external.image}} 或 {{external.image.path}}
+		path := strings.TrimPrefix(varRef, "external.")
+		if externalParams != nil {
+			return s.getNestedValue(externalParams, path)
+		}
+	} else if strings.HasPrefix(varRef, "nodes.") {
+		// {{nodes.upload.url}}
+		path := strings.TrimPrefix(varRef, "nodes.")
+		parts := strings.SplitN(path, ".", 2)
+		if len(parts) >= 1 {
+			nodeID := parts[0]
+			if output, ok := nodeOutputs[nodeID]; ok {
+				if len(parts) == 2 {
+					return s.getNestedValue(output, parts[1])
+				}
+				return output
+			}
+		}
+	} else if strings.HasPrefix(varRef, "env.") {
+		// {{env.api_key}}
+		key := strings.TrimPrefix(varRef, "env.")
+		if val, ok := envMap[key]; ok {
+			return val
+		}
+	}
+
+	return nil
+}
 
 func marshalJSON(v interface{}) string {
 	bytes, _ := json.Marshal(v)
 	return string(bytes)
+}
+
+// cleanupExecutionFiles 清理执行记录的临时文件
+func (s *EngineService) cleanupExecutionFiles(executionID string) {
+	baseDir := "/tmp/workflow-files"
+	dirPath := filepath.Join(baseDir, executionID)
+
+	// 检查目录是否存在
+	if _, err := os.Stat(dirPath); os.IsNotExist(err) {
+		return // 没有文件，不需要清理
+	}
+
+	// 删除整个执行目录
+	if err := os.RemoveAll(dirPath); err != nil {
+		log.Error("清理临时文件失败: ExecutionID=%s, Error=%v", executionID, err)
+	} else {
+		log.Info("已清理临时文件: ExecutionID=%s", executionID)
+	}
 }

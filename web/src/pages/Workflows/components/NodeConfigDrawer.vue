@@ -205,6 +205,19 @@
           :previous-nodes="props.previousNodes"
           :env-vars="props.envVars"
         />
+
+        <PixelPunkUploadConfig
+          v-else-if="node.toolCode === 'pixelpunk_upload'"
+          v-model:config="localNode.config"
+        />
+        <AliyunOSSConfig
+          v-else-if="node.toolCode === 'aliyun_oss'"
+          v-model:config="localNode.config"
+        />
+        <TencentCOSConfig
+          v-else-if="node.toolCode === 'tencent_cos'"
+          v-model:config="localNode.config"
+        />
       </div>
 
       <div v-if="node.type === 'external_trigger'" class="border-t border-border-primary pt-4">
@@ -410,20 +423,23 @@ import BaseInput from '@/components/BaseInput'
 import BaseSelect from '@/components/BaseSelect'
 import ParamInput from '@/components/ParamInput'
 import VariableSelector from '@/components/VariableSelector'
-import EmailToolConfig from '@/components/tools/EmailToolConfig.vue'
-import HealthCheckerConfig from '@/components/tools/HealthCheckerConfig.vue'
-import FeishuBotConfig from '@/components/tools/FeishuBotConfig.vue'
-import OpenAIConfig from '@/components/tools/OpenAIConfig.vue'
-import OpenAIImageConfig from '@/components/tools/OpenAIImageConfig.vue'
-import JsonTransformConfig from '@/components/tools/JsonTransformConfig.vue'
-import OutputFormatterConfig from '@/components/tools/OutputFormatterConfig.vue'
-import HtmlRenderConfig from '@/components/tools/HtmlRenderConfig.vue'
-import RedisContextConfig from '@/components/tools/RedisContextConfig.vue'
-import ContextManagerConfig from '@/components/tools/ContextManagerConfig.vue'
-import TriggerConfig from '@/components/tools/TriggerConfig.vue'
-import ConditionConfig from '@/components/tools/ConditionConfig.vue'
-import DelayConfig from '@/components/tools/DelayConfig.vue'
-import SwitchConfig from '@/components/tools/SwitchConfig.vue'
+import EmailToolConfig from '@/components/tools/EmailToolConfig/index.vue'
+import HealthCheckerConfig from '@/components/tools/HealthCheckerConfig/index.vue'
+import FeishuBotConfig from '@/components/tools/FeishuBotConfig/index.vue'
+import OpenAIConfig from '@/components/tools/OpenAIConfig/index.vue'
+import OpenAIImageConfig from '@/components/tools/OpenAIImageConfig/index.vue'
+import JsonTransformConfig from '@/components/tools/JsonTransformConfig/index.vue'
+import OutputFormatterConfig from '@/components/tools/OutputFormatterConfig/index.vue'
+import HtmlRenderConfig from '@/components/tools/HtmlRenderConfig/index.vue'
+import RedisContextConfig from '@/components/tools/RedisContextConfig/index.vue'
+import ContextManagerConfig from '@/components/tools/ContextManagerConfig/index.vue'
+import PixelPunkUploadConfig from '@/components/tools/PixelPunkUploadConfig/index.vue'
+import TriggerConfig from '@/components/tools/TriggerConfig/index.vue'
+import AliyunOSSConfig from '@/components/tools/AliyunOSSConfig/index.vue'
+import TencentCOSConfig from '@/components/tools/TencentCOSConfig/index.vue'
+import ConditionConfig from '@/components/tools/ConditionConfig/index.vue'
+import DelayConfig from '@/components/tools/DelayConfig/index.vue'
+import SwitchConfig from '@/components/tools/SwitchConfig/index.vue'
 import ExternalTriggerConfig from './ExternalTriggerConfig.vue'
 import RetryConfig from '@/components/RetryConfig'
 import VariableHelper from '@/components/VariableHelper'

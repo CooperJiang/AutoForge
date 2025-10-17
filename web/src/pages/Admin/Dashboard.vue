@@ -108,11 +108,11 @@
           <div
             class="text-xs font-semibold px-2 py-1 bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 rounded-full"
           >
-            模板
+            工作流
           </div>
         </div>
         <div>
-          <p class="text-text-tertiary text-xs font-medium mb-1">工作流模板</p>
+          <p class="text-text-tertiary text-xs font-medium mb-1">工作流市场</p>
           <p class="text-3xl font-bold text-text-primary">{{ stats.total_templates }}</p>
         </div>
       </div>
@@ -136,8 +136,7 @@
           @toggle-status="toggleTaskStatus"
           @execute="executeTaskNow"
           @delete="deleteTaskConfirm"
-          @prev-page="prevPage"
-          @next-page="nextPage"
+          @page-change="handleTaskPageChange"
         />
       </div>
 
@@ -338,20 +337,10 @@ const handleCopy = (id: string) => {
   copyToClipboard(id)
 }
 
-// 上一页
-const prevPage = () => {
-  if (currentPage.value > 1) {
-    currentPage.value--
-    loadTasks()
-  }
-}
-
-// 下一页
-const nextPage = () => {
-  if (currentPage.value < totalPages.value) {
-    currentPage.value++
-    loadTasks()
-  }
+// 任务页码变化
+const handleTaskPageChange = (page: number) => {
+  currentPage.value = page
+  loadTasks()
 }
 
 onMounted(() => {

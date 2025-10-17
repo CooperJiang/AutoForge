@@ -20,6 +20,10 @@ request.interceptors.request.use(
       config.headers.Authorization = `Bearer ${token}`
     }
 
+    if (config.data instanceof FormData) {
+      delete config.headers['Content-Type']
+    }
+
     if (config.method === 'get') {
       config.params = {
         ...config.params,
@@ -30,7 +34,6 @@ request.interceptors.request.use(
     return config
   },
   (error) => {
-    console.error('❌ Request Error:', error)
     return Promise.reject(error)
   }
 )

@@ -93,6 +93,7 @@
 
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
+import { Package } from 'lucide-vue-next'
 import Dialog from '@/components/Dialog'
 import BaseButton from '@/components/BaseButton'
 import BaseInput from '@/components/BaseInput'

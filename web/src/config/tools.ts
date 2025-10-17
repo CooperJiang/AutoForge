@@ -12,6 +12,8 @@ import {
   Sparkles,
   Image as ImageIcon,
   Database,
+  Upload,
+  Cloud,
 } from 'lucide-vue-next'
 
 export interface ToolUsageItem {
@@ -229,6 +231,60 @@ export const TOOL_CONFIGS: Record<string, ToolConfig> = {
       { text: '适用场景：智能客服、AI 助手、教育辅导、知识问答等' },
     ],
     tags: ['Context', 'Memory', 'Chat', 'Conversation', 'Session'],
+  },
+
+  pixelpunk_upload: {
+    code: 'pixelpunk_upload',
+    title: '📸 PixelPunk 图床上传',
+    description: '上传图片到 PixelPunk 图床，返回 CDN URL',
+    icon: Upload,
+    iconBg: 'bg-gradient-to-br from-cyan-500 to-blue-600',
+    usageTitle: 'PixelPunk Image Upload',
+    usageDescription: '将图片上传到 PixelPunk 图床，获取永久可访问的 CDN URL。',
+    usageItems: [
+      { text: '支持多种访问级别：public（公开）、private（私有）、protected（受保护）' },
+      { text: '可选图片优化压缩，减少文件大小' },
+      { text: '支持虚拟路径管理和文件夹分类' },
+      { text: '返回原图 URL、缩略图 URL、图片尺寸等完整信息' },
+      { text: '适用场景：内容发布、图片存储、CDN 加速等' },
+    ],
+    tags: ['Image', 'Upload', 'CDN', 'Storage', 'PixelPunk'],
+  },
+
+  aliyun_oss: {
+    code: 'aliyun_oss',
+    title: '☁️ 阿里云 OSS 上传',
+    description: '上传文件到阿里云对象存储服务',
+    icon: Cloud,
+    iconBg: 'bg-gradient-to-br from-orange-500 to-red-600',
+    usageTitle: 'Aliyun OSS Upload',
+    usageDescription: '将文件上传到阿里云 OSS，获取永久可访问的文件 URL。',
+    usageItems: [
+      { text: '支持任意类型文件上传' },
+      { text: '自动识别文件类型（Content-Type）' },
+      { text: '可自定义 OSS 存储路径' },
+      { text: '配置统一管理在后端，安全可靠' },
+      { text: '适用场景：文件存储、图片管理、视频上传、文档分发等' },
+    ],
+    tags: ['Storage', 'Upload', 'Aliyun', 'OSS', 'Cloud'],
+  },
+
+  tencent_cos: {
+    code: 'tencent_cos',
+    title: '☁️ 腾讯云 COS 上传',
+    description: '上传文件到腾讯云对象存储服务',
+    icon: Cloud,
+    iconBg: 'bg-gradient-to-br from-blue-500 to-cyan-600',
+    usageTitle: 'Tencent COS Upload',
+    usageDescription: '将文件上传到腾讯云 COS，获取永久可访问的文件 URL。',
+    usageItems: [
+      { text: '支持任意类型文件上传' },
+      { text: '自动识别文件类型（Content-Type）' },
+      { text: '可自定义 COS 存储路径' },
+      { text: '配置统一管理在后端，安全可靠' },
+      { text: '适用场景：文件存储、图片管理、视频上传、文档分发等' },
+    ],
+    tags: ['Storage', 'Upload', 'Tencent', 'COS', 'Cloud'],
   },
 }
 

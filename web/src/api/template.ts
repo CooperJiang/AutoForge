@@ -10,13 +10,13 @@ export interface TemplateBasicInfo {
   description: string
   category: string
   cover_image: string
-  icon: string
   install_count: number
   view_count: number
   is_official: boolean
   is_featured: boolean
   author_name: string
   required_tools: string[]
+  status: string
   created_at: string
 }
 
@@ -32,13 +32,13 @@ export interface TemplateDetail {
   description: string
   category: string
   cover_image: string
-  icon: string
   install_count: number
   view_count: number
   is_official: boolean
   is_featured: boolean
   author_name: string
   required_tools: string[]
+  case_images: string[]
   usage_guide: string
   template_data: TemplateData
   status: string
@@ -71,7 +71,7 @@ export interface UpdateTemplateDto {
   description?: string
   category?: string
   cover_image?: string
-  icon?: string
+  case_images?: string[]
   usage_guide?: string
   is_featured?: boolean
   status?: string
@@ -130,6 +130,8 @@ export const templateApi = {
     category?: string
     is_featured?: boolean
     search?: string
+    status?: string
+    show_all?: boolean
   }) => {
     const response = await request.get<TemplateListData>('/api/v1/templates', { params })
     return response.data

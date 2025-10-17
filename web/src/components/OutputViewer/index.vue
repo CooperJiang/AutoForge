@@ -14,7 +14,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import JsonViewer from '@/components/JsonViewer'
-import ImageViewer from './ImageViewer.vue'
+import ImageViewer from './ImageViewer/index.vue'
 import VideoViewer from './VideoViewer.vue'
 import HtmlViewer from './HtmlViewer.vue'
 import MarkdownViewer from './MarkdownViewer.vue'
