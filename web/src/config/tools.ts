@@ -17,6 +17,11 @@ import {
   Download,
   QrCode,
   Bot,
+  Rss,
+  Flame,
+  TrendingUp,
+  Briefcase,
+  CircleDot,
 } from 'lucide-vue-next'
 
 export interface ToolUsageItem {
@@ -340,6 +345,101 @@ export const TOOL_CONFIGS: Record<string, ToolConfig> = {
       { text: '适用场景：文本生成、内容分析、智能问答、代码生成、创意写作、图像理解等' },
     ],
     tags: ['AI', 'Gemini', 'LLM', 'Google', 'Chat', 'NLP', 'Vision'],
+  },
+
+  rss_feed: {
+    code: 'rss_feed',
+    title: 'RSS 多源聚合器',
+    description: '支持多个 RSS 源聚合、去重、排序，一次获取所有订阅更新',
+    icon: Rss,
+    iconBg: 'bg-gradient-to-br from-orange-500 to-red-600',
+    usageTitle: 'RSS 多源聚合器',
+    usageDescription:
+      '一个节点采集多个 RSS 订阅源，自动汇总、去重、排序。适合新闻聚合、博客监控、竞品追踪等场景。',
+    usageItems: [
+      { text: '✅ 支持添加多个 RSS/Atom/JSON Feed 订阅源' },
+      { text: '✅ 每个订阅源可独立配置关键词过滤' },
+      { text: '✅ 自动按链接或标题去重，避免重复文章' },
+      { text: '✅ 支持按发布时间或订阅源顺序排序' },
+      { text: '✅ 输出标注文章来源，方便追溯' },
+      { text: '✅ 配合飞书/企微机器人实现多源资讯推送' },
+    ],
+    tags: ['数据采集', 'RSS', '多源聚合', '新闻', '自动化'],
+  },
+
+  weibo_hot: {
+    code: 'weibo_hot',
+    title: '🔥 微博热搜',
+    description: '获取微博实时热搜榜单，支持过滤广告、分类筛选、关键词排除等',
+    icon: Flame,
+    iconBg: 'bg-gradient-to-br from-red-500 to-orange-600',
+    usageTitle: '微博热搜榜单',
+    usageDescription: '实时获取微博热搜话题，支持灵活的过滤和筛选条件。',
+    usageItems: [
+      { text: '支持过滤广告热搜，获取真实热点' },
+      { text: '可按分类筛选（社会、娱乐、科技等）' },
+      { text: '支持关键词排除，过滤不感兴趣的内容' },
+      { text: '可设置最小热度值，只获取高热度话题' },
+      { text: '支持仅显示新话题或热门话题' },
+      { text: '适用场景：舆情监控、热点追踪、内容运营等' },
+    ],
+    tags: ['新闻', '热搜', '微博', '社交媒体', '数据采集'],
+  },
+
+  hackernews: {
+    code: 'hackernews',
+    title: '🧡 Hacker News',
+    description: '获取 Hacker News 热门技术新闻，支持多种排序和过滤条件',
+    icon: CircleDot,
+    iconBg: 'bg-gradient-to-br from-orange-500 to-amber-600',
+    usageTitle: 'Hacker News 文章聚合',
+    usageDescription: '使用官方 API 获取 Hacker News 热门技术文章和讨论。',
+    usageItems: [
+      { text: '支持 top、new、best 三种排序方式' },
+      { text: '可设置最小评分和评论数过滤' },
+      { text: '支持时间范围过滤（如：仅获取 24 小时内的文章）' },
+      { text: '支持关键词排除，过滤特定主题' },
+      { text: '提供文章标题、链接、作者、评论数等完整信息' },
+      { text: '适用场景：技术资讯聚合、行业动态追踪、内容推荐等' },
+    ],
+    tags: ['新闻', '技术', 'Hacker News', '科技资讯', '数据采集'],
+  },
+
+  baidu_hot: {
+    code: 'baidu_hot',
+    title: '📈 百度热搜',
+    description: '获取百度实时热搜榜单，了解国内热门话题和趋势',
+    icon: TrendingUp,
+    iconBg: 'bg-gradient-to-br from-blue-500 to-cyan-600',
+    usageTitle: '百度热搜榜单',
+    usageDescription: '实时获取百度热搜排行榜，掌握国内热点动态。',
+    usageItems: [
+      { text: '获取百度实时热搜榜单数据' },
+      { text: '支持按排名过滤，只获取 Top N 热搜' },
+      { text: '支持关键词排除，过滤不感兴趣的内容' },
+      { text: '提供热搜标题、排名、热度值、链接等信息' },
+      { text: '适用场景：热点追踪、舆情分析、内容选题等' },
+    ],
+    tags: ['新闻', '热搜', '百度', '搜索引擎', '数据采集'],
+  },
+
+  kr36_news: {
+    code: 'kr36_news',
+    title: '💼 36氪快讯',
+    description: '获取 36氪 科技创投快讯，聚焦创业公司和投资动态',
+    icon: Briefcase,
+    iconBg: 'bg-gradient-to-br from-indigo-500 to-purple-600',
+    usageTitle: '36氪快讯聚合',
+    usageDescription: '实时获取 36氪 科技快讯，了解创投圈最新动态。',
+    usageItems: [
+      { text: '获取 36氪 最新科技创投快讯' },
+      { text: '支持时间范围过滤（如：仅获取 N 小时内的快讯）' },
+      { text: '支持关键词筛选，只显示包含特定关键词的快讯' },
+      { text: '支持关键词排除，过滤不相关的内容' },
+      { text: '提供快讯标题、摘要、链接、发布时间等完整信息' },
+      { text: '适用场景：创投追踪、行业研究、竞品监控等' },
+    ],
+    tags: ['新闻', '科技', '创投', '36氪', '快讯', '数据采集'],
   },
 }
 

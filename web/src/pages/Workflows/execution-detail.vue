@@ -263,12 +263,12 @@
                   </div>
                 </div>
 
-                <div v-if="nodeLog.error" class="bg-red-50 border border-red-200 rounded-lg p-3">
+                <div v-if="nodeLog.error" class="bg-error-light border border-error rounded-lg p-3">
                   <div class="flex items-start gap-2">
-                    <AlertCircle class="w-4 h-4 text-red-600 flex-shrink-0 mt-0.5" />
+                    <AlertCircle class="w-4 h-4 text-error flex-shrink-0 mt-0.5" />
                     <div class="flex-1 min-w-0">
-                      <div class="text-xs font-semibold text-red-900 mb-1">错误信息</div>
-                      <div class="text-xs text-red-700 break-words overflow-hidden">
+                      <div class="text-xs font-semibold text-error-text mb-1">错误信息</div>
+                      <div class="text-xs text-error-text break-words overflow-hidden">
                         <div
                           v-if="!expandedErrors[nodeLog.node_id] && nodeLog.error.length > 200"
                           class="relative"
@@ -276,7 +276,7 @@
                           <div class="line-clamp-3">{{ nodeLog.error }}</div>
                           <button
                             @click="toggleErrorExpand(nodeLog.node_id)"
-                            class="mt-1 text-xs text-red-600 hover:text-red-800 font-medium underline"
+                            class="mt-1 text-xs text-error hover:text-error-hover font-medium underline"
                           >
                             展开全部
                           </button>
@@ -286,7 +286,7 @@
                           <button
                             v-if="nodeLog.error.length > 200"
                             @click="toggleErrorExpand(nodeLog.node_id)"
-                            class="mt-1 text-xs text-red-600 hover:text-red-800 font-medium underline"
+                            class="mt-1 text-xs text-error hover:text-error-hover font-medium underline"
                           >
                             收起
                           </button>
@@ -421,8 +421,8 @@ const isSectionOpen = (nodeId: string, section: 'input' | 'output') => {
 const getStatusClass = (status: string) => {
   const classes = {
     running: 'bg-primary-light text-primary',
-    success: 'bg-green-100 text-green-700',
-    failed: 'bg-red-100 text-red-700',
+    success: 'bg-success-light text-success-text',
+    failed: 'bg-error-light text-error-text',
     cancelled: 'bg-bg-tertiary text-text-secondary',
   }
   return classes[status as keyof typeof classes] || classes.cancelled
@@ -431,9 +431,9 @@ const getStatusClass = (status: string) => {
 const getStatusDotClass = (status: string) => {
   const classes = {
     running: 'bg-[var(--color-primary)] animate-pulse',
-    success: 'bg-green-500',
-    failed: 'bg-red-500',
-    cancelled: 'bg-bg-hover0',
+    success: 'bg-success',
+    failed: 'bg-error',
+    cancelled: 'bg-bg-tertiary',
   }
   return classes[status as keyof typeof classes] || classes.cancelled
 }
@@ -453,9 +453,9 @@ const getNodeStatusClass = (status: string) => {
   const classes = {
     pending: 'bg-bg-tertiary text-text-secondary',
     running: 'bg-primary-light text-primary',
-    success: 'bg-green-100 text-green-700',
-    failed: 'bg-red-100 text-red-700',
-    skipped: 'bg-amber-100 text-amber-700',
+    success: 'bg-success-light text-success-text',
+    failed: 'bg-error-light text-error-text',
+    skipped: 'bg-warning-light text-warning-text',
   }
   return classes[status as keyof typeof classes] || classes.pending
 }
@@ -464,9 +464,9 @@ const getNodeStatusBgClass = (status: string) => {
   const classes = {
     pending: 'bg-bg-tertiary text-text-secondary',
     running: 'bg-[var(--color-primary)] text-white',
-    success: 'bg-green-500 text-white',
-    failed: 'bg-red-500 text-white',
-    skipped: 'bg-amber-500 text-white',
+    success: 'bg-success text-white',
+    failed: 'bg-error text-white',
+    skipped: 'bg-warning text-white',
   }
   return classes[status as keyof typeof classes] || classes.pending
 }

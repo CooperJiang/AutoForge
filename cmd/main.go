@@ -21,20 +21,25 @@ import (
 
 	// 导入工具包以触发工具注册
 	_ "auto-forge/pkg/utools/aliyunoss"
+	_ "auto-forge/pkg/utools/baidu"
 	_ "auto-forge/pkg/utools/context"
 	_ "auto-forge/pkg/utools/downloader"
 	_ "auto-forge/pkg/utools/email"
 	_ "auto-forge/pkg/utools/feishu"
 	_ "auto-forge/pkg/utools/formatter"
 	_ "auto-forge/pkg/utools/gemini"
+	_ "auto-forge/pkg/utools/hackernews"
 	_ "auto-forge/pkg/utools/health"
 	_ "auto-forge/pkg/utools/http"
 	_ "auto-forge/pkg/utools/jsontransform"
+	_ "auto-forge/pkg/utools/kr36"
 	_ "auto-forge/pkg/utools/openai"
 	_ "auto-forge/pkg/utools/pixelpunk"
 	_ "auto-forge/pkg/utools/qrcode"
+	_ "auto-forge/pkg/utools/rssfeed"
 	_ "auto-forge/pkg/utools/tencentcos"
 	_ "auto-forge/pkg/utools/web"
+	_ "auto-forge/pkg/utools/weibo"
 )
 
 // 应用版本号

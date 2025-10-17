@@ -135,8 +135,8 @@ html[data-theme='dark'] {
   /* 5. 功能色 - Error */
   --color-error: #ef4444;
   --color-error-hover: #dc2626;
-  --color-error-light: #7f1d1d;
-  --color-error-text: #fecaca;
+  --color-error-light: #7c2d12;
+  --color-error-text: #fed7aa;
 
   /* 5. 功能色 - Info */
   --color-info: #0ea5e9;

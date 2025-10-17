@@ -51,7 +51,7 @@
       </div>
       <div
         v-else
-        class="text-xs text-text-placeholder bg-bg-hover px-2.5 py-2 rounded-md flex items-center gap-2 border border-border-primary"
+        class="text-xs text-text-secondary bg-bg-hover px-2.5 py-2 rounded-md flex items-center gap-2 border border-border-primary"
       >
         <Clock class="w-3.5 h-3.5" />
         {{ getNoScheduleText(workflow) }}

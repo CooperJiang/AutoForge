@@ -6,16 +6,16 @@
       <div v-show="activeTab === 'overview'">
         <div
           v-if="hasExternalTrigger"
-          class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4"
+          class="bg-info-light border border-info rounded-lg p-4 mb-4"
         >
           <div class="flex items-start gap-3">
-            <AlertTriangle class="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
-            <div class="text-sm text-blue-800">
+            <AlertTriangle class="w-5 h-5 text-info flex-shrink-0 mt-0.5" />
+            <div class="text-sm text-info-text">
               <p class="font-medium mb-1">已配置外部触发节点</p>
               <p>
                 工作流将接收外部传入的参数，参数可在后续节点中通过
                 <code
-                  class="px-1 py-0.5 bg-blue-100 rounded font-mono text-xs"
+                  class="px-1 py-0.5 bg-bg-hover rounded font-mono text-xs text-text-primary"
                   v-text="'{{external.参数名}}'"
                 ></code>
                 引用。
@@ -26,11 +26,11 @@
 
         <div
           v-if="!props.workflow?.id"
-          class="bg-yellow-50 border border-yellow-300 rounded-lg p-3 mb-4"
+          class="bg-warning-light border border-warning rounded-lg p-3 mb-4"
         >
           <div class="flex items-start gap-2">
-            <AlertTriangle class="w-4 h-4 text-yellow-600 mt-0.5 flex-shrink-0" />
-            <div class="text-xs text-yellow-800">
+            <AlertTriangle class="w-4 h-4 text-warning mt-0.5 flex-shrink-0" />
+            <div class="text-xs text-warning-text">
               <p class="font-medium">工作流尚未保存</p>
               <p class="mt-1">请先保存工作流后，才能启用 API 调用功能。</p>
             </div>

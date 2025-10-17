@@ -129,7 +129,7 @@
 
             <div
               v-if="execution.error"
-              class="mt-2 text-sm text-red-600 bg-red-50 rounded px-2 py-1 break-words overflow-hidden"
+              class="mt-2 text-sm text-error-text bg-error-light rounded px-2 py-1 break-words overflow-hidden"
             >
               <div class="line-clamp-2">{{ execution.error }}</div>
             </div>

@@ -32,7 +32,7 @@
           <BaseButton
             size="sm"
             variant="ghost"
-            @click="workflow.id && router.push(`/workflows/${workflow.id}/executions`)"
+            @click="handleViewExecutions"
             :disabled="!workflow.id"
           >
             <History class="w-4 h-4" />
@@ -709,6 +709,9 @@ const handleSave = async () => {
       },
     }
 
+    // 先暂停 watch 监听，防止后续操作触发变更检测
+    isLoadingData.value = true
+
     if (currentWorkflowId && currentWorkflowId !== 'create') {
       // 更新已有工作流
       const { workflowApi } = await import('@/api/workflow')
@@ -716,10 +719,10 @@ const handleSave = async () => {
       message.success('工作流已更新')
       // 保存成功后清除草稿和未保存标记
       clearDraft()
-      // 暂时阻止 watch 触发
-      isLoadingData.value = true
       hasUnsavedChanges.value = false
       await nextTick()
+      // 延迟恢复 watch 监听，确保所有状态更新完成
+      await new Promise((resolve) => setTimeout(resolve, 100))
       isLoadingData.value = false
     } else {
       // 创建新工作流
@@ -728,11 +731,7 @@ const handleSave = async () => {
       message.success('工作流已创建')
       // 清除创建页面的草稿和未保存标记
       clearDraft()
-      // 暂时阻止 watch 触发
-      isLoadingData.value = true
       hasUnsavedChanges.value = false
-      await nextTick()
-      isLoadingData.value = false
       // 更新 workflow 对象的 id
       workflow.value.id = data.id
       // 跳转到编辑页面
@@ -820,12 +819,22 @@ const executeWorkflow = async (params: Record<string, any> | FormData) => {
     )
     message.success('工作流已开始执行')
     showExecuteDialog.value = false
+    // 清除未保存标记，避免跳转时触发确认对话框
+    hasUnsavedChanges.value = false
     // 跳转到执行详情
     router.push(`/workflows/${workflowId}/executions/${data.execution_id}`)
   } catch (error: any) {
     console.error('Execute workflow failed:', error)
     message.error(error.message || '执行失败')
   }
+}
+
+// 查看执行历史
+const handleViewExecutions = () => {
+  if (!workflow.value.id) return
+  // 清除未保存标记，避免跳转时触发确认对话框
+  hasUnsavedChanges.value = false
+  router.push(`/workflows/${workflow.value.id}/executions`)
 }
 
 // 清除草稿

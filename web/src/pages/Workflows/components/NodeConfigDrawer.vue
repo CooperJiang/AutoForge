@@ -232,6 +232,10 @@
           v-else-if="node.toolCode === 'gemini_chat'"
           v-model:config="localNode.config"
         />
+        <RSSFeedConfig
+          v-else-if="node.toolCode === 'rss_feed'"
+          v-model:config="localNode.config"
+        />
       </div>
 
       <div v-if="node.type === 'external_trigger'" class="border-t border-border-primary pt-4">
@@ -454,6 +458,7 @@ import AliyunOSSConfig from '@/components/tools/AliyunOSSConfig/index.vue'
 import TencentCOSConfig from '@/components/tools/TencentCOSConfig/index.vue'
 import QRCodeConfig from '@/components/tools/QRCodeConfig/index.vue'
 import GeminiConfig from '@/components/tools/GeminiConfig/index.vue'
+import RSSFeedConfig from '@/components/tools/RSSFeedConfig/index.vue'
 import ConditionConfig from '@/components/tools/ConditionConfig/index.vue'
 import DelayConfig from '@/components/tools/DelayConfig/index.vue'
 import SwitchConfig from '@/components/tools/SwitchConfig/index.vue'

@@ -17,6 +17,7 @@ const (
 	CategoryStorage      = "storage"      // 存储
 	CategoryUtility      = "utility"      // 工具
 	CategoryMonitoring   = "monitoring"   // 监控
+	CategoryNews         = "news"         // 新闻资讯
 )
 
 // toolCategories 工具分类列表
@@ -62,6 +63,12 @@ var toolCategories = []ToolCategory{
 		Name:        "监控",
 		Description: "健康检查、监控工具",
 		Icon:        "📡",
+	},
+	{
+		Code:        CategoryNews,
+		Name:        "新闻资讯",
+		Description: "热搜、热榜、新闻采集工具",
+		Icon:        "📰",
 	},
 }
 
