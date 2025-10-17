@@ -14,9 +14,7 @@
           @update:modelValue="loadCategories"
           style="width: 260px"
         />
-        <BaseButton @click="loadCategories" variant="primary">
-          搜索
-        </BaseButton>
+        <BaseButton @click="loadCategories" variant="primary"> 搜索 </BaseButton>
       </div>
       <BaseButton @click="showCreateDialog = true">
         <Plus class="w-4 h-4 mr-1.5" />
@@ -30,43 +28,98 @@
       暂无分类，点击上方按钮创建第一个分类
     </div>
 
-    <div v-else class="space-y-2">
+    <!-- 分类卡片网格 -->
+    <div
+      v-else
+      class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4"
+    >
       <div
         v-for="category in categories"
         :key="category.id"
-        class="flex items-center justify-between p-4 bg-bg-primary border border-border-primary rounded-lg hover:bg-bg-hover transition-colors"
+        class="border-2 rounded-xl overflow-hidden hover:shadow-xl transition-all shadow-md relative"
+        :style="{
+          backgroundColor: 'var(--color-bg-elevated)',
+          borderColor: category.is_active
+            ? 'var(--color-border-primary)'
+            : 'var(--color-border-secondary)',
+          opacity: category.is_active ? '1' : '0.6',
+        }"
+        @mouseenter="
+          (e) => ((e.currentTarget as HTMLElement).style.borderColor = 'var(--color-primary)')
+        "
+        @mouseleave="
+          (e) =>
+            ((e.currentTarget as HTMLElement).style.borderColor = category.is_active
+              ? 'var(--color-border-primary)'
+              : 'var(--color-border-secondary)')
+        "
       >
-        <div class="flex-1">
-          <div class="flex items-center space-x-2">
-            <h4 class="font-medium text-text-primary">{{ category.name }}</h4>
-            <span
-              v-if="!category.is_active"
-              class="text-xs px-2 py-0.5 bg-gray-500/10 text-gray-600 dark:text-gray-400 rounded"
-            >
-              已禁用
-            </span>
-          </div>
-          <p class="text-sm text-text-secondary mt-1">{{ category.description || '暂无描述' }}</p>
-          <div class="flex items-center space-x-3 mt-2 text-xs text-text-tertiary">
-            <span>排序: {{ category.sort_order }}</span>
-            <span>创建时间: {{ formatDate(category.created_at) }}</span>
+        <!-- 分类头部 -->
+        <div class="p-4 border-b-2 border-border-primary">
+          <div class="flex items-start justify-between">
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center gap-2 mb-1">
+                <h3 class="text-base font-bold text-text-primary truncate">
+                  {{ category.name }}
+                </h3>
+                <span
+                  v-if="!category.is_active"
+                  class="px-2 py-0.5 text-xs font-semibold rounded-full bg-bg-tertiary text-text-disabled flex-shrink-0"
+                >
+                  已禁用
+                </span>
+              </div>
+              <p class="text-xs text-text-tertiary line-clamp-2 min-h-[2.5rem]">
+                {{ category.description || '暂无描述' }}
+              </p>
+            </div>
           </div>
         </div>
-        <div class="flex items-center space-x-2">
-          <button
-            @click="editCategory(category)"
-            class="p-1.5 bg-blue-500/10 hover:bg-blue-500/20 text-blue-600 dark:text-blue-400 rounded-lg transition-colors border border-blue-500/20"
-            title="编辑"
+
+        <!-- 分类信息 -->
+        <div class="p-4 space-y-2">
+          <div class="flex items-center justify-between text-xs">
+            <span class="text-text-tertiary">排序值</span>
+            <span class="font-semibold text-text-primary">{{ category.sort_order }}</span>
+          </div>
+          <div class="flex items-center justify-between text-xs">
+            <span class="text-text-tertiary">创建时间</span>
+            <span class="font-medium text-text-secondary">{{
+              formatDate(category.created_at)
+            }}</span>
+          </div>
+        </div>
+
+        <!-- 操作按钮 -->
+        <div
+          class="p-3 border-t-2 border-border-primary flex items-center justify-between bg-bg-secondary"
+        >
+          <div class="flex items-center gap-1.5">
+            <button
+              @click="editCategory(category)"
+              class="p-1.5 rounded-lg transition-all hover:bg-info-light"
+              :style="{ color: 'var(--color-info)' }"
+              title="编辑"
+            >
+              <Edit2 class="w-4 h-4" />
+            </button>
+            <button
+              @click="deleteCategoryConfirm(category)"
+              class="p-1.5 rounded-lg transition-all hover:bg-error-light"
+              :style="{ color: 'var(--color-error)' }"
+              title="删除"
+            >
+              <Trash2 class="w-4 h-4" />
+            </button>
+          </div>
+          <div
+            class="text-xs font-medium"
+            :style="{
+              color: category.is_active ? 'var(--color-success)' : 'var(--color-text-disabled)',
+            }"
           >
-            <Edit2 class="w-4 h-4" />
-          </button>
-          <button
-            @click="deleteCategoryConfirm(category)"
-            class="p-1.5 bg-red-500/10 hover:bg-red-500/20 text-red-600 dark:text-red-400 rounded-lg transition-colors border border-red-500/20"
-            title="删除"
-          >
-            <Trash2 class="w-4 h-4" />
-          </button>
+            {{ category.is_active ? '已启用' : '已禁用' }}
+          </div>
         </div>
       </div>
     </div>
@@ -101,11 +154,7 @@
             排序值
             <span class="text-xs text-text-tertiary ml-2">数值越小越靠前，默认 100</span>
           </label>
-          <BaseInput
-            v-model.number="form.sort_order"
-            type="number"
-            placeholder="100"
-          />
+          <BaseInput v-model.number="form.sort_order" type="number" placeholder="100" />
         </div>
         <div v-if="editingCategory" class="flex items-center space-x-2">
           <BaseCheckbox v-model="form.is_active" label="启用此分类" />
@@ -126,7 +175,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, onMounted } from 'vue'
 import { Plus, Edit2, Trash2 } from 'lucide-vue-next'
 import { templateApi } from '@/api/template'
 import type { TemplateCategory, CreateCategoryDto, UpdateCategoryDto } from '@/api/template'
@@ -156,8 +205,6 @@ const statusFilterOptions = [
   { label: '已启用', value: 'active' },
   { label: '已禁用', value: 'inactive' },
 ]
-
-const totalPages = computed(() => Math.ceil(total.value / pageSize.value))
 
 const form = ref({
   name: '',
