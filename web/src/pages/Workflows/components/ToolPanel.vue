@@ -101,11 +101,12 @@
         </div>
       </div>
 
-      <div>
-        <div class="text-xs font-semibold text-text-secondary mb-2 px-2">工具</div>
+      <!-- 动态渲染工具分类 -->
+      <div v-for="category in toolCategories" :key="category.code" class="mb-4">
+        <div class="text-xs font-semibold text-text-secondary mb-2 px-2">{{ category.name }}</div>
         <div class="space-y-2">
           <button
-            v-for="tool in tools"
+            v-for="tool in category.tools"
             :key="tool.code"
             @click="handleAddTool(tool)"
             draggable="true"
@@ -146,12 +147,12 @@ const emit = defineEmits<{
   addNode: [toolCode: string, toolName: string, nodeType?: string]
 }>()
 
-const tools = ref<any[]>([])
+const toolCategories = ref<toolApi.ToolCategory[]>([])
 
-// 加载工具列表
+// 加载工具列表（按分类分组）
 const loadTools = async () => {
   try {
-    tools.value = await toolApi.getToolList()
+    toolCategories.value = await toolApi.getToolsGroupedByCategory()
   } catch (error) {
     console.error('Failed to load tools:', error)
   }

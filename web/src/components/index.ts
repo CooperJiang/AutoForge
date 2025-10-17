@@ -9,6 +9,7 @@ import type { App, Plugin } from 'vue'
 import BaseButton from './BaseButton'
 import BaseInput from './BaseInput'
 import BaseSelect from './BaseSelect'
+import BaseCheckbox from './BaseCheckbox'
 import Dialog from './Dialog'
 import Drawer from './Drawer'
 import Message from './Message'
@@ -39,6 +40,7 @@ const componentMap = {
   BaseButton,
   BaseInput,
   BaseSelect,
+  BaseCheckbox,
   Dialog,
   Drawer,
   Message,
@@ -72,6 +74,7 @@ export {
   BaseButton,
   BaseInput,
   BaseSelect,
+  BaseCheckbox,
   Dialog,
   Drawer,
   Message,

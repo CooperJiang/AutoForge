@@ -21,7 +21,7 @@ func NewHTTPTool() *HTTPTool {
         Code:        "http_request",
         Name:        "HTTP 请求",
         Description: "发送 HTTP/HTTPS 请求，支持 GET、POST、PUT、DELETE 等方法",
-        Category:    "network",
+        Category:    utools.CategoryNetwork,
         Version:     "1.0.0",
         Author:      "AutoForge",
         AICallable:  true,

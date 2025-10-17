@@ -68,16 +68,7 @@
           </div>
 
           <div class="flex items-center gap-2">
-            <input
-              :id="`required-${index}`"
-              v-model="param.required"
-              type="checkbox"
-              class="w-4 h-4 rounded border-border-primary text-primary focus:ring-primary cursor-pointer"
-              @change="emitUpdate"
-            />
-            <label :for="`required-${index}`" class="text-xs text-text-secondary cursor-pointer">
-              必填参数
-            </label>
+            <BaseCheckbox v-model="param.required" label="必填参数" @update:modelValue="emitUpdate" />
           </div>
 
           <div>
@@ -186,6 +177,7 @@ import { Globe, Plus, Trash2, Settings, Info } from 'lucide-vue-next'
 import BaseButton from '@/components/BaseButton'
 import BaseInput from '@/components/BaseInput'
 import BaseSelect from '@/components/BaseSelect'
+import BaseCheckbox from '@/components/BaseCheckbox/index.vue'
 
 interface Parameter {
   key: string

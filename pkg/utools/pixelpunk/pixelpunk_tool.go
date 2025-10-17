@@ -1,7 +1,7 @@
 package pixelpunk
 
 import (
-	config2 "auto-forge/pkg/config"
+	toolConfigService "auto-forge/internal/services/tool_config"
 	log "auto-forge/pkg/logger"
 	"auto-forge/pkg/utools"
 	"bytes"
@@ -52,7 +52,7 @@ func NewPixelPunkUploadTool() *PixelPunkUploadTool {
 		Code:        "pixelpunk_upload",
 		Name:        "PixelPunk 图床上传",
 		Description: "上传图片到 PixelPunk 图床，返回 CDN URL",
-		Category:    "data",
+		Category:    utools.CategoryStorage,
 		Version:     "1.0.0",
 		Author:      "Cooper Team",
 		AICallable:  true,
@@ -166,15 +166,29 @@ func NewPixelPunkUploadTool() *PixelPunkUploadTool {
 func (t *PixelPunkUploadTool) Execute(ctx *utools.ExecutionContext, config map[string]interface{}) (*utools.ExecutionResult, error) {
 	startTime := time.Now()
 
-	// 1. 检查 PixelPunk 是否启用
-	cfg := config2.GetConfig()
-	if cfg.PixelPunk.BaseURL == "" || !cfg.PixelPunk.Enabled {
+	// 1. 从数据库加载 PixelPunk 配置
+	dbConfig, err := toolConfigService.GetToolConfigForExecution("pixelpunk_upload")
+	if err != nil {
 		return &utools.ExecutionResult{
 			Success:    false,
-			Message:    "PixelPunk 图床未配置或未启用",
-			Error:      "请在 config.yaml 中配置 pixelpunk 相关参数",
+			Message:    "PixelPunk 配置错误",
+			Error:      err.Error(),
 			DurationMs: time.Since(startTime).Milliseconds(),
-		}, fmt.Errorf("PixelPunk 未配置")
+		}, err
+	}
+
+	// 解析配置字段
+	baseURL, _ := dbConfig["base_url"].(string)
+	apiKey, _ := dbConfig["api_key"].(string)
+
+	// 验证配置
+	if baseURL == "" || apiKey == "" {
+		return &utools.ExecutionResult{
+			Success:    false,
+			Message:    "PixelPunk 配置不完整",
+			Error:      "missing required PixelPunk configuration",
+			DurationMs: time.Since(startTime).Milliseconds(),
+		}, fmt.Errorf("PixelPunk 配置不完整")
 	}
 
 	// 2. 获取文件对象
@@ -222,7 +236,7 @@ func (t *PixelPunkUploadTool) Execute(ctx *utools.ExecutionContext, config map[s
 
 	// 5. 上传文件到 PixelPunk
 	log.Info("开始上传文件到 PixelPunk: %s", filePath)
-	uploadedFile, err := t.uploadFile(cfg.PixelPunk.BaseURL, cfg.PixelPunk.APIKey, filePath, accessLevel, optimize, filePaths, folderID)
+	uploadedFile, err := t.uploadFile(baseURL, apiKey, filePath, accessLevel, optimize, filePaths, folderID)
 	if err != nil {
 		return &utools.ExecutionResult{
 			Success:    false,

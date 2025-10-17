@@ -4,7 +4,6 @@
  */
 
 import { ref, computed, type Ref } from 'vue'
-import type { ImageTransformState, ImageTransformActions } from './types'
 
 interface UseImageTransformOptions {
   containerRef: Ref<HTMLElement | null>
@@ -25,7 +24,10 @@ export function useImageTransform(options: UseImageTransformOptions) {
 
   // 计算样式
   const imageStyle = computed(() => ({
-    transform: `translate(${translateX.value}px, ${translateY.value}px) scale(${scale.value}) rotate(${rotation.value}deg)`,
+    // 先平移到中心，再缩放和旋转
+    // 使用 translate(-50%, -50%) 将图片中心对齐到容器中心（left-1/2 top-1/2）
+    // 然后应用自定义平移、缩放、旋转
+    transform: `translate(-50%, -50%) translate(${translateX.value}px, ${translateY.value}px) scale(${scale.value}) rotate(${rotation.value}deg)`,
     transformOrigin: 'center center',
   }))
 
@@ -69,24 +71,10 @@ export function useImageTransform(options: UseImageTransformOptions) {
 
   // 居中图片
   const centerImage = () => {
-    if (!imageRef.value || !containerRef.value) return
-
-    const img = imageRef.value
-    if (img.naturalWidth === 0 || img.naturalHeight === 0) {
-      img.addEventListener('load', centerImage, { once: true })
-      return
-    }
-
-    const rect = containerRef.value.getBoundingClientRect()
-    const containerWidth = rect.width
-    const containerHeight = rect.height
-
-    const scaledWidth = img.naturalWidth * scale.value
-    const scaledHeight = img.naturalHeight * scale.value
-
-    const margin = 40
-    translateX.value = margin + (containerWidth - margin * 2 - scaledWidth) / 2
-    translateY.value = margin + (containerHeight - margin * 2 - scaledHeight) / 2
+    // 由于使用了 translate(-50%, -50%)，图片已经自动居中
+    // 只需将自定义平移重置为 0
+    translateX.value = 0
+    translateY.value = 0
   }
 
   // 计算适合容器的初始缩放比例
@@ -100,9 +88,8 @@ export function useImageTransform(options: UseImageTransformOptions) {
     const containerWidth = rect.width
     const containerHeight = rect.height
 
-    const margin = 40
-    const maxWidth = containerWidth - margin * 2
-    const maxHeight = containerHeight - margin * 2
+    const maxWidth = containerWidth
+    const maxHeight = containerHeight
 
     const imgWidth = img.naturalWidth
     const imgHeight = img.naturalHeight
@@ -158,4 +145,3 @@ export function useImageTransform(options: UseImageTransformOptions) {
     initialize,
   }
 }
-

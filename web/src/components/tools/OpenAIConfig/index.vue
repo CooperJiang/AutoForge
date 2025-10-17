@@ -52,6 +52,18 @@
     </div>
 
     <div>
+      <label class="block text-sm font-medium text-text-secondary mb-2"> 图片输入 (可选) </label>
+      <BaseInput
+        v-model="localConfig.image"
+        placeholder="{{nodes.xxx.file}} 或 {{nodes.xxx.data}}"
+      />
+      <p class="mt-1 text-xs text-text-tertiary">
+        仅 vision 模型支持（如 gpt-4-vision、gpt-4o），可传入：① 文件对象 ② Base64 字符串 ③
+        Data URI
+      </p>
+    </div>
+
+    <div>
       <label class="block text-sm font-medium text-text-secondary mb-2">
         温度: {{ localConfig.temperature }}
       </label>
@@ -117,13 +129,7 @@
           <div class="text-sm font-medium text-text-secondary">启用对话记忆</div>
           <div class="text-xs text-text-tertiary">适用于聊天机器人、客服助手等多轮对话场景</div>
         </div>
-        <label class="inline-flex items-center cursor-pointer">
-          <input
-            type="checkbox"
-            v-model="localConfig.context_config.enabled"
-            class="w-4 h-4 text-primary bg-bg-elevated border-border-primary rounded focus:ring-primary"
-          />
-        </label>
+        <BaseCheckbox v-model="localConfig.context_config.enabled" />
       </div>
 
       <div v-if="localConfig.context_config.enabled" class="space-y-3 pt-2">
@@ -170,6 +176,7 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'
 import BaseInput from '@/components/BaseInput'
+import BaseCheckbox from '@/components/BaseCheckbox/index.vue'
 
 interface Props {
   config: Record<string, any>
@@ -190,6 +197,7 @@ const localConfig = ref({
   model: props.config.model || 'gpt-4.1-nano',
   prompt: props.config.prompt || '',
   system_message: props.config.system_message || '',
+  image: props.config.image || '',
   temperature: props.config.temperature ?? 0.7,
   max_tokens: props.config.max_tokens || '',
   timeout: props.config.timeout || 300,
@@ -223,6 +231,7 @@ watch(
         model: newConfig.model || 'gpt-4.1-nano',
         prompt: newConfig.prompt || '',
         system_message: newConfig.system_message || '',
+        image: newConfig.image || '',
         temperature: newConfig.temperature ?? 0.7,
         max_tokens: newConfig.max_tokens || '',
         timeout: newConfig.timeout || 300,

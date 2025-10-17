@@ -19,7 +19,7 @@ func NewOutputFormatterTool() *OutputFormatterTool {
 		Code:        "output_formatter",
 		Name:        "输出格式化",
 		Description: "将数据格式化为指定的展示类型（图片、视频、HTML、Markdown 等），用于控制最终输出的显示方式",
-		Category:    "utility",
+		Category:    utools.CategoryUtility,
 		Version:     "1.0.0",
 		Author:      "AutoForge",
 		AICallable:  false,

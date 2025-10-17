@@ -1,13 +1,16 @@
 package openai
 
 import (
-	"auto-forge/pkg/config"
+	toolConfigService "auto-forge/internal/services/tool_config"
 	"auto-forge/pkg/utools"
 	"bytes"
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
+	"os"
+	"path/filepath"
 	"strings"
 	"time"
 )
@@ -21,7 +24,7 @@ func NewOpenAITool() *OpenAITool {
 		Code:        "openai_chatgpt",
 		Name:        "OpenAI Chat",
 		Description: "使用 OpenAI Chat API 进行对话，支持 GPT-3.5、GPT-4、GPT-4o 等对话模型",
-		Category:    "ai",
+		Category:    utools.CategoryAI,
 		Version:     "1.0.0",
 		Author:      "AutoForge",
 		AICallable:  true,
@@ -103,6 +106,11 @@ func NewOpenAITool() *OpenAITool {
 				Title:       "系统消息",
 				Description: "系统角色消息（可选），用于设定 AI 的行为和角色",
 			},
+			"image": {
+				Type:        "object",
+				Title:       "图片输入",
+				Description: "传入图片文件对象或 Base64 字符串（可选，仅 vision 模型支持），支持变量",
+			},
 			"temperature": {
 				Type:        "number",
 				Title:       "温度",
@@ -165,18 +173,31 @@ func NewOpenAITool() *OpenAITool {
 func (t *OpenAITool) Execute(ctx *utools.ExecutionContext, toolConfig map[string]interface{}) (*utools.ExecutionResult, error) {
 	startTime := time.Now()
 
-	cfg := config.GetConfig()
-	apiKey := cfg.OpenAI.APIKey
+	// 从数据库加载 OpenAI 配置
+	dbConfig, err := toolConfigService.GetToolConfigForExecution("openai_chatgpt")
+	if err != nil {
+		return &utools.ExecutionResult{
+			Success:    false,
+			Message:    "OpenAI 配置错误",
+			Error:      err.Error(),
+			DurationMs: time.Since(startTime).Milliseconds(),
+		}, err
+	}
+
+	// 解析配置字段
+	apiKey, _ := dbConfig["api_key"].(string)
+	apiBase, _ := dbConfig["api_base"].(string)
+
+	// 验证配置
 	if apiKey == "" {
 		return &utools.ExecutionResult{
 			Success:    false,
-			Message:    "OpenAI API Key 未配置，请在 config.yaml 中配置 openai.api_key",
+			Message:    "OpenAI API Key 未配置",
 			Error:      "missing openai api_key in config",
 			DurationMs: time.Since(startTime).Milliseconds(),
 		}, fmt.Errorf("openai api_key not configured")
 	}
 
-	apiBase := cfg.OpenAI.APIBase
 	if apiBase == "" {
 		apiBase = "https://api.openai.com"
 	}
@@ -239,10 +260,38 @@ func (t *OpenAITool) Execute(ctx *utools.ExecutionContext, toolConfig map[string
 				"content": systemMessage,
 			})
 		}
-		messages = append(messages, map[string]interface{}{
-			"role":    "user",
-			"content": prompt,
-		})
+
+		// 构建用户消息（支持图片）
+		userMessage := map[string]interface{}{
+			"role": "user",
+		}
+
+		// 检查是否有图片输入
+		imageParam := toolConfig["image"]
+		if imageParam != nil {
+			// 多模态内容数组
+			contentArray := []map[string]interface{}{
+				{"type": "text", "text": prompt},
+			}
+
+			// 处理图片输入（支持 file 对象和 base64 字符串）
+			imageURL, err := t.processImage(imageParam)
+			if err == nil && imageURL != "" {
+				contentArray = append(contentArray, map[string]interface{}{
+					"type": "image_url",
+					"image_url": map[string]interface{}{
+						"url": imageURL,
+					},
+				})
+			}
+
+			userMessage["content"] = contentArray
+		} else {
+			// 纯文本消息
+			userMessage["content"] = prompt
+		}
+
+		messages = append(messages, userMessage)
 	}
 
 	requestBody := map[string]interface{}{
@@ -414,6 +463,59 @@ func (t *OpenAITool) Execute(ctx *utools.ExecutionContext, toolConfig map[string
 		Output:     output,
 		DurationMs: time.Since(startTime).Milliseconds(),
 	}, nil
+}
+
+// processImage 处理图片输入，支持 file 对象和 base64 字符串
+// 返回 Data URI 格式的图片 URL
+func (t *OpenAITool) processImage(imageParam interface{}) (string, error) {
+	switch v := imageParam.(type) {
+	case map[string]interface{}:
+		// 格式 1: File 对象 {path: "...", mime_type: "..."}
+		imagePath, _ := v["path"].(string)
+		if imagePath != "" {
+			// 读取图片文件
+			imageData, err := os.ReadFile(imagePath)
+			if err != nil {
+				return "", fmt.Errorf("读取图片文件失败: %w", err)
+			}
+
+			// 检测 MIME 类型
+			mimeType := "image/jpeg"
+			if mt, ok := v["mime_type"].(string); ok && mt != "" {
+				mimeType = mt
+			} else {
+				// 根据文件扩展名判断
+				ext := strings.ToLower(filepath.Ext(imagePath))
+				switch ext {
+				case ".png":
+					mimeType = "image/png"
+				case ".jpg", ".jpeg":
+					mimeType = "image/jpeg"
+				case ".webp":
+					mimeType = "image/webp"
+				case ".gif":
+					mimeType = "image/gif"
+				}
+			}
+
+			base64Data := base64.StdEncoding.EncodeToString(imageData)
+			return fmt.Sprintf("data:%s;base64,%s", mimeType, base64Data), nil
+		}
+
+	case string:
+		// 格式 2: Base64 字符串
+		inputStr := v
+
+		// 检查是否已经是 Data URI 格式
+		if strings.HasPrefix(inputStr, "data:") {
+			return inputStr, nil
+		}
+
+		// 纯 Base64 字符串，转换为 Data URI
+		return fmt.Sprintf("data:image/png;base64,%s", inputStr), nil
+	}
+
+	return "", fmt.Errorf("无效的图片格式")
 }
 
 func (t *OpenAITool) DescribeOutput(config map[string]interface{}) map[string]utools.OutputFieldDef {

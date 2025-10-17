@@ -1,7 +1,7 @@
 package openai
 
 import (
-	"auto-forge/pkg/config"
+	toolConfigService "auto-forge/internal/services/tool_config"
 	"auto-forge/pkg/utools"
 	"bytes"
 	"encoding/json"
@@ -11,47 +11,45 @@ import (
 	"time"
 )
 
-
 type OpenAIImageTool struct {
 	*utools.BaseTool
 }
 
-
 func NewOpenAIImageTool() *OpenAIImageTool {
-    metadata := &utools.ToolMetadata{
-        Code:        "openai_image",
-        Name:        "OpenAI Image",
-        Description: "使用 OpenAI DALL-E Gpt-image-1 等模型生成图片",
-        Category:    "ai",
-        Version:     "1.0.0",
-        Author:      "AutoForge",
-        AICallable:  true,
-        Tags:        []string{"openai", "dalle", "image", "ai", "picture"},
-        OutputFieldsSchema: map[string]utools.OutputFieldDef{
-            "response": {
-                Type:  "object",
-                Label: "OpenAI 原始响应",
-                Children: map[string]utools.OutputFieldDef{
-                    "created": {Type: "number", Label: "创建时间戳"},
-                    "data": {
-                        Type:  "array",
-                        Label: "图片数组",
-                        Children: map[string]utools.OutputFieldDef{
-                            "0": {
-                                Type:  "object",
-                                Label: "第一张图片",
-                                Children: map[string]utools.OutputFieldDef{
-                                    "url":            {Type: "string", Label: "图片 URL（当 response_format=url）"},
-                                    "b64_json":       {Type: "string", Label: "Base64 内容（当 response_format=b64_json）"},
-                                    "revised_prompt": {Type: "string", Label: "修订后的提示词（可选）"},
-                                },
-                            },
-                        },
-                    },
-                },
-            },
-        },
-    }
+	metadata := &utools.ToolMetadata{
+		Code:        "openai_image",
+		Name:        "OpenAI Image",
+		Description: "使用 OpenAI DALL-E Gpt-image-1 等模型生成图片",
+		Category:    utools.CategoryAI,
+		Version:     "1.0.0",
+		Author:      "AutoForge",
+		AICallable:  true,
+		Tags:        []string{"openai", "dalle", "image", "ai", "picture"},
+		OutputFieldsSchema: map[string]utools.OutputFieldDef{
+			"response": {
+				Type:  "object",
+				Label: "OpenAI 原始响应",
+				Children: map[string]utools.OutputFieldDef{
+					"created": {Type: "number", Label: "创建时间戳"},
+					"data": {
+						Type:  "array",
+						Label: "图片数组",
+						Children: map[string]utools.OutputFieldDef{
+							"0": {
+								Type:  "object",
+								Label: "第一张图片",
+								Children: map[string]utools.OutputFieldDef{
+									"url":            {Type: "string", Label: "图片 URL（当 response_format=url）"},
+									"b64_json":       {Type: "string", Label: "Base64 内容（当 response_format=b64_json）"},
+									"revised_prompt": {Type: "string", Label: "修订后的提示词（可选）"},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+	}
 
 	schema := &utools.ConfigSchema{
 		Type: "object",
@@ -105,27 +103,37 @@ func NewOpenAIImageTool() *OpenAIImageTool {
 	}
 }
 
-
 func (t *OpenAIImageTool) Execute(ctx *utools.ExecutionContext, toolConfig map[string]interface{}) (*utools.ExecutionResult, error) {
 	startTime := time.Now()
 
+	// 从数据库加载 OpenAI 配置
+	dbConfig, err := toolConfigService.GetToolConfigForExecution("openai_image")
+	if err != nil {
+		return &utools.ExecutionResult{
+			Success:    false,
+			Message:    "OpenAI 配置错误",
+			Error:      err.Error(),
+			DurationMs: time.Since(startTime).Milliseconds(),
+		}, err
+	}
 
-	cfg := config.GetConfig()
-	apiKey := cfg.OpenAI.APIKey
+	// 解析配置字段
+	apiKey, _ := dbConfig["api_key"].(string)
+	apiBase, _ := dbConfig["api_base"].(string)
+
+	// 验证配置
 	if apiKey == "" {
 		return &utools.ExecutionResult{
 			Success:    false,
-			Message:    "OpenAI API Key 未配置，请在 config.yaml 中配置 openai.api_key",
+			Message:    "OpenAI API Key 未配置",
 			Error:      "missing openai api_key in config",
 			DurationMs: time.Since(startTime).Milliseconds(),
 		}, fmt.Errorf("openai api_key not configured")
 	}
 
-	apiBase := cfg.OpenAI.APIBase
 	if apiBase == "" {
 		apiBase = "https://api.openai.com"
 	}
-
 
 	model, _ := toolConfig["model"].(string)
 	if model == "" {
@@ -141,7 +149,6 @@ func (t *OpenAIImageTool) Execute(ctx *utools.ExecutionContext, toolConfig map[s
 			DurationMs: time.Since(startTime).Milliseconds(),
 		}, fmt.Errorf("prompt is required")
 	}
-
 
 	n := 1
 	if nVal, ok := toolConfig["n"].(float64); ok && nVal > 0 {
@@ -161,12 +168,10 @@ func (t *OpenAIImageTool) Execute(ctx *utools.ExecutionContext, toolConfig map[s
 
 	quality, _ := toolConfig["quality"].(string)
 
-
 	responseFormat, _ := toolConfig["response_format"].(string)
 	if responseFormat == "" {
 		responseFormat = "url"
 	}
-
 
 	timeout := 300
 	if t, ok := toolConfig["timeout"].(float64); ok && t > 0 {
@@ -179,7 +184,6 @@ func (t *OpenAIImageTool) Execute(ctx *utools.ExecutionContext, toolConfig map[s
 		}
 	}
 
-
 	requestBody := map[string]interface{}{
 		"model":           model,
 		"prompt":          prompt,
@@ -187,7 +191,6 @@ func (t *OpenAIImageTool) Execute(ctx *utools.ExecutionContext, toolConfig map[s
 		"size":            size,
 		"response_format": responseFormat,
 	}
-
 
 	if quality != "" {
 		requestBody["quality"] = quality
@@ -202,7 +205,6 @@ func (t *OpenAIImageTool) Execute(ctx *utools.ExecutionContext, toolConfig map[s
 			DurationMs: time.Since(startTime).Milliseconds(),
 		}, err
 	}
-
 
 	url := fmt.Sprintf("%s/images/generations", apiBase)
 	req, err := http.NewRequest("POST", url, bytes.NewBuffer(jsonData))
@@ -243,7 +245,6 @@ func (t *OpenAIImageTool) Execute(ctx *utools.ExecutionContext, toolConfig map[s
 		}, err
 	}
 
-
 	var result map[string]interface{}
 	if err := json.Unmarshal(body, &result); err != nil {
 		return &utools.ExecutionResult{
@@ -254,7 +255,6 @@ func (t *OpenAIImageTool) Execute(ctx *utools.ExecutionContext, toolConfig map[s
 			DurationMs: time.Since(startTime).Milliseconds(),
 		}, err
 	}
-
 
 	if resp.StatusCode != 200 {
 		errorMsg := fmt.Sprintf("HTTP %d", resp.StatusCode)
@@ -272,7 +272,6 @@ func (t *OpenAIImageTool) Execute(ctx *utools.ExecutionContext, toolConfig map[s
 		}, fmt.Errorf("openai api error: %s", errorMsg)
 	}
 
-
 	if errorObj, ok := result["error"].(map[string]interface{}); ok {
 		errorMsg, _ := errorObj["message"].(string)
 		errorType, _ := errorObj["type"].(string)
@@ -284,7 +283,6 @@ func (t *OpenAIImageTool) Execute(ctx *utools.ExecutionContext, toolConfig map[s
 			DurationMs: time.Since(startTime).Milliseconds(),
 		}, fmt.Errorf("openai api error: %s", errorMsg)
 	}
-
 
 	data, ok := result["data"].([]interface{})
 	if !ok || len(data) == 0 {
@@ -309,7 +307,6 @@ func (t *OpenAIImageTool) Execute(ctx *utools.ExecutionContext, toolConfig map[s
 		DurationMs: time.Since(startTime).Milliseconds(),
 	}, nil
 }
-
 
 func init() {
 	tool := NewOpenAIImageTool()

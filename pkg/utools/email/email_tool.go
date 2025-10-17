@@ -21,7 +21,7 @@ func NewEmailTool() *EmailTool {
         Code:        "email_sender",
         Name:        "邮件发送",
         Description: "发送邮件通知，支持HTML格式和多个收件人",
-        Category:    "notification",
+        Category:    utools.CategoryNotification,
         Version:     "1.0.0",
         Author:      "AutoForge",
         AICallable:  true,

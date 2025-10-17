@@ -1,7 +1,7 @@
 package aliyunoss
 
 import (
-	"auto-forge/pkg/config"
+	toolConfigService "auto-forge/internal/services/tool_config"
 	"auto-forge/pkg/utools"
 	"bytes"
 	"crypto/hmac"
@@ -24,7 +24,7 @@ func NewAliyunOSSTool() *AliyunOSSTool {
 		Code:        "aliyun_oss",
 		Name:        "阿里云 OSS 上传",
 		Description: "上传文件到阿里云对象存储服务",
-		Category:    "data",
+		Category:    utools.CategoryStorage,
 		Version:     "1.0.0",
 		Author:      "Cooper Team",
 		AICallable:  true,
@@ -92,20 +92,25 @@ func NewAliyunOSSTool() *AliyunOSSTool {
 func (t *AliyunOSSTool) Execute(ctx *utools.ExecutionContext, toolConfig map[string]interface{}) (*utools.ExecutionResult, error) {
 	startTime := time.Now()
 
-	// 从配置文件加载 OSS 配置
-	cfg := config.GetConfig()
-
-	if !cfg.AliyunOSS.Enabled {
+	// 从数据库加载 OSS 配置
+	dbConfig, err := toolConfigService.GetToolConfigForExecution("aliyun_oss")
+	if err != nil {
 		return &utools.ExecutionResult{
 			Success:    false,
-			Message:    "阿里云 OSS 未启用",
-			Error:      "aliyun_oss.enabled is false in config",
+			Message:    "阿里云 OSS 配置错误",
+			Error:      err.Error(),
 			DurationMs: time.Since(startTime).Milliseconds(),
-		}, fmt.Errorf("阿里云 OSS 未启用")
+		}, err
 	}
 
+	// 解析配置字段
+	endpoint, _ := dbConfig["endpoint"].(string)
+	accessKeyID, _ := dbConfig["access_key_id"].(string)
+	accessKeySecret, _ := dbConfig["access_key_secret"].(string)
+	bucket, _ := dbConfig["bucket"].(string)
+
 	// 验证配置
-	if cfg.AliyunOSS.Endpoint == "" || cfg.AliyunOSS.AccessKeyID == "" || cfg.AliyunOSS.AccessKeySecret == "" || cfg.AliyunOSS.Bucket == "" {
+	if endpoint == "" || accessKeyID == "" || accessKeySecret == "" || bucket == "" {
 		return &utools.ExecutionResult{
 			Success:    false,
 			Message:    "阿里云 OSS 配置不完整",
@@ -170,7 +175,7 @@ func (t *AliyunOSSTool) Execute(ctx *utools.ExecutionContext, toolConfig map[str
 	}
 
 	// 上传到 OSS
-	fileURL, err := t.uploadToOSS(&cfg.AliyunOSS, ossPath, fileData)
+	fileURL, err := t.uploadToOSS(endpoint, accessKeyID, accessKeySecret, bucket, ossPath, fileData)
 	if err != nil {
 		return &utools.ExecutionResult{
 			Success:    false,
@@ -185,7 +190,7 @@ func (t *AliyunOSSTool) Execute(ctx *utools.ExecutionContext, toolConfig map[str
 		"url":         fileURL,
 		"filename":    filepath.Base(filePath),
 		"size":        fileInfo.Size(),
-		"bucket":      cfg.AliyunOSS.Bucket,
+		"bucket":      bucket,
 		"uploaded_at": time.Now().Format(time.RFC3339),
 	}
 
@@ -201,9 +206,9 @@ func (t *AliyunOSSTool) Execute(ctx *utools.ExecutionContext, toolConfig map[str
 	}, nil
 }
 
-func (t *AliyunOSSTool) uploadToOSS(ossConfig *config.AliyunOSSConfig, objectKey string, data []byte) (string, error) {
+func (t *AliyunOSSTool) uploadToOSS(endpoint, accessKeyID, accessKeySecret, bucket, objectKey string, data []byte) (string, error) {
 	// 构建 OSS URL
-	host := fmt.Sprintf("%s.%s", ossConfig.Bucket, ossConfig.Endpoint)
+	host := fmt.Sprintf("%s.%s", bucket, endpoint)
 	url := fmt.Sprintf("https://%s/%s", host, objectKey)
 
 	// 创建请求
@@ -221,8 +226,8 @@ func (t *AliyunOSSTool) uploadToOSS(ossConfig *config.AliyunOSSConfig, objectKey
 	date := time.Now().UTC().Format(http.TimeFormat)
 	req.Header.Set("Date", date)
 
-	signature := t.generateSignature(ossConfig, "PUT", objectKey, contentType, date)
-	req.Header.Set("Authorization", fmt.Sprintf("OSS %s:%s", ossConfig.AccessKeyID, signature))
+	signature := t.generateSignature(accessKeySecret, bucket, "PUT", objectKey, contentType, date)
+	req.Header.Set("Authorization", fmt.Sprintf("OSS %s:%s", accessKeyID, signature))
 
 	// 发送请求
 	client := &http.Client{Timeout: 30 * time.Second}
@@ -240,9 +245,9 @@ func (t *AliyunOSSTool) uploadToOSS(ossConfig *config.AliyunOSSConfig, objectKey
 	return url, nil
 }
 
-func (t *AliyunOSSTool) generateSignature(ossConfig *config.AliyunOSSConfig, method, objectKey, contentType, date string) string {
+func (t *AliyunOSSTool) generateSignature(accessKeySecret, bucket, method, objectKey, contentType, date string) string {
 	// 构建签名字符串
-	canonicalizedResource := fmt.Sprintf("/%s/%s", ossConfig.Bucket, objectKey)
+	canonicalizedResource := fmt.Sprintf("/%s/%s", bucket, objectKey)
 	stringToSign := fmt.Sprintf("%s\n\n%s\n%s\n%s",
 		method,
 		contentType,
@@ -251,7 +256,7 @@ func (t *AliyunOSSTool) generateSignature(ossConfig *config.AliyunOSSConfig, met
 	)
 
 	// 使用 HMAC-SHA1 生成签名
-	h := hmac.New(sha1.New, []byte(ossConfig.AccessKeySecret))
+	h := hmac.New(sha1.New, []byte(accessKeySecret))
 	h.Write([]byte(stringToSign))
 	signature := base64.StdEncoding.EncodeToString(h.Sum(nil))
 

@@ -197,17 +197,26 @@ web/src/components/tools/
   <div class="space-y-4">
     <h3 class="text-sm font-semibold text-text-primary mb-3">你的工具配置</h3>
 
+    <!-- 使用全局组件，不要用原生 input/select -->
     <div>
       <label class="block text-xs font-medium text-text-secondary mb-1.5">
         参数名 <span class="text-error">*</span>
       </label>
-      <input
+      <BaseInput
         v-model="localConfig.param"
-        type="text"
         placeholder="请输入参数"
-        class="w-full px-3 py-2 text-sm bg-bg-primary text-text-primary 
-               border border-border-primary rounded-md
-               focus:ring-2 focus:ring-primary focus:border-primary"
+      />
+    </div>
+
+    <!-- 下拉选择使用 BaseSelect -->
+    <div>
+      <label class="block text-xs font-medium text-text-secondary mb-1.5">选项</label>
+      <BaseSelect
+        v-model="localConfig.option"
+        :options="[
+          { label: '选项 1', value: 'option1' },
+          { label: '选项 2', value: 'option2' },
+        ]"
       />
     </div>
   </div>
@@ -215,6 +224,9 @@ web/src/components/tools/
 
 <script setup lang="ts">
 import { ref, watch } from 'vue'
+// ⚠️ 重要：不要带 .vue 后缀！（项目使用文件夹结构）
+import BaseInput from '@/components/BaseInput'
+import BaseSelect from '@/components/BaseSelect'
 
 interface Props {
   config: Record<string, any>
@@ -227,6 +239,7 @@ const emit = defineEmits<{
 
 const localConfig = ref({
   param: props.config.param || '',
+  option: props.config.option || 'option1',
 })
 
 watch(localConfig, (newConfig) => {
@@ -234,6 +247,11 @@ watch(localConfig, (newConfig) => {
 }, { deep: true })
 </script>
 ```
+
+**⚠️ 关键点：**
+- ✅ 使用 `BaseInput`、`BaseSelect` 等全局组件，不要用原生 `<input>`、`<select>`
+- ✅ 导入时**不带 `.vue` 后缀**：`import BaseInput from '@/components/BaseInput'`
+- ✅ `BaseSelect` 的 `options` 格式：`[{ label: string, value: any }]`
 
 ### 3. 注册配置组件（⚠️ 重要：两个位置）
 
@@ -295,6 +313,304 @@ import YourToolConfig from '@/components/tools/YourToolConfig/index.vue'
 
 ---
 
+## 🧩 前端配置组件最佳实践（避免递归与编译错误）
+
+在实现工具的配置组件时，容易踩到两个坑：
+
+1) 递归更新（Maximum recursive updates）
+
+症状：输入框每次输入就报错 `Maximum recursive updates exceeded in component <BaseTransition>`。
+
+根因：子组件 `emit('update:config', ...)` → 父组件回填 `props.config` → 子组件 `watch(props.config)` 又立即覆盖本地 `localConfig` → 再触发 `emit`，形成闭环。
+
+解决方案（推荐模版）：
+
+```vue
+<script setup lang="ts">
+import { ref, watch } from 'vue'
+
+interface Props { config: Record<string, any> }
+const props = defineProps<Props>()
+const emit = defineEmits<{ 'update:config': [Record<string, any>] }>()
+
+// 本地副本
+const localConfig = ref({
+  // ...用 props.config 初始化
+  url: props.config.url || '',
+  timeout: props.config.timeout ?? 60,
+})
+
+// 防抖旗标防止递归
+const updatingFromProps = ref(false)
+
+// 子改父
+watch(localConfig, (v) => {
+  if (!updatingFromProps.value) emit('update:config', { ...v })
+}, { deep: true })
+
+// 父改子
+watch(() => props.config, (cfg) => {
+  updatingFromProps.value = true
+  localConfig.value = {
+    url: cfg?.url || '',
+    timeout: cfg?.timeout ?? 60,
+  }
+  setTimeout(() => { updatingFromProps.value = false }, 0)
+}, { deep: true })
+</script>
+```
+
+2) Mustache 示例被当成表达式解析
+
+症状：Vite 报错 `Error parsing JavaScript expression: Unterminated string constant.`
+
+根因：在模板中直接写 `{{external.xxx}}` / `{{nodes.xxx.yyy}}` 作为说明文本，被 Vue 编译器当作表达式。
+
+解决方案：为展示用 Mustache 包上 `v-pre` 或使用转义写法：
+
+```vue
+<p class="text-xs" >
+  支持变量：<code v-pre>{{external.xxx}}</code> / <code v-pre>{{nodes.xxx.yyy}}</code>
+</p>
+```
+
+> 小结：配置组件应始终维护“本地副本 + 更新守卫”的模式，并用 v-pre 展示变量占位，避免编译器解析。
+
+---
+
+## 🧾 Headers 数据结构规范与前后端兼容
+
+- 推荐前端在 UI 中用数组形态维护 Headers：`[{ key: string, value: string }]`，便于增删改。
+- 发送到后端之前，可以转换成对象：
+
+```ts
+const headersObj = Object.fromEntries(localHeaders.map(h => [h.key, h.value]))
+```
+
+- 后端工具实现建议兼容两种形态（对象或数组），示例（Go）：
+
+```go
+// 优先对象
+if hdrs, ok := config["headers"].(map[string]interface{}); ok {
+    for k, v := range hdrs { if s, ok := v.(string); ok { req.Header.Set(k, s) } }
+} else if arr, ok := config["headers"].([]interface{}); ok {
+    for _, item := range arr {
+        if m, ok := item.(map[string]interface{}); ok {
+            k, _ := m["key"].(string)
+            v, _ := m["value"].(string)
+            if strings.TrimSpace(k) != "" { req.Header.Set(k, v) }
+        }
+    }
+}
+```
+
+---
+
+## 📦 文件类工具规范（输出对象与临时文件）
+
+为与平台的"文件传递链路（下载 → 上传到图床/OSS/COS → 渲染）"契合，文件类工具输出应包含：
+
+- `response`（object）：完整响应或元信息（用于调试）
+- `file`（object）：标准文件对象
+  - `path`: 本地绝对路径（供后续工具读取）
+  - `filename`: 文件名
+  - `size`: 字节大小（int64）
+  - `mime_type`: MIME 类型
+
+**标准文件对象示例：**
+```go
+fileObject := map[string]interface{}{
+    "path":      "/tmp/autoforge-xxx/file.png",
+    "filename":  "file.png",
+    "size":      int64(12345),
+    "mime_type": "image/png",
+}
+```
+
+**临时文件管理：**
+- 工具应将临时文件保存到 `/tmp/autoforge-<tool-name>/` 或 `/tmp/workflow-files/<execution_id>/`
+- 引擎在执行完成后会自动清理 `/tmp/workflow-files/<execution_id>/` 目录
+- 其他临时目录需要工具自行清理或依赖系统定时清理
+
+---
+
+## 🔀 多模式输出工具最佳实践（如二维码生成）
+
+当工具支持多种输出模式时（如 Base64 字符串 vs 文件对象），应遵循以下规范：
+
+### 1. 配置参数设计
+```go
+Properties: map[string]utools.PropertySchema{
+    "output_format": {
+        Type:        "string",
+        Title:       "输出格式",
+        Description: "base64: 返回字符串; file: 返回文件对象",
+        Default:     "base64",
+        Enum:        []interface{}{"base64", "file"},
+    },
+}
+```
+
+### 2. OutputFieldsSchema 设计
+```go
+OutputFieldsSchema: map[string]utools.OutputFieldDef{
+    "response": {
+        Type:  "object",
+        Label: "完整响应",
+        Children: map[string]utools.OutputFieldDef{
+            "data": {
+                Type:  "string",
+                Label: "Base64 数据（仅 base64 模式）",
+            },
+            "file": {
+                Type:  "object",
+                Label: "文件对象（仅 file 模式）",
+                Children: map[string]utools.OutputFieldDef{
+                    "path":      {Type: "string", Label: "文件路径"},
+                    "filename":  {Type: "string", Label: "文件名"},
+                    "size":      {Type: "integer", Label: "文件大小"},
+                    "mime_type": {Type: "string", Label: "MIME 类型"},
+                },
+            },
+        },
+    },
+    "data": {Type: "string", Label: "Base64 数据（快捷访问，仅 base64 模式）"},
+    "file": {
+        Type:  "object",
+        Label: "文件对象（快捷访问，仅 file 模式）",
+        Children: map[string]utools.OutputFieldDef{
+            "path": {Type: "string", Label: "文件路径"},
+        },
+    },
+}
+```
+
+### 3. Execute 实现
+```go
+var output map[string]interface{}
+
+if outputFormat == "file" {
+    // 生成临时文件
+    tempDir := filepath.Join(os.TempDir(), "autoforge-yourtool")
+    os.MkdirAll(tempDir, 0755)
+    filePath := filepath.Join(tempDir, "file.ext")
+    os.WriteFile(filePath, data, 0644)
+    
+    fileObject := map[string]interface{}{
+        "path":      filePath,
+        "filename":  "file.ext",
+        "size":      int64(len(data)),
+        "mime_type": "image/png",
+    }
+    
+    output = map[string]interface{}{
+        "response": map[string]interface{}{
+            "file": fileObject,
+            // 其他字段...
+        },
+        "file": fileObject,  // 快捷访问
+    }
+} else {
+    // Base64 模式
+    base64Data := base64.StdEncoding.EncodeToString(data)
+    
+    output = map[string]interface{}{
+        "response": map[string]interface{}{
+            "data": base64Data,
+            // 其他字段...
+        },
+        "data": base64Data,  // 快捷访问
+    }
+}
+```
+
+### 4. 前端使用说明
+**⚠️ 重要：不同模式输出的字段不同！**
+
+**Base64 模式：**
+- ✅ 可访问：`{{nodes.xxx.data}}` - Base64 字符串
+- ❌ 不可访问：`{{nodes.xxx.file}}` - 此字段不存在
+
+**File 模式：**
+- ✅ 可访问：`{{nodes.xxx.file}}` - 文件对象（可传递给上传工具）
+- ✅ 可访问：`{{nodes.xxx.file.path}}` - 文件路径
+- ❌ 不可访问：`{{nodes.xxx.data}}` - 此字段不存在
+
+**配置说明中应明确标注：**
+```typescript
+usageItems: [
+  { text: 'Base64 模式：输出字符串，可用于直接显示' },
+  { text: 'File 模式：输出文件对象，可传递给上传工具' },
+  { text: '注意：两种模式输出字段不同，请根据后续节点选择' },
+]
+```
+
+---
+
+## 🧭 工作流编辑器接入 Checklist
+
+1) 工具元数据（必填）：`web/src/config/tools.ts`
+   - code/title/description/icon/tags/usageItems 等
+2) 配置组件（必填）：`web/src/components/tools/YourToolConfig/index.vue`
+   - 采用“本地副本 + 更新守卫”模式，避免递归更新
+   - 变量说明用 `v-pre` 展示
+3) 侧边配置面板注册（必填）：`web/src/pages/Workflows/components/NodeConfigDrawer.vue`
+   - `import YourToolConfig ...`
+   - 在模板里：`v-else-if="node.toolCode === 'your_tool'"`
+4)（如适用）任务编辑器注册：`web/src/pages/Tasks/components/ToolConfigDrawer.vue`
+5) 工具前端列表与图标渲染可用 `getToolIcon/getToolIconBg`（已由工具元数据驱动）
+
+---
+
+## 🧰 后端接入 Checklist（复盘）
+
+1) 工具类实现：`pkg/utools/<code>/<code>_tool.go`
+   - `ToolMetadata` + `ConfigSchema` + `Execute`
+   - `OutputFieldsSchema` 必须包含 `response`（object）
+2) 工具注册：在 `cmd/main.go` 以空导入 `_ "auto-forge/pkg/utools/<code>"`
+3)（如需）后端全局配置：更新 `pkg/config/config.go` 与 `config.yaml`
+4) 工具配置（敏感信息）统一用工具配置中心：`internal/services/tool_config`
+
+---
+
+## 🧪 调试与排错（新增）
+
+- 工具未显示在列表：
+  - 检查 `cmd/main.go` 是否空导入了你的工具；重启后端。
+  - 调用管理员 API 同步工具定义（或查看启动日志）。
+- 配置组件不显示/报错：
+  - 确认 `NodeConfigDrawer.vue` 已注册 `v-else-if="node.toolCode === 'xxx'"`
+  - 避免在模板中直接写 `{{external.xxx}}`，改用 `v-pre`
+  - 若出现递归更新报错，按“本地副本 + 更新守卫”模式改造
+- 变量不生效：
+  - 使用 `VariableSelector` 并传入 `previousNodes` 与 `envVars`
+  - 检查执行详情中的 `resolved_config`
+- 文件未清理：
+  - 确认工具写入了 `/tmp/workflow-files/<execution_id>/`；执行结束后引擎会清理该目录
+
+---
+
+## 🌰 参考：文件下载器（file_downloader）最小表单
+
+```vue
+<FileDownloaderConfig
+  v-model:config="localNode.config"
+  :previous-nodes="props.previousNodes"
+  :env-vars="props.envVars"
+/>
+```
+
+后端输出（关键字段）：
+
+```json
+{
+  "response": { "url": "...", "status_code": 200, "headers": {"Content-Type": "..."} },
+  "file": { "type": "file", "path": "/tmp/workflow-files/<execID>/...", "filename": "...", "size": 123, "mime_type": "..." }
+}
+```
+
+> 以上规范已在近期开发中验证可用，按此模板开发可避免常见前后端联调问题。
+
 ## 📐 开发规范
 
 ### 后端规范
@@ -304,19 +620,74 @@ import YourToolConfig from '@/components/tools/YourToolConfig/index.vue'
 1. **OutputFieldsSchema 必须包含 `response` 字段**
    ```go
    OutputFieldsSchema: map[string]utools.OutputFieldDef{
-       "response": {Type: "object", Label: "完整响应", Children: {...}},
-       // 可选：快捷访问字段
+       "response": {
+           Type: "object",      // ✅ 正确
+           Label: "完整响应",    // ✅ 使用 Label，不是 Description
+           Children: map[string]utools.OutputFieldDef{  // ✅ 使用 Children，不是 Properties
+               "field": {Type: "string", Label: "字段"},
+           },
+       },
+       "field": {Type: "string", Label: "快捷访问"},  // 可选：快捷访问字段
+   }
+   ```
+   
+   **⚠️ 常见错误：**
+   - ❌ 使用 `Properties` → ✅ 应使用 `Children`
+   - ❌ 使用 `Description` → ✅ 应使用 `Label`
+
+2. **ConfigSchema 数值范围必须使用指针**
+   ```go
+   Properties: map[string]utools.PropertySchema{
+       "size": {
+           Type:    "integer",
+           Title:   "尺寸",
+           Default: 256,
+           Minimum: float64Ptr(64),   // ✅ 必须使用指针
+           Maximum: float64Ptr(2048), // ✅ 必须使用指针
+       },
+   }
+   
+   // 辅助函数
+   func float64Ptr(v float64) *float64 {
+       return &v
    }
    ```
 
-2. **敏感信息必须标记**
+3. **Enum 必须是 []interface{} 类型**
+   ```go
+   Properties: map[string]utools.PropertySchema{
+       "level": {
+           Type:  "string",
+           Title: "级别",
+           Enum:  []interface{}{"Low", "Medium", "High"},  // ✅ []interface{}
+           // ❌ 错误：Enum: []string{...}
+       },
+   }
+   ```
+
+4. **Required 字段在 ConfigSchema 中，不在 PropertySchema 中**
+   ```go
+   schema := &utools.ConfigSchema{
+       Type: "object",
+       Properties: map[string]utools.PropertySchema{
+           "param": {
+               Type:  "string",
+               Title: "参数",
+               // ❌ 错误：Required: true  // PropertySchema 没有 Required 字段
+           },
+       },
+       Required: []string{"param"},  // ✅ 正确：在 ConfigSchema 层级
+   }
+   ```
+
+5. **敏感信息必须标记**
    ```go
    Properties: map[string]utools.PropertySchema{
        "api_key": {Type: "string", Title: "API Key", Secret: true},
    }
    ```
 
-3. **返回结果必须包含 response**
+6. **返回结果必须包含 response**
    ```go
    Output: map[string]interface{}{
        "response": fullResponse,  // 完整对象

@@ -5,7 +5,11 @@ import SecureStorage from '@/utils/storage'
 const WORKFLOW_DRAFT_KEY = 'workflow_draft'
 
 export function useWorkflow(workflowId?: string) {
-  const storageKey = workflowId ? `${WORKFLOW_DRAFT_KEY}_${workflowId}` : WORKFLOW_DRAFT_KEY
+  // 创建页面（workflowId === 'create'）使用通用草稿 key
+  const storageKey =
+    workflowId && workflowId !== 'create'
+      ? `${WORKFLOW_DRAFT_KEY}_${workflowId}`
+      : WORKFLOW_DRAFT_KEY
 
   const loadDraft = () => {
     const draft = SecureStorage.getItem<{
@@ -17,24 +21,32 @@ export function useWorkflow(workflowId?: string) {
     return draft
   }
 
-  const draft = loadDraft()
+  const hasDraft = () => {
+    const draft = loadDraft()
+    return draft !== null && draft !== undefined
+  }
 
-  const workflow = ref<Partial<Workflow>>(
-    draft?.workflow || {
-      name: '',
-      description: '',
-      nodes: [],
-      edges: [],
-      env_vars: [],
-      enabled: false,
-    }
-  )
+  // 不自动加载草稿，返回空数据
+  const workflow = ref<Partial<Workflow>>({
+    name: '',
+    description: '',
+    nodes: [],
+    edges: [],
+    env_vars: [],
+    enabled: false,
+  })
 
-  const nodes = ref<WorkflowNode[]>(draft?.nodes || [])
-  const edges = ref<WorkflowEdge[]>(draft?.edges || [])
-  const envVars = ref<WorkflowEnvVar[]>(draft?.envVars || [])
+  const nodes = ref<WorkflowNode[]>([])
+  const edges = ref<WorkflowEdge[]>([])
+  const envVars = ref<WorkflowEnvVar[]>([])
+
+  // 标记是否允许自动保存草稿（防止初始化时触发）
+  let allowAutoSave = false
 
   const saveDraft = () => {
+    if (!allowAutoSave) {
+      return
+    }
     SecureStorage.setItem(
       storageKey,
       {
@@ -54,6 +66,8 @@ export function useWorkflow(workflowId?: string) {
     },
     { deep: true }
   )
+
+  // 不再自动启用，必须手动调用 enableAutoSave() 或 restoreDraft()
 
   const addNode = (node: WorkflowNode) => {
     nodes.value.push(node)
@@ -198,6 +212,26 @@ export function useWorkflow(workflowId?: string) {
     SecureStorage.removeItem(storageKey)
   }
 
+  // 手动加载草稿
+  const restoreDraft = () => {
+    const draft = loadDraft()
+    if (draft) {
+      workflow.value = draft.workflow
+      nodes.value = draft.nodes
+      edges.value = draft.edges
+      envVars.value = draft.envVars
+      // 恢复草稿后启用自动保存
+      allowAutoSave = true
+      return true
+    }
+    return false
+  }
+
+  // 启用自动保存（外部调用）
+  const enableAutoSave = () => {
+    allowAutoSave = true
+  }
+
   return {
     workflow,
     nodes,
@@ -219,5 +253,8 @@ export function useWorkflow(workflowId?: string) {
     validateWorkflow,
     saveDraft,
     clearDraft,
+    hasDraft,
+    restoreDraft,
+    enableAutoSave,
   }
 }

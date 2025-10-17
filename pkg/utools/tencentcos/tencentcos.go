@@ -1,7 +1,7 @@
 package tencentcos
 
 import (
-	"auto-forge/pkg/config"
+	toolConfigService "auto-forge/internal/services/tool_config"
 	"auto-forge/pkg/utools"
 	"bytes"
 	"crypto/hmac"
@@ -27,7 +27,7 @@ func NewTencentCOSTool() *TencentCOSTool {
 		Code:        "tencent_cos",
 		Name:        "腾讯云 COS 上传",
 		Description: "上传文件到腾讯云对象存储服务",
-		Category:    "data",
+		Category:    utools.CategoryStorage,
 		Version:     "1.0.0",
 		Author:      "Cooper Team",
 		AICallable:  true,
@@ -95,20 +95,25 @@ func NewTencentCOSTool() *TencentCOSTool {
 func (t *TencentCOSTool) Execute(ctx *utools.ExecutionContext, toolConfig map[string]interface{}) (*utools.ExecutionResult, error) {
 	startTime := time.Now()
 
-	// 从配置文件加载 COS 配置
-	cfg := config.GetConfig()
-
-	if !cfg.TencentCOS.Enabled {
+	// 从数据库加载 COS 配置
+	dbConfig, err := toolConfigService.GetToolConfigForExecution("tencent_cos")
+	if err != nil {
 		return &utools.ExecutionResult{
 			Success:    false,
-			Message:    "腾讯云 COS 未启用",
-			Error:      "tencent_cos.enabled is false in config",
+			Message:    "腾讯云 COS 配置错误",
+			Error:      err.Error(),
 			DurationMs: time.Since(startTime).Milliseconds(),
-		}, fmt.Errorf("腾讯云 COS 未启用")
+		}, err
 	}
 
+	// 解析配置字段
+	secretID, _ := dbConfig["secret_id"].(string)
+	secretKey, _ := dbConfig["secret_key"].(string)
+	bucket, _ := dbConfig["bucket"].(string)
+	region, _ := dbConfig["region"].(string)
+
 	// 验证配置
-	if cfg.TencentCOS.SecretID == "" || cfg.TencentCOS.SecretKey == "" || cfg.TencentCOS.Bucket == "" || cfg.TencentCOS.Region == "" {
+	if secretID == "" || secretKey == "" || bucket == "" || region == "" {
 		return &utools.ExecutionResult{
 			Success:    false,
 			Message:    "腾讯云 COS 配置不完整",
@@ -173,7 +178,7 @@ func (t *TencentCOSTool) Execute(ctx *utools.ExecutionContext, toolConfig map[st
 	}
 
 	// 上传到 COS
-	fileURL, err := t.uploadToCOS(&cfg.TencentCOS, cosPath, fileData)
+	fileURL, err := t.uploadToCOS(secretID, secretKey, bucket, region, cosPath, fileData)
 	if err != nil {
 		return &utools.ExecutionResult{
 			Success:    false,
@@ -188,7 +193,7 @@ func (t *TencentCOSTool) Execute(ctx *utools.ExecutionContext, toolConfig map[st
 		"url":         fileURL,
 		"filename":    filepath.Base(filePath),
 		"size":        fileInfo.Size(),
-		"bucket":      cfg.TencentCOS.Bucket,
+		"bucket":      bucket,
 		"uploaded_at": time.Now().Format(time.RFC3339),
 	}
 
@@ -204,9 +209,9 @@ func (t *TencentCOSTool) Execute(ctx *utools.ExecutionContext, toolConfig map[st
 	}, nil
 }
 
-func (t *TencentCOSTool) uploadToCOS(cosConfig *config.TencentCOSConfig, objectKey string, data []byte) (string, error) {
+func (t *TencentCOSTool) uploadToCOS(secretID, secretKey, bucket, region, objectKey string, data []byte) (string, error) {
 	// 构建 COS URL
-	host := fmt.Sprintf("%s.cos.%s.myqcloud.com", cosConfig.Bucket, cosConfig.Region)
+	host := fmt.Sprintf("%s.cos.%s.myqcloud.com", bucket, region)
 	uploadURL := fmt.Sprintf("https://%s/%s", host, objectKey)
 
 	// 创建请求
@@ -222,7 +227,7 @@ func (t *TencentCOSTool) uploadToCOS(cosConfig *config.TencentCOSConfig, objectK
 	req.Header.Set("Host", host)
 
 	// 生成签名
-	authorization := t.generateAuthorization(cosConfig, req, objectKey)
+	authorization := t.generateAuthorization(secretID, secretKey, req, objectKey)
 	req.Header.Set("Authorization", authorization)
 
 	// 发送请求
@@ -241,7 +246,7 @@ func (t *TencentCOSTool) uploadToCOS(cosConfig *config.TencentCOSConfig, objectK
 	return uploadURL, nil
 }
 
-func (t *TencentCOSTool) generateAuthorization(cosConfig *config.TencentCOSConfig, req *http.Request, objectKey string) string {
+func (t *TencentCOSTool) generateAuthorization(secretID, secretKey string, req *http.Request, objectKey string) string {
 	// 腾讯云 COS 签名算法
 	now := time.Now()
 	expiredTime := now.Add(time.Hour)
@@ -253,7 +258,7 @@ func (t *TencentCOSTool) generateAuthorization(cosConfig *config.TencentCOSConfi
 	keyTime := signTime
 
 	// 计算 SignKey
-	signKey := t.hmacSha1(cosConfig.SecretKey, keyTime)
+	signKey := t.hmacSha1(secretKey, keyTime)
 
 	// HttpString
 	httpMethod := strings.ToLower(req.Method)
@@ -271,7 +276,7 @@ func (t *TencentCOSTool) generateAuthorization(cosConfig *config.TencentCOSConfi
 
 	// Authorization
 	authorization := fmt.Sprintf("q-sign-algorithm=sha1&q-ak=%s&q-sign-time=%s&q-key-time=%s&q-header-list=%s&q-url-param-list=%s&q-signature=%s",
-		cosConfig.SecretID,
+		secretID,
 		signTime,
 		keyTime,
 		t.getHeaderList(req.Header),

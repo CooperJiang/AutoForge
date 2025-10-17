@@ -3,16 +3,7 @@
     <div class="flex items-center justify-between">
       <label class="text-sm font-medium text-text-secondary"> 错误重试 </label>
       <div class="flex items-center gap-2">
-        <input
-          v-model="localConfig.enabled"
-          type="checkbox"
-          :id="`retry-enabled-${uniqueId}`"
-          class="rounded border-slate-300 text-green-600 focus:ring-green-500"
-          @change="emitUpdate"
-        />
-        <label :for="`retry-enabled-${uniqueId}`" class="text-sm text-text-secondary">
-          启用自动重试
-        </label>
+        <BaseCheckbox v-model="localConfig.enabled" label="启用自动重试" @update:modelValue="emitUpdate" />
       </div>
     </div>
 
@@ -61,16 +52,7 @@
       </div>
 
       <div class="flex items-center gap-2">
-        <input
-          v-model="localConfig.exponentialBackoff"
-          type="checkbox"
-          :id="`exponential-${uniqueId}`"
-          class="rounded border-slate-300 text-green-600 focus:ring-green-500"
-          @change="emitUpdate"
-        />
-        <label :for="`exponential-${uniqueId}`" class="text-sm text-text-secondary">
-          使用指数退避策略
-        </label>
+        <BaseCheckbox v-model="localConfig.exponentialBackoff" label="使用指数退避策略" @update:modelValue="emitUpdate" />
       </div>
 
       <div v-if="localConfig.exponentialBackoff" class="bg-bg-hover rounded-lg p-3 text-xs">
@@ -88,6 +70,7 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'
 import BaseInput from '@/components/BaseInput'
+import BaseCheckbox from '@/components/BaseCheckbox/index.vue'
 import type { NodeRetryConfig } from '@/types/workflow'
 
 interface Props {

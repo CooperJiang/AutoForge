@@ -27,7 +27,7 @@ func NewFeishuTool() *FeishuTool {
         Code:        "feishu_bot",
         Name:        "飞书机器人",
         Description: "通过飞书机器人 Webhook 发送消息通知，支持文本、富文本、图片和卡片消息",
-        Category:    "notification",
+        Category:    utools.CategoryNotification,
         Version:     "1.0.0",
         Author:      "AutoForge",
         AICallable:  true,

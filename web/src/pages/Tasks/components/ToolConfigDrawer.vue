@@ -260,27 +260,11 @@
       </div>
 
       <div class="flex items-center gap-2">
-        <input
-          type="checkbox"
-          v-model="healthConfig.use_regex"
-          id="use_regex"
-          class="rounded border-slate-300"
-        />
-        <label for="use_regex" class="text-sm text-text-secondary cursor-pointer">
-          使用正则表达式匹配
-        </label>
+        <BaseCheckbox v-model="healthConfig.use_regex" label="使用正则表达式匹配" />
       </div>
 
       <div class="flex items-center gap-2">
-        <input
-          type="checkbox"
-          v-model="healthConfig.check_ssl"
-          id="check_ssl"
-          class="rounded border-slate-300"
-        />
-        <label for="check_ssl" class="text-sm text-text-secondary cursor-pointer">
-          检查 SSL 证书有效期
-        </label>
+        <BaseCheckbox v-model="healthConfig.check_ssl" label="检查 SSL 证书有效期" />
       </div>
 
       <div v-if="healthConfig.check_ssl">
@@ -289,32 +273,63 @@
       </div>
 
       <div class="flex items-center gap-2">
-        <input
-          type="checkbox"
-          v-model="healthConfig.follow_redirects"
-          id="follow_redirects"
-          class="rounded border-slate-300"
-        />
-        <label for="follow_redirects" class="text-sm text-text-secondary cursor-pointer">
-          跟随重定向
-        </label>
+        <BaseCheckbox v-model="healthConfig.follow_redirects" label="跟随重定向" />
       </div>
 
       <div class="flex items-center gap-2">
-        <input
-          type="checkbox"
-          v-model="healthConfig.verify_ssl"
-          id="verify_ssl"
-          class="rounded border-slate-300"
-        />
-        <label for="verify_ssl" class="text-sm text-text-secondary cursor-pointer">
-          验证 SSL 证书有效性
-        </label>
+        <BaseCheckbox v-model="healthConfig.verify_ssl" label="验证 SSL 证书有效性" />
       </div>
     </div>
 
     <div v-else-if="toolCode === 'feishu_bot'" class="space-y-4">
       <FeishuBotConfig :config="feishuConfig" @update:config="feishuConfig = $event" />
+    </div>
+
+    <div v-else-if="toolCode === 'file_downloader'" class="space-y-4">
+      <div>
+        <label class="block text-sm font-medium text-text-secondary mb-2">
+          下载链接 <span class="text-red-500">*</span>
+        </label>
+        <BaseInput v-model="downloaderConfig.url" placeholder="https://example.com/file.png" />
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium text-text-secondary mb-2"> 请求头（可选） </label>
+        <div class="space-y-2">
+          <ParamInput
+            v-for="(header, index) in downloaderHeaders"
+            :key="index"
+            :param="header"
+            key-placeholder="Header名称"
+            value-placeholder="Header值"
+            @update:param="(p) => updateDownloaderHeader(index, p)"
+            @remove="removeDownloaderHeader(index)"
+          />
+          <button
+            type="button"
+            @click="addDownloaderHeader"
+            class="w-full py-2 text-sm text-text-secondary border-2 border-dashed border-slate-300 rounded-lg hover:border-slate-400 hover:text-text-secondary transition-colors"
+          >
+            + 添加请求头
+          </button>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-2 gap-3">
+        <div>
+          <label class="block text-sm font-medium text-text-secondary mb-2"> 自定义文件名（可选） </label>
+          <BaseInput v-model="downloaderConfig.filename" placeholder="my-file.png" />
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-text-secondary mb-2"> 超时时间（秒） </label>
+          <BaseInput v-model.number="downloaderConfig.timeout" type="number" min="1" placeholder="60" />
+        </div>
+      </div>
+
+      <div class="flex items-center gap-4">
+        <BaseCheckbox v-model="downloaderConfig.verify_ssl" label="验证 SSL 证书" />
+        <BaseCheckbox v-model="downloaderConfig.follow_redirects" label="跟随重定向" />
+      </div>
     </div>
 
     <div v-else class="text-center py-8 text-text-tertiary">该工具暂无需配置参数</div>
@@ -327,6 +342,7 @@ import Drawer from '@/components/Drawer'
 import BaseInput from '@/components/BaseInput'
 import BaseSelect from '@/components/BaseSelect'
 import ParamInput from '@/components/ParamInput'
+import BaseCheckbox from '@/components/BaseCheckbox/index.vue'
 import FeishuBotConfig from '@/components/tools/FeishuBotConfig/index.vue'
 import { message } from '@/utils/message'
 import { parseCurl } from '@/utils/curlParser'
@@ -375,6 +391,14 @@ interface HealthConfig {
   verify_ssl: boolean
 }
 
+interface DownloaderConfig {
+  url: string
+  filename: string
+  timeout: number
+  verify_ssl: boolean
+  follow_redirects: boolean
+}
+
 const props = defineProps<{
   modelValue: boolean
   toolCode: string
@@ -420,6 +444,15 @@ const healthConfig = ref<HealthConfig>({
   follow_redirects: true,
   verify_ssl: true,
 })
+
+const downloaderConfig = ref<DownloaderConfig>({
+  url: '',
+  filename: '',
+  timeout: 60,
+  verify_ssl: true,
+  follow_redirects: true,
+})
+const downloaderHeaders = ref<Param[]>([])
 
 const healthHeaders = ref<Param[]>([])
 const healthBody = ref('')
@@ -762,6 +795,19 @@ const handleSave = () => {
 
     // 直接发送 feishuConfig
     emit('update:config', feishuConfig.value as any)
+  } else if (props.toolCode === 'file_downloader') {
+    if (!downloaderConfig.value.url) {
+      message.error('请输入下载链接')
+      return
+    }
+    emit('update:config', {
+      url: downloaderConfig.value.url,
+      filename: downloaderConfig.value.filename,
+      timeout: downloaderConfig.value.timeout,
+      verify_ssl: downloaderConfig.value.verify_ssl,
+      follow_redirects: downloaderConfig.value.follow_redirects,
+      headers: downloaderHeaders.value,
+    } as any)
   }
 
   emit('save')

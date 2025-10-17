@@ -21,7 +21,7 @@ func NewJSONTransformTool() *JSONTransformTool {
 		Code:        "json_transform",
 		Name:        "JSON 转换",
 		Description: "基于变量系统和 JS 表达式动态转换数据",
-		Category:    "data",
+		Category:    utools.CategoryData,
 		Version:     "2.0.0",
 		Author:      "AutoForge",
 		AICallable:  true,

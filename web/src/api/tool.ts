@@ -18,7 +18,7 @@ export interface Tool {
   config_schema: string
   ai_callable: boolean
   enabled: boolean
-  tags: string
+  tags: string[]
   output_fields_schema?: Record<string, OutputFieldDef>
   created_at?: string
   updated_at?: string
@@ -39,5 +39,18 @@ export const describeToolOutput = async (code: string, config: Record<string, an
     `/api/v1/tools/${code}/describe-output`,
     config
   )
+  return response.data
+}
+
+export interface ToolCategory {
+  code: string
+  name: string
+  description: string
+  icon: string
+  tools: Tool[]
+}
+
+export const getToolsGroupedByCategory = async () => {
+  const response = await request.get<ToolCategory[]>('/api/v1/tools/grouped')
   return response.data
 }

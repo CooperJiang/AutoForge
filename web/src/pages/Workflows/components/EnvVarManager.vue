@@ -52,15 +52,7 @@
           </div>
           <div class="flex items-center justify-between pt-2">
             <div class="flex items-center gap-2">
-              <input
-                v-model="envVar.encrypted"
-                type="checkbox"
-                :id="`encrypted-${index}`"
-                class="rounded border-slate-300 text-green-600 focus:ring-green-500"
-              />
-              <label :for="`encrypted-${index}`" class="text-xs text-text-secondary">
-                敏感信息（加密存储）
-              </label>
+              <BaseCheckbox v-model="envVar.encrypted" label="敏感信息（加密存储）" />
             </div>
             <button
               type="button"
@@ -97,6 +89,7 @@ import { Eye, EyeOff } from 'lucide-vue-next'
 import Drawer from '@/components/Drawer'
 import BaseButton from '@/components/BaseButton'
 import BaseInput from '@/components/BaseInput'
+import BaseCheckbox from '@/components/BaseCheckbox/index.vue'
 import type { WorkflowEnvVar } from '@/types/workflow'
 import { message } from '@/utils/message'
 

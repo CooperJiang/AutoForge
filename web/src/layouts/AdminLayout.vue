@@ -4,14 +4,18 @@
 
     <div class="flex-1 overflow-y-auto">
       <router-view v-slot="{ Component }">
-        <component :is="Component" :active-tab="activeTab" @update:active-tab="activeTab = $event" />
+        <component
+          :is="Component"
+          :active-tab="activeTab"
+          @update:active-tab="activeTab = $event"
+        />
       </router-view>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import AdminHeader from '@/components/AdminHeader/index.vue'
 
@@ -27,6 +31,7 @@ const tabs = [
   { label: '用户管理', value: 'users' },
   { label: '工作流管理', value: 'workflows' },
   { label: '工作流分类', value: 'categories' },
+  { label: '工具管理', value: 'tools' },
 ]
 
 const handleTabChange = (value: string) => {
@@ -34,6 +39,16 @@ const handleTabChange = (value: string) => {
   // 更新 URL query 参数，保持 tab 状态
   router.push({ query: { tab: value } })
 }
+
+// 监听路由变化，同步 activeTab
+watch(
+  () => route.query.tab,
+  (newTab) => {
+    if (newTab && typeof newTab === 'string') {
+      activeTab.value = newTab
+    }
+  }
+)
 
 onMounted(() => {
   // 确保初始状态也更新 URL

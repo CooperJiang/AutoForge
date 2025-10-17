@@ -14,6 +14,9 @@ import {
   Database,
   Upload,
   Cloud,
+  Download,
+  QrCode,
+  Bot,
 } from 'lucide-vue-next'
 
 export interface ToolUsageItem {
@@ -33,6 +36,21 @@ export interface ToolConfig {
 }
 
 export const TOOL_CONFIGS: Record<string, ToolConfig> = {
+  file_downloader: {
+    code: 'file_downloader',
+    title: '⬇️ 文件下载器',
+    description: 'Download a file from URL and produce a file object for later steps',
+    icon: Download,
+    iconBg: 'bg-gradient-to-br from-slate-500 to-slate-700',
+    usageTitle: 'File Downloader',
+    usageDescription: '从 URL 下载文件并生成文件对象，便于后续上传到图床/OSS/COS 等工具。',
+    usageItems: [
+      { text: '支持自定义请求头、超时时间、SSL 校验与重定向' },
+      { text: '自动推断文件名（可覆盖）与 MIME 类型' },
+      { text: '输出规范“文件对象”，可直接传入上传类工具的 file 字段' },
+    ],
+    tags: ['download', 'file', 'http', 'storage'],
+  },
   http_request: {
     code: 'http_request',
     title: '📡 HTTP 请求工具',
@@ -285,6 +303,43 @@ export const TOOL_CONFIGS: Record<string, ToolConfig> = {
       { text: '适用场景：文件存储、图片管理、视频上传、文档分发等' },
     ],
     tags: ['Storage', 'Upload', 'Tencent', 'COS', 'Cloud'],
+  },
+
+  qrcode_generator: {
+    code: 'qrcode_generator',
+    title: '二维码生成',
+    description: '生成二维码图片，支持自定义尺寸和错误纠正级别，可输出 Base64 或文件对象',
+    icon: QrCode,
+    iconBg: 'bg-gradient-to-br from-indigo-500 to-purple-600',
+    usageTitle: 'QR Code Generator',
+    usageDescription: '快速生成二维码图片，支持 Base64 编码或文件对象输出。',
+    usageItems: [
+      { text: '支持任意文本内容（URL、文本、vCard 等）' },
+      { text: '可自定义图片尺寸（64-2048px）' },
+      { text: '支持 4 种错误纠正级别（Low/Medium/High/Highest）' },
+      { text: 'Base64 模式：直接显示图片；File 模式：输出文件对象可传递给上传工具' },
+      { text: '适用场景：链接分享、名片生成、活动推广、支付码等' },
+    ],
+    tags: ['QRCode', 'Image', 'Generator', 'Utility', 'Marketing'],
+  },
+
+  gemini_chat: {
+    code: 'gemini_chat',
+    title: 'Gemini AI 对话',
+    description: '使用 Google Gemini AI 模型进行智能对话、内容生成和图像理解',
+    icon: Bot,
+    iconBg: 'bg-gradient-to-br from-blue-500 to-cyan-600',
+    usageTitle: 'Gemini AI Chat',
+    usageDescription: '调用 Google Gemini AI 进行智能对话、文本生成、内容分析、图像理解等任务。',
+    usageItems: [
+      { text: '支持自定义模型名称，可使用变量，适应未来新模型' },
+      { text: '支持图片输入（vision 模型），可分析图片内容' },
+      { text: '可自定义系统指令，设定 AI 的角色和行为' },
+      { text: '支持调节温度、Top-P、Top-K 等参数控制输出' },
+      { text: '支持自定义 Token 限制，适应不同模型' },
+      { text: '适用场景：文本生成、内容分析、智能问答、代码生成、创意写作、图像理解等' },
+    ],
+    tags: ['AI', 'Gemini', 'LLM', 'Google', 'Chat', 'NLP', 'Vision'],
   },
 }
 

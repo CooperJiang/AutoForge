@@ -24,7 +24,7 @@ func NewHtmlRenderTool() *HtmlRenderTool {
 		Code:        "html_render",
 		Name:        "HTML 内容保存",
 		Description: "将 HTML 内容保存为网页文件并生成可访问的 URL，支持分享和预览",
-		Category:    "utility",
+		Category:    utools.CategoryUtility,
 		Version:     "1.0.0",
 		Author:      "AutoForge",
 		AICallable:  true,

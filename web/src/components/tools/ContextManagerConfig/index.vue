@@ -105,11 +105,7 @@
       </div>
 
       <div class="flex items-center gap-2">
-        <input
-          type="checkbox"
-          v-model="localConfig.clear_history"
-          class="w-4 h-4 text-primary bg-bg-elevated border-border-primary rounded focus:ring-primary"
-        />
+        <BaseCheckbox v-model="localConfig.clear_history" />
         <label class="text-sm text-text-secondary"> 执行前清空历史记录（用于重新开始对话） </label>
       </div>
     </div>
@@ -129,6 +125,7 @@
 import { ref, watch, nextTick } from 'vue'
 import BaseInput from '@/components/BaseInput'
 import BaseSelect from '@/components/BaseSelect'
+import BaseCheckbox from '@/components/BaseCheckbox/index.vue'
 import type { WorkflowNode, WorkflowEnvVar } from '@/types/workflow'
 
 interface Props {

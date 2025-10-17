@@ -108,13 +108,7 @@
           />
         </div>
         <div v-if="editingCategory" class="flex items-center space-x-2">
-          <input
-            type="checkbox"
-            id="is_active"
-            v-model="form.is_active"
-            class="w-4 h-4 rounded border-border-primary text-green-600 focus:ring-green-500"
-          />
-          <label for="is_active" class="text-sm font-medium text-text-primary">启用此分类</label>
+          <BaseCheckbox v-model="form.is_active" label="启用此分类" />
         </div>
       </div>
     </Dialog>
@@ -142,6 +136,7 @@ import BaseInput from '@/components/BaseInput'
 import BaseSelect from '@/components/BaseSelect'
 import Pagination from '@/components/Pagination'
 import Dialog from '@/components/Dialog'
+import BaseCheckbox from '@/components/BaseCheckbox/index.vue'
 
 const loading = ref(false)
 const categories = ref<TemplateCategory[]>([])

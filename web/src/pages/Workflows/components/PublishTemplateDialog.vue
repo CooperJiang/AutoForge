@@ -69,15 +69,7 @@
       </div>
 
       <div class="flex items-center gap-2">
-        <input
-          id="is_featured"
-          v-model="form.is_featured"
-          type="checkbox"
-          class="w-4 h-4 rounded border-border-primary text-primary focus:ring-primary"
-        />
-        <label for="is_featured" class="text-sm text-text-primary cursor-pointer">
-          设为精选模板
-        </label>
+        <BaseCheckbox v-model="form.is_featured" label="设为精选模板" />
       </div>
     </div>
 
@@ -98,6 +90,7 @@ import Dialog from '@/components/Dialog'
 import BaseButton from '@/components/BaseButton'
 import BaseInput from '@/components/BaseInput'
 import BaseSelect from '@/components/BaseSelect'
+import BaseCheckbox from '@/components/BaseCheckbox/index.vue'
 import { templateApi } from '@/api/template'
 import type { TemplateCategory } from '@/api/template'
 import { message } from '@/utils/message'

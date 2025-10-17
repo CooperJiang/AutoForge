@@ -5,7 +5,7 @@ import (
 	"auto-forge/internal/middleware"
 	"auto-forge/internal/routes"
 	taskService "auto-forge/internal/services/task"
-	toolService "auto-forge/internal/services/tool"
+	toolConfigService "auto-forge/internal/services/tool_config"
 	uploadService "auto-forge/internal/services/upload"
 	"auto-forge/internal/services/user"
 	"auto-forge/pkg/cache"
@@ -22,14 +22,17 @@ import (
 	// 导入工具包以触发工具注册
 	_ "auto-forge/pkg/utools/aliyunoss"
 	_ "auto-forge/pkg/utools/context"
+	_ "auto-forge/pkg/utools/downloader"
 	_ "auto-forge/pkg/utools/email"
 	_ "auto-forge/pkg/utools/feishu"
 	_ "auto-forge/pkg/utools/formatter"
+	_ "auto-forge/pkg/utools/gemini"
 	_ "auto-forge/pkg/utools/health"
 	_ "auto-forge/pkg/utools/http"
 	_ "auto-forge/pkg/utools/jsontransform"
 	_ "auto-forge/pkg/utools/openai"
 	_ "auto-forge/pkg/utools/pixelpunk"
+	_ "auto-forge/pkg/utools/qrcode"
 	_ "auto-forge/pkg/utools/tencentcos"
 	_ "auto-forge/pkg/utools/web"
 )
@@ -57,9 +60,6 @@ func main() {
 	user.InitUserService()
 	uploadService.InitUploadService()
 
-	// 初始化工具服务
-	toolService.InitToolService()
-
 	// 初始化任务服务（必须在 cron 之前）
 	taskService.InitTaskService()
 
@@ -86,6 +86,14 @@ func main() {
 
 	// 注册路由
 	routes.RegisterRoutes(r)
+
+	// 同步工具定义到数据库
+	syncService := toolConfigService.NewToolConfigService()
+	if err := syncService.SyncToolsFromRegistry(); err != nil {
+		logger.Error("同步工具定义失败: %v", err)
+	} else {
+		logger.Info("工具定义已同步到数据库")
+	}
 
 	// 启动服务器
 	logger.Info("服务启动成功，监听端口: %d，版本: %s", config.GetConfig().App.Port, appVersion)

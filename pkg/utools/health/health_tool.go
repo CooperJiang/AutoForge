@@ -23,7 +23,7 @@ func NewHealthCheckerTool() *HealthCheckerTool {
         Code:        "health_checker",
         Name:        "网站健康检查",
         Description: "检查网站/API的可用性、响应时间、状态码和内容匹配",
-        Category:    "monitoring",
+        Category:    utools.CategoryMonitoring,
         Version:     "1.0.0",
         Author:      "AutoForge",
         AICallable:  true,

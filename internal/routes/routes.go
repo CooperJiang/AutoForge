@@ -48,6 +48,9 @@ func RegisterRoutes(r *gin.Engine) {
 		// 工具相关路由
 		RegisterToolRoutes(version)
 
+		// 工具配置路由
+		RegisterToolConfigRoutes(r)
+
 		// 工作流相关路由
 		RegisterWorkflowRoutes(version)
 

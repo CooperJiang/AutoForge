@@ -210,12 +210,26 @@
           v-else-if="node.toolCode === 'pixelpunk_upload'"
           v-model:config="localNode.config"
         />
+        <FileDownloaderConfig
+          v-else-if="node.toolCode === 'file_downloader'"
+          v-model:config="localNode.config"
+          :previous-nodes="props.previousNodes"
+          :env-vars="props.envVars"
+        />
         <AliyunOSSConfig
           v-else-if="node.toolCode === 'aliyun_oss'"
           v-model:config="localNode.config"
         />
         <TencentCOSConfig
           v-else-if="node.toolCode === 'tencent_cos'"
+          v-model:config="localNode.config"
+        />
+        <QRCodeConfig
+          v-else-if="node.toolCode === 'qrcode_generator'"
+          v-model:config="localNode.config"
+        />
+        <GeminiConfig
+          v-else-if="node.toolCode === 'gemini_chat'"
           v-model:config="localNode.config"
         />
       </div>
@@ -434,9 +448,12 @@ import HtmlRenderConfig from '@/components/tools/HtmlRenderConfig/index.vue'
 import RedisContextConfig from '@/components/tools/RedisContextConfig/index.vue'
 import ContextManagerConfig from '@/components/tools/ContextManagerConfig/index.vue'
 import PixelPunkUploadConfig from '@/components/tools/PixelPunkUploadConfig/index.vue'
+import FileDownloaderConfig from '@/components/tools/FileDownloaderConfig/index.vue'
 import TriggerConfig from '@/components/tools/TriggerConfig/index.vue'
 import AliyunOSSConfig from '@/components/tools/AliyunOSSConfig/index.vue'
 import TencentCOSConfig from '@/components/tools/TencentCOSConfig/index.vue'
+import QRCodeConfig from '@/components/tools/QRCodeConfig/index.vue'
+import GeminiConfig from '@/components/tools/GeminiConfig/index.vue'
 import ConditionConfig from '@/components/tools/ConditionConfig/index.vue'
 import DelayConfig from '@/components/tools/DelayConfig/index.vue'
 import SwitchConfig from '@/components/tools/SwitchConfig/index.vue'

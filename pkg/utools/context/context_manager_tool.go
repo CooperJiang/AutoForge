@@ -28,7 +28,7 @@ func NewContextManagerTool() *ContextManagerTool {
 		Code:        "context_manager",
 		Name:        "对话上下文管理器",
 		Description: "管理多轮对话的上下文历史，支持准备消息（prepare）和保存消息（persist）两种模式",
-		Category:    "data",
+		Category:    utools.CategoryData,
 		Version:     "1.0.0",
 		Author:      "AutoForge",
 		AICallable:  false,

@@ -15,7 +15,7 @@
         ref="imageRef"
         :src="src"
         :alt="alt"
-        class="absolute left-0 top-0 select-none"
+        class="absolute left-1/2 top-1/2 select-none"
         :style="imageStyle"
         @click.stop
         @dblclick.stop="$emit('dblclick')"

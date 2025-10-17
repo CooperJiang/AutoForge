@@ -99,6 +99,11 @@ func InitDB() {
 		log.Fatal("创建 root 用户失败: %v", err)
 	}
 
+	// 同步工具定义到数据库
+	if err := syncToolsToDatabase(); err != nil {
+		log.Error("同步工具定义失败: %v", err)
+	}
+
 	log.Info("数据库连接成功")
 }
 
@@ -121,6 +126,8 @@ func autoMigrate() error {
 		&models.WorkflowTemplate{},
 		&models.TemplateInstall{},
 		&models.TemplateCategory{},
+		// 工具配置模型
+		&models.ToolConfig{},
 		// 在这里添加其他模型
 	)
 }
@@ -157,6 +164,15 @@ func createRootUserIfNotExists() error {
 // runDataMigrations 执行数据迁移
 func runDataMigrations() error {
 	return migrations.RunAllMigrations(db)
+}
+
+// syncToolsToDatabase 同步工具定义到数据库
+func syncToolsToDatabase() error {
+	// 注意：这里不能直接导入 tool_config service，会造成循环依赖
+	// 所以我们在这里直接调用同步逻辑
+	// 实际同步会在应用完全启动后通过 HTTP API 手动触发
+	log.Info("工具定义将在应用启动后自动同步到数据库")
+	return nil
 }
 
 // Close 关闭数据库连接

@@ -262,15 +262,7 @@
           </p>
         </div>
         <div class="flex items-center space-x-2">
-          <input
-            type="checkbox"
-            id="is_featured"
-            v-model="form.is_featured"
-            class="w-4 h-4 rounded border-border-primary text-green-600 focus:ring-green-500"
-          />
-          <label for="is_featured" class="text-sm font-medium text-text-primary">
-            设为精选
-          </label>
+          <BaseCheckbox v-model="form.is_featured" label="设为精选" />
         </div>
         <div>
           <label class="block text-sm font-medium text-text-primary mb-2">状态</label>
@@ -305,6 +297,7 @@ import { message } from '@/utils/message'
 import BaseButton from '@/components/BaseButton'
 import BaseInput from '@/components/BaseInput'
 import BaseSelect from '@/components/BaseSelect'
+import BaseCheckbox from '@/components/BaseCheckbox/index.vue'
 import Pagination from '@/components/Pagination'
 import RadioGroup from '@/components/RadioGroup/index.vue'
 import Dialog from '@/components/Dialog'

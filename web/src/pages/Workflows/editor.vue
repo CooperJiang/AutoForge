@@ -3,12 +3,15 @@
     <div
       class="bg-bg-elevated border-b border-border-primary px-6 py-3 flex items-center justify-between flex-shrink-0"
     >
-      <div class="flex items-center gap-4">
-        <BaseButton size="sm" variant="ghost" @click="handleBack" class="shrink-0">
-          <ArrowLeft class="w-4 h-4" />
-        </BaseButton>
+      <div class="flex items-center gap-3">
+        <button
+          @click="handleBack"
+          class="shrink-0 h-[34px] w-[34px] flex items-center justify-center rounded-md bg-bg-hover border border-border-primary hover:bg-bg-tertiary hover:border-slate-300 transition-all duration-200 cursor-pointer"
+        >
+          <ArrowLeft class="w-4 h-4 text-text-secondary" />
+        </button>
         <div
-          class="input-wrapper flex items-center gap-2 px-2.5 py-1 rounded-md bg-bg-hover border border-border-primary hover:border-slate-300 transition-all duration-200"
+          class="input-wrapper flex items-center gap-2 px-3 h-[34px] rounded-md bg-bg-hover border border-border-primary hover:border-slate-300 transition-all duration-200"
         >
           <Workflow class="w-3.5 h-3.5 text-text-placeholder shrink-0" />
           <input
@@ -21,6 +24,20 @@
             @blur="$event.target.parentElement.classList.remove('input-focused')"
           />
         </div>
+
+        <div class="h-6 w-px bg-bg-tertiary"></div>
+
+        <!-- 执行历史快捷按钮 -->
+        <Tooltip :text="workflow.id ? '查看执行历史' : '请先保存工作流'" position="bottom">
+          <BaseButton
+            size="sm"
+            variant="ghost"
+            @click="workflow.id && router.push(`/workflows/${workflow.id}/executions`)"
+            :disabled="!workflow.id"
+          >
+            <History class="w-4 h-4" />
+          </BaseButton>
+        </Tooltip>
       </div>
       <div class="flex items-center gap-3">
         <div
@@ -247,6 +264,7 @@ import {
   Trash2,
   Globe,
   Package,
+  History,
 } from 'lucide-vue-next'
 import BaseButton from '@/components/BaseButton'
 import ConfirmDialog from '@/components/ConfirmDialog'
@@ -320,6 +338,9 @@ const {
   validateWorkflow,
   loadWorkflow: loadWorkflowData,
   clearDraft,
+  hasDraft,
+  restoreDraft,
+  enableAutoSave,
 } = useWorkflow(workflowId.value)
 const { project, viewport, setViewport } = useVueFlow()
 
@@ -360,10 +381,16 @@ const isAdmin = computed(() => {
 // 追踪是否有未保存的更改
 const hasUnsavedChanges = ref(false)
 
+// 是否正在加载数据（防止加载时触发 watch）
+// 初始值为 true，防止页面初始化时的 watch 触发
+const isLoadingData = ref(true)
+
 // 监听数据变化，标记为有未保存的更改
 watch(
   [nodes, edges, workflow, envVars],
   () => {
+    // 如果正在加载数据，不标记为有更改
+    if (isLoadingData.value) return
     hasUnsavedChanges.value = true
   },
   { deep: true }
@@ -426,6 +453,9 @@ const syncToVueFlow = () => {
 watch(
   [vueFlowNodes, vueFlowEdges],
   () => {
+    // 如果正在加载数据，不触发更新（避免循环触发）
+    if (isLoadingData.value) return
+
     nodes.value = vueFlowNodes.value.map((node) => ({
       ...node.data,
       position: node.position,
@@ -686,7 +716,11 @@ const handleSave = async () => {
       message.success('工作流已更新')
       // 保存成功后清除草稿和未保存标记
       clearDraft()
+      // 暂时阻止 watch 触发
+      isLoadingData.value = true
       hasUnsavedChanges.value = false
+      await nextTick()
+      isLoadingData.value = false
     } else {
       // 创建新工作流
       const { workflowApi } = await import('@/api/workflow')
@@ -694,7 +728,11 @@ const handleSave = async () => {
       message.success('工作流已创建')
       // 清除创建页面的草稿和未保存标记
       clearDraft()
+      // 暂时阻止 watch 触发
+      isLoadingData.value = true
       hasUnsavedChanges.value = false
+      await nextTick()
+      isLoadingData.value = false
       // 更新 workflow 对象的 id
       workflow.value.id = data.id
       // 跳转到编辑页面
@@ -769,13 +807,17 @@ const handleExecute = async () => {
 }
 
 // 执行工作流（带参数）
-const executeWorkflow = async (params: Record<string, any>) => {
+const executeWorkflow = async (params: Record<string, any> | FormData) => {
   const workflowId = route.params.id as string
 
   try {
     message.info('正在执行工作流...')
     const { workflowApi } = await import('@/api/workflow')
-    const data = await workflowApi.execute(workflowId, { params })
+    // 如果是 FormData，直接传递；否则包装成 {params}
+    const data = await workflowApi.execute(
+      workflowId,
+      params instanceof FormData ? params : { params }
+    )
     message.success('工作流已开始执行')
     showExecuteDialog.value = false
     // 跳转到执行详情
@@ -830,7 +872,7 @@ const exportWorkflowData = computed(() => {
 })
 
 // 处理导入数据
-const handleImportData = (data: any) => {
+const handleImportData = async (data: any) => {
   // 导入数据
   workflow.value = {
     name: data.name || '导入的工作流',
@@ -844,7 +886,10 @@ const handleImportData = (data: any) => {
   // 同步到画布
   syncToVueFlow()
 
-  // 标记为有未保存的更改
+  // 导入后暂时阻止 watch，然后标记为有未保存的更改
+  isLoadingData.value = true
+  await nextTick()
+  isLoadingData.value = false
   hasUnsavedChanges.value = true
 
   message.success('工作流已导入')
@@ -854,12 +899,62 @@ const handleImportData = (data: any) => {
 const loadWorkflow = async () => {
   const currentWorkflowId = workflowId.value
   if (!currentWorkflowId || currentWorkflowId === 'create') {
-    // 创建模式，直接显示 VueFlow
+    // 创建模式，检查是否有草稿
+    if (hasDraft()) {
+      const loadDraft = await confirm({
+        title: '检测到草稿',
+        message: '检测到有未保存的草稿，是否恢复？',
+        variant: 'question',
+        confirmText: '恢复草稿',
+        cancelText: '放弃草稿',
+      })
+
+      if (loadDraft) {
+        // 恢复草稿（restoreDraft 内部会启用自动保存）
+        // isLoadingData 已经是 true，不需要再设置
+        restoreDraft()
+        await nextTick()
+        syncToVueFlow()
+        hasUnsavedChanges.value = true
+
+        // 等待 VueFlow 稳定
+        await new Promise((resolve) => setTimeout(resolve, 100))
+        isLoadingData.value = false
+        await nextTick()
+
+        message.success('草稿已恢复')
+      } else {
+        // 放弃草稿，清除它
+        clearDraft()
+        message.info('草稿已清除')
+
+        // 等待初始化完成
+        await new Promise((resolve) => setTimeout(resolve, 100))
+        isLoadingData.value = false
+        await nextTick()
+
+        // 放弃草稿后，启用自动保存（用户可能会创建新的工作流）
+        enableAutoSave()
+      }
+    } else {
+      // 没有草稿，等待初始化完成
+      await new Promise((resolve) => setTimeout(resolve, 100))
+      isLoadingData.value = false
+      await nextTick()
+
+      // 启用自动保存（用户开始创建新工作流）
+      enableAutoSave()
+    }
+
+    // 显示 VueFlow
     isVueFlowReady.value = true
     return
   }
 
   try {
+    // 设置加载标志，阻止 watch 触发
+    isLoadingData.value = true
+
     const { workflowApi } = await import('@/api/workflow')
     const data = await workflowApi.getById(currentWorkflowId)
 
@@ -888,14 +983,25 @@ const loadWorkflow = async () => {
       })
     }
 
-    // 加载完成后，再次使用 nextTick 确保所有响应式更新完成后再重置标记
+    // 加载完成后，重置标记
     await nextTick()
     hasUnsavedChanges.value = false
+
+    // 延迟解除加载标志，等待 VueFlow 完成所有内部更新（布局、位置等）
+    await new Promise((resolve) => setTimeout(resolve, 100))
+
+    isLoadingData.value = false
+
+    // 再等一个 tick，确保所有 watch 执行完毕
+    await nextTick()
+
+    enableAutoSave()
   } catch (error: any) {
     console.error('Load workflow failed:', error)
     message.error('加载工作流失败')
     // 即使加载失败，也显示 VueFlow
     isVueFlowReady.value = true
+    isLoadingData.value = false
   }
 }
 
@@ -919,7 +1025,8 @@ const handleSaveAndLeave = async () => {
 
 const handleDiscardAndLeave = () => {
   showLeaveDialog.value = false
-  // 清除未保存标记并返回
+  // 放弃更改，清除草稿和未保存标记
+  clearDraft()
   hasUnsavedChanges.value = false
   isLeavingConfirmed.value = true
   router.back()

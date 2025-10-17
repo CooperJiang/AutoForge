@@ -18,20 +18,16 @@ const (
 
 // Config 应用配置结构
 type Config struct {
-	App        AppConfig        `yaml:"app" env:"APP"`
-	Admin      AdminConfig      `yaml:"admin" env:"ADMIN"`
-	Database   DatabaseConfig   `yaml:"database" env:"DB"`
-	Redis      RedisConfig      `yaml:"redis" env:"REDIS"`
-	JWT        JWTConfig        `yaml:"jwt" env:"JWT"`
-	Log        LogConfig        `yaml:"log" env:"LOG"`
-	Mail       MailConfig       `yaml:"mail" env:"MAIL"`
-	CORS       CORSConfig       `yaml:"cors" env:"CORS"`
-	Frontend   FrontendConfig   `yaml:"frontend" env:"FRONTEND"`
-	OAuth2     OAuth2Config     `yaml:"oauth2" env:"OAUTH2"`
-	OpenAI     OpenAIConfig     `yaml:"openai" env:"OPENAI"`
-	PixelPunk  PixelPunkConfig  `yaml:"pixelpunk" env:"PIXELPUNK"`
-	AliyunOSS  AliyunOSSConfig  `yaml:"aliyun_oss" env:"ALIYUN_OSS"`
-	TencentCOS TencentCOSConfig `yaml:"tencent_cos" env:"TENCENT_COS"`
+	App      AppConfig      `yaml:"app" env:"APP"`
+	Admin    AdminConfig    `yaml:"admin" env:"ADMIN"`
+	Database DatabaseConfig `yaml:"database" env:"DB"`
+	Redis    RedisConfig    `yaml:"redis" env:"REDIS"`
+	JWT      JWTConfig      `yaml:"jwt" env:"JWT"`
+	Log      LogConfig      `yaml:"log" env:"LOG"`
+	Mail     MailConfig     `yaml:"mail" env:"MAIL"`
+	CORS     CORSConfig     `yaml:"cors" env:"CORS"`
+	Frontend FrontendConfig `yaml:"frontend" env:"FRONTEND"`
+	OAuth2   OAuth2Config   `yaml:"oauth2" env:"OAUTH2"`
 }
 
 // AppConfig 应用基础配置
@@ -152,39 +148,6 @@ type GitHubOAuth2Config struct {
 	ClientSecret string `yaml:"client_secret" env:"CLIENT_SECRET"`
 	RedirectURL  string `yaml:"redirect_url" env:"REDIRECT_URL"`
 	Enabled      bool   `yaml:"enabled" env:"ENABLED"`
-}
-
-// OpenAIConfig OpenAI配置
-type OpenAIConfig struct {
-	APIKey  string `yaml:"api_key" env:"API_KEY"`
-	APIBase string `yaml:"api_base" env:"API_BASE"`
-	Enabled bool   `yaml:"enabled" env:"ENABLED"`
-}
-
-// PixelPunkConfig PixelPunk图床配置
-type PixelPunkConfig struct {
-	BaseURL string `yaml:"base_url" env:"BASE_URL"`
-	APIKey  string `yaml:"api_key" env:"API_KEY"`
-	Enabled bool   `yaml:"enabled" env:"ENABLED"`
-}
-
-// AliyunOSSConfig 阿里云OSS配置
-type AliyunOSSConfig struct {
-	Endpoint        string `yaml:"endpoint" env:"ENDPOINT"`
-	AccessKeyID     string `yaml:"access_key_id" env:"ACCESS_KEY_ID"`
-	AccessKeySecret string `yaml:"access_key_secret" env:"ACCESS_KEY_SECRET"`
-	Bucket          string `yaml:"bucket" env:"BUCKET"`
-	Region          string `yaml:"region" env:"REGION"`
-	Enabled         bool   `yaml:"enabled" env:"ENABLED"`
-}
-
-// TencentCOSConfig 腾讯云COS配置
-type TencentCOSConfig struct {
-	SecretID  string `yaml:"secret_id" env:"SECRET_ID"`
-	SecretKey string `yaml:"secret_key" env:"SECRET_KEY"`
-	Bucket    string `yaml:"bucket" env:"BUCKET"`
-	Region    string `yaml:"region" env:"REGION"`
-	Enabled   bool   `yaml:"enabled" env:"ENABLED"`
 }
 
 var (

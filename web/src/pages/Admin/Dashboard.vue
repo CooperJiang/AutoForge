@@ -151,6 +151,10 @@
       <div v-show="activeTab === 'categories'">
         <CategoryManagement />
       </div>
+
+      <div v-show="activeTab === 'tools'">
+        <ToolManagement />
+      </div>
     </div>
 
     <Dialog
@@ -206,6 +210,7 @@ import TasksTab from './components/TasksTab.vue'
 import UsersTab from './UsersTab.vue'
 import TemplateManagement from './TemplateManagement.vue'
 import CategoryManagement from './CategoryManagement.vue'
+import ToolManagement from './ToolManagement.vue'
 
 // 统计数据
 const stats = ref<StatsResponse>({

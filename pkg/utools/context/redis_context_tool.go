@@ -20,7 +20,7 @@ func NewRedisContextTool() *RedisContextTool {
         Code:        "redis_context",
         Name:        "Redis 存储器",
         Description: "使用 Redis/内存缓存存取上下文数据，支持 get/set/delete 并可选 TTL",
-        Category:    "data",
+        Category:    utools.CategoryData,
         Version:     "1.0.0",
         Author:      "AutoForge",
         AICallable:  false,
