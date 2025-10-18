@@ -60,6 +60,9 @@ func RegisterRoutes(r *gin.Engine) {
 		// 模板市场路由
 		RegisterTemplateRoutes(version)
 
+		// Agent 对话路由
+		RegisterAgentRoutes(r)
+
 		// 在这里添加其他模块路由
 		// 例如：
 		// productRoutes := api.Group("/product")

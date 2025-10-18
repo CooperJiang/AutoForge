@@ -107,7 +107,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
-import { ListTodo, Wrench, Workflow, Settings, User, LogOut, Package } from 'lucide-vue-next'
+import { ListTodo, Wrench, Workflow, Settings, User, LogOut, Package, Bot } from 'lucide-vue-next'
 import SecureStorage, { STORAGE_KEYS } from '@/utils/storage'
 import { message } from '@/utils/message'
 
@@ -148,6 +148,7 @@ const isAdmin = computed(() => {
 
 // 通用菜单项（不需要分组的）
 const generalMenuItems = [
+  { path: '/agent', label: 'AI Agent', icon: Bot },
   { path: '/marketplace', label: '工作流市场', icon: Package },
   { path: '/tools', label: '工具箱市场', icon: Wrench },
 ]

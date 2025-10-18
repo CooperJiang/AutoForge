@@ -2,16 +2,21 @@ package pixelpunk
 
 import (
 	toolConfigService "auto-forge/internal/services/tool_config"
+	"auto-forge/pkg/agent/tooling"
 	log "auto-forge/pkg/logger"
 	"auto-forge/pkg/utools"
 	"bytes"
+	"crypto/tls"
 	"encoding/json"
 	"fmt"
 	"io"
 	"mime/multipart"
 	"net/http"
+	neturl "net/url"
 	"os"
 	"path/filepath"
+	"regexp"
+	"strings"
 	"time"
 )
 
@@ -51,9 +56,9 @@ func NewPixelPunkUploadTool() *PixelPunkUploadTool {
 	metadata := &utools.ToolMetadata{
 		Code:        "pixelpunk_upload",
 		Name:        "PixelPunk 图床上传",
-		Description: "上传图片到 PixelPunk 图床，返回 CDN URL",
+		Description: "上传图片到 PixelPunk 图床，支持文件对象或 URL，返回 CDN URL",
 		Category:    utools.CategoryStorage,
-		Version:     "1.0.0",
+		Version:     "1.1.0",
 		Author:      "Cooper Team",
 		AICallable:  true,
 		Tags:        []string{"image", "upload", "cdn", "storage", "pixelpunk"},
@@ -125,8 +130,14 @@ func NewPixelPunkUploadTool() *PixelPunkUploadTool {
 		Properties: map[string]utools.PropertySchema{
 			"file": {
 				Type:        "object",
-				Title:       "文件",
-				Description: "要上传的图片文件（从 external_trigger 接收的文件对象）",
+				Title:       "文件对象",
+				Description: "要上传的图片文件对象（与 url 二选一）",
+			},
+			"url": {
+				Type:        "string",
+				Title:       "图片 URL",
+				Description: "要上传的图片 URL，工具会自动下载后上传（与 file 二选一）",
+				Format:      "uri",
 			},
 			"access_level": {
 				Type:        "string",
@@ -154,7 +165,7 @@ func NewPixelPunkUploadTool() *PixelPunkUploadTool {
 				Default:     "",
 			},
 		},
-		Required: []string{"file"},
+		Required: []string{},
 	}
 
 	return &PixelPunkUploadTool{
@@ -191,26 +202,55 @@ func (t *PixelPunkUploadTool) Execute(ctx *utools.ExecutionContext, config map[s
 		}, fmt.Errorf("PixelPunk 配置不完整")
 	}
 
-	// 2. 获取文件对象
-	fileObj, ok := config["file"].(map[string]interface{})
-	if !ok {
+	// 2. 获取文件路径（支持 file 对象或 url）
+	var filePath string
+	var tempFile string // 用于记录临时文件，最后需要清理
+
+	// 优先检查 url 参数
+	if imageURL, ok := config["url"].(string); ok && imageURL != "" {
+		log.Info("从 URL 下载图片: %s", imageURL)
+		downloadedPath, err := t.downloadFromURL(imageURL)
+		if err != nil {
+			return &utools.ExecutionResult{
+				Success:    false,
+				Message:    "下载图片失败",
+				Error:      err.Error(),
+				DurationMs: time.Since(startTime).Milliseconds(),
+			}, err
+		}
+		filePath = downloadedPath
+		tempFile = downloadedPath // 标记为临时文件
+		log.Info("图片下载成功: %s", filePath)
+	} else if fileObj, ok := config["file"].(map[string]interface{}); ok {
+		// 使用 file 对象
+		path, ok := fileObj["path"].(string)
+		if !ok || path == "" {
+			return &utools.ExecutionResult{
+				Success:    false,
+				Message:    "文件路径不存在",
+				Error:      "无法获取文件路径",
+				DurationMs: time.Since(startTime).Milliseconds(),
+			}, fmt.Errorf("文件路径为空")
+		}
+		filePath = path
+	} else {
 		return &utools.ExecutionResult{
 			Success:    false,
-			Message:    "文件参数格式错误",
-			Error:      "file 参数必须是文件对象",
+			Message:    "缺少必需参数",
+			Error:      "必须提供 file 对象或 url 参数",
 			DurationMs: time.Since(startTime).Milliseconds(),
-		}, fmt.Errorf("无效的文件参数")
+		}, fmt.Errorf("缺少 file 或 url 参数")
 	}
 
-	// 3. 获取文件路径
-	filePath, ok := fileObj["path"].(string)
-	if !ok || filePath == "" {
-		return &utools.ExecutionResult{
-			Success:    false,
-			Message:    "文件路径不存在",
-			Error:      "无法获取文件路径",
-			DurationMs: time.Since(startTime).Milliseconds(),
-		}, fmt.Errorf("文件路径为空")
+	// 确保在函数结束时清理临时文件
+	if tempFile != "" {
+		defer func() {
+			if err := os.Remove(tempFile); err != nil {
+				log.Info("清理临时文件失败: %s, error: %v", tempFile, err)
+			} else {
+				log.Info("已清理临时文件: %s", tempFile)
+			}
+		}()
 	}
 
 	// 4. 获取可选参数
@@ -382,6 +422,148 @@ func (t *PixelPunkUploadTool) handleError(code int, message string) error {
 		return fmt.Errorf("上传次数已用尽: 请等待下个周期或升级配额 (%s)", message)
 	default:
 		return fmt.Errorf("上传失败 (错误码: %d): %s", code, message)
+	}
+}
+
+// downloadFromURL 从 URL 下载文件到临时目录
+func (t *PixelPunkUploadTool) downloadFromURL(urlStr string) (string, error) {
+	// 1. 验证 URL
+	parsedURL, err := neturl.Parse(urlStr)
+	if err != nil {
+		return "", fmt.Errorf("无效的 URL: %w", err)
+	}
+	if parsedURL.Scheme != "http" && parsedURL.Scheme != "https" {
+		return "", fmt.Errorf("不支持的协议: %s (仅支持 http/https)", parsedURL.Scheme)
+	}
+
+	// 2. 创建 HTTP 客户端（60 秒超时，跟随重定向，可选禁用 SSL 验证）
+	client := &http.Client{
+		Timeout: 60 * time.Second,
+		Transport: &http.Transport{
+			TLSClientConfig: &tls.Config{InsecureSkipVerify: true}, // 允许自签名证书
+		},
+	}
+
+	// 3. 发送 GET 请求
+	req, err := http.NewRequest("GET", urlStr, nil)
+	if err != nil {
+		return "", fmt.Errorf("创建请求失败: %w", err)
+	}
+	req.Header.Set("User-Agent", "AutoForge-PixelPunk/1.0")
+
+	resp, err := client.Do(req)
+	if err != nil {
+		return "", fmt.Errorf("下载失败: %w", err)
+	}
+	defer resp.Body.Close()
+
+	// 4. 检查状态码
+	if resp.StatusCode != http.StatusOK {
+		return "", fmt.Errorf("下载失败: HTTP %d", resp.StatusCode)
+	}
+
+	// 5. 推断文件名
+	filename := t.inferFilename(urlStr, resp.Header.Get("Content-Type"))
+
+	// 6. 创建临时文件
+	tempDir := os.TempDir()
+	tempFile := filepath.Join(tempDir, filename)
+
+	outFile, err := os.Create(tempFile)
+	if err != nil {
+		return "", fmt.Errorf("创建临时文件失败: %w", err)
+	}
+	defer outFile.Close()
+
+	// 7. 写入文件
+	written, err := io.Copy(outFile, resp.Body)
+	if err != nil {
+		os.Remove(tempFile) // 清理失败的文件
+		return "", fmt.Errorf("保存文件失败: %w", err)
+	}
+
+	log.Info("文件下载完成: %s (%d bytes)", tempFile, written)
+	return tempFile, nil
+}
+
+// inferFilename 从 URL 或 Content-Type 推断文件名
+func (t *PixelPunkUploadTool) inferFilename(urlStr, contentType string) string {
+	// 1. 尝试从 URL 路径提取文件名
+	parsedURL, _ := neturl.Parse(urlStr)
+	if parsedURL != nil {
+		pathParts := strings.Split(parsedURL.Path, "/")
+		if len(pathParts) > 0 {
+			lastPart := pathParts[len(pathParts)-1]
+			// 检查是否有文件扩展名
+			if strings.Contains(lastPart, ".") {
+				// 清理文件名（移除查询参数等）
+				cleanName := regexp.MustCompile(`[?#].*`).ReplaceAllString(lastPart, "")
+				if cleanName != "" {
+					return cleanName
+				}
+			}
+		}
+	}
+
+	// 2. 根据 Content-Type 生成文件名
+	ext := ".png" // 默认扩展名
+	if strings.Contains(contentType, "image/jpeg") || strings.Contains(contentType, "image/jpg") {
+		ext = ".jpg"
+	} else if strings.Contains(contentType, "image/png") {
+		ext = ".png"
+	} else if strings.Contains(contentType, "image/gif") {
+		ext = ".gif"
+	} else if strings.Contains(contentType, "image/webp") {
+		ext = ".webp"
+	}
+
+	// 3. 生成唯一文件名
+	timestamp := time.Now().UnixNano()
+	return fmt.Sprintf("download_%d%s", timestamp, ext)
+}
+
+// GetExecutionConfig 返回工具执行配置（实现 ConfigurableTool 接口）
+func (t *PixelPunkUploadTool) GetExecutionConfig() *tooling.ExecutionConfig {
+	return &tooling.ExecutionConfig{
+		// 超时配置：上传可能需要较长时间
+		TimeoutSeconds: 120, // 2 分钟
+
+		// 重试配置：网络问题可以重试
+		Retry: &tooling.RetryConfig{
+			MaxRetries:        2,
+			InitialBackoff:    2000,  // 2 秒
+			MaxBackoff:        10000, // 10 秒
+			BackoffMultiplier: 2.0,
+			RetryableErrors: []string{
+				"timeout",
+				"connection",
+				"network",
+				"503",
+				"504",
+				"EOF",
+			},
+		},
+
+		// 依赖配置
+		Dependencies: &tooling.DependencyConfig{
+			// 需要图片 URL 或文件对象
+			Requires: []string{"image_url", "file_object"},
+
+			// 提供 CDN URL
+			Provides: []string{"cdn_url", "image_info"},
+
+			// 建议的前置工具
+			SuggestedPredecessors: []string{
+				"openai_image",    // AI 生成图片
+				"file_downloader", // 下载文件
+			},
+		},
+
+		// 缓存配置：相同的图片可以缓存
+		Cache: &tooling.CacheConfig{
+			Enabled: false, // 暂不启用（每次上传都会生成新的 URL）
+			TTL:     0,
+		},
 	}
 }
 

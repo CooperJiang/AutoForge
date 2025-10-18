@@ -28,6 +28,7 @@ type Config struct {
 	CORS     CORSConfig     `yaml:"cors" env:"CORS"`
 	Frontend FrontendConfig `yaml:"frontend" env:"FRONTEND"`
 	OAuth2   OAuth2Config   `yaml:"oauth2" env:"OAUTH2"`
+	Agent    AgentConfig    `yaml:"agent" env:"AGENT"`
 }
 
 // AppConfig 应用基础配置
@@ -150,6 +151,27 @@ type GitHubOAuth2Config struct {
 	Enabled      bool   `yaml:"enabled" env:"ENABLED"`
 }
 
+// AgentConfig Agent AI 配置
+type AgentConfig struct {
+	OpenAI        AgentOpenAIConfig        `yaml:"openai" env:"OPENAI"`
+	DefaultConfig AgentDefaultConfigStruct `yaml:"default_config" env:"DEFAULT_CONFIG"`
+}
+
+// AgentOpenAIConfig OpenAI 配置
+type AgentOpenAIConfig struct {
+	APIKey       string `yaml:"api_key" env:"API_KEY"`
+	BaseURL      string `yaml:"base_url" env:"BASE_URL"`
+	DefaultModel string `yaml:"default_model" env:"DEFAULT_MODEL"`
+	Timeout      int    `yaml:"timeout" env:"TIMEOUT"`
+}
+
+// AgentDefaultConfigStruct Agent 默认配置
+type AgentDefaultConfigStruct struct {
+	MaxSteps    int     `yaml:"max_steps" env:"MAX_STEPS"`
+	Temperature float64 `yaml:"temperature" env:"TEMPERATURE"`
+	Mode        string  `yaml:"mode" env:"MODE"`
+}
+
 var (
 	config Config
 	once   sync.Once
@@ -215,6 +237,10 @@ func loadConfigFromEnv(cfg *Config) {
 
 	// 处理OAuth2配置的环境变量
 	loadEnvToStruct(envPrefix+"OAUTH2_GITHUB_", &cfg.OAuth2.GitHub)
+
+	// 处理Agent配置的环境变量
+	loadEnvToStruct(envPrefix+"AGENT_OPENAI_", &cfg.Agent.OpenAI)
+	loadEnvToStruct(envPrefix+"AGENT_DEFAULT_CONFIG_", &cfg.Agent.DefaultConfig)
 }
 
 // loadEnvToStruct 加载环境变量到结构体

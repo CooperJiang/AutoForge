@@ -128,6 +128,9 @@ func autoMigrate() error {
 		&models.TemplateCategory{},
 		// 工具配置模型
 		&models.ToolConfig{},
+		// Agent 对话模型
+		&models.AgentConversation{},
+		&models.AgentMessage{},
 		// 在这里添加其他模型
 	)
 }

@@ -298,10 +298,28 @@ func (t *OpenAIImageTool) Execute(ctx *utools.ExecutionContext, toolConfig map[s
 		}, fmt.Errorf("no data in response, raw: %v", result)
 	}
 
+	// 提取第一张图片的信息（便于 AI 访问）
+	var imageURL, revisedPrompt string
+	if len(data) > 0 {
+		if firstImage, ok := data[0].(map[string]interface{}); ok {
+			if u, ok := firstImage["url"].(string); ok {
+				imageURL = u
+			}
+			if rp, ok := firstImage["revised_prompt"].(string); ok {
+				revisedPrompt = rp
+			}
+		}
+	}
+
 	return &utools.ExecutionResult{
 		Success: true,
 		Message: fmt.Sprintf("图片生成成功，共 %d 张", len(data)),
 		Output: map[string]interface{}{
+			// 顶级快捷字段（便于 AI 直接访问）
+			"url":            imageURL,
+			"revised_prompt": revisedPrompt,
+
+			// 完整响应（用于高级用户）
 			"response": result,
 		},
 		DurationMs: time.Since(startTime).Milliseconds(),

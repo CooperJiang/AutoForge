@@ -281,18 +281,23 @@ const handleExecute = () => {
       } else {
         const value = paramValues.value[param.key]
 
-        // 跳过空值（非必填）
-        if (!param.required && (value === '' || value === null || value === undefined)) {
+        // 如果有默认值且当前值为空，使用默认值
+        const finalValue = (value === '' || value === null || value === undefined)
+          ? param.defaultValue
+          : value
+
+        // 跳过空值且无默认值的非必填参数
+        if (!param.required && (finalValue === '' || finalValue === null || finalValue === undefined)) {
           return
         }
 
         // 类型转换后添加到 jsonParams
         if (param.type === 'number') {
-          jsonParams[param.key] = Number(value)
+          jsonParams[param.key] = Number(finalValue)
         } else if (param.type === 'boolean') {
-          jsonParams[param.key] = value === 'true' || value === true
+          jsonParams[param.key] = finalValue === 'true' || finalValue === true
         } else {
-          jsonParams[param.key] = value
+          jsonParams[param.key] = finalValue
         }
       }
     })
@@ -312,18 +317,23 @@ const handleExecute = () => {
     externalParams.value.forEach((param) => {
       const value = paramValues.value[param.key]
 
-      // 跳过空值（非必填）
-      if (!param.required && (value === '' || value === null || value === undefined)) {
+      // 如果有默认值且当前值为空，使用默认值
+      const finalValue = (value === '' || value === null || value === undefined)
+        ? param.defaultValue
+        : value
+
+      // 跳过空值且无默认值的非必填参数
+      if (!param.required && (finalValue === '' || finalValue === null || finalValue === undefined)) {
         return
       }
 
       // 类型转换
       if (param.type === 'number') {
-        params[param.key] = Number(value)
+        params[param.key] = Number(finalValue)
       } else if (param.type === 'boolean') {
-        params[param.key] = value === 'true' || value === true
+        params[param.key] = finalValue === 'true' || finalValue === true
       } else {
-        params[param.key] = value
+        params[param.key] = finalValue
       }
     })
 

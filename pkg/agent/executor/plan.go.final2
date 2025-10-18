@@ -1,0 +1,450 @@
+package executor
+
+import (
+	"auto-forge/internal/models"
+	"auto-forge/pkg/agent/llm"
+	"auto-forge/pkg/agent/prompt"
+	"auto-forge/pkg/agent/registry"
+	"context"
+	"encoding/json"
+	"fmt"
+	"time"
+)
+
+// PlanExecutor Plan 执行器
+type PlanExecutor struct {
+	llmClient    llm.LLMClient
+	toolRegistry *registry.ToolRegistry
+	temperature  float64
+}
+
+// NewPlanExecutor 创建 Plan 执行器
+func NewPlanExecutor(
+	llmClient llm.LLMClient,
+	toolRegistry *registry.ToolRegistry,
+	temperature float64,
+) *PlanExecutor {
+	return &PlanExecutor{
+		llmClient:    llmClient,
+		toolRegistry: toolRegistry,
+		temperature:  temperature,
+	}
+}
+
+// Execute 执行 Plan 模式
+func (e *PlanExecutor) Execute(
+	ctx context.Context,
+	userMessage string,
+	conversationHistory string,
+	allowedTools []string,
+	maxSteps int,
+	streamCallback func(event StreamEvent),
+) (*ExecutionResult, error) {
+	startTime := time.Now()
+
+	// Step 1: 生成计划
+	plan, err := e.generatePlan(ctx, userMessage, conversationHistory, allowedTools)
+	if err != nil {
+		return nil, fmt.Errorf("生成计划失败: %w", err)
+	}
+
+	log.Info(ctx, "生成计划成功，共 %d 步", len(plan.Steps))
+
+	// 发送计划开始事件
+	if streamCallback != nil {
+		streamCallback(StreamEvent{
+			Type: "plan_start",
+			Data: map[string]interface{}{
+				"plan": plan,
+			},
+		})
+	}
+
+	// Step 2: 执行计划
+	trace := &models.AgentTrace{
+		Steps:     []models.AgentStep{},
+		UsedTools: make(map[string]interface{}),
+	}
+
+	for i, planStep := range plan.Steps {
+		if i >= maxSteps {
+			log.Warn(ctx, "达到最大步骤数 %d", maxSteps)
+			break
+		}
+
+		// 更新计划步骤状态
+		plan.Steps[i].Status = "running"
+		if streamCallback != nil {
+			streamCallback(StreamEvent{
+				Type: "plan_step",
+				Data: map[string]interface{}{
+					"step_index": i,
+					"status":     "running",
+				},
+			})
+		}
+
+		// 执行步骤
+		step, err := e.executeStep(ctx, planStep, i+1, streamCallback)
+		if err != nil {
+			log.Error(ctx, "执行步骤 %d 失败: %v", i+1, err)
+			plan.Steps[i].Status = "failed"
+
+			if streamCallback != nil {
+				streamCallback(StreamEvent{
+					Type: "plan_step",
+					Data: map[string]interface{}{
+						"step_index": i,
+						"status":     "failed",
+						"error":      err.Error(),
+					},
+				})
+			}
+
+			// 继续执行下一步（可选：也可以选择终止）
+			step.Error = err.Error()
+		} else {
+			plan.Steps[i].Status = "completed"
+			if streamCallback != nil {
+				streamCallback(StreamEvent{
+					Type: "plan_step",
+					Data: map[string]interface{}{
+						"step_index": i,
+						"status":     "completed",
+					},
+				})
+			}
+		}
+
+		trace.Steps = append(trace.Steps, *step)
+
+		// 更新工具使用统计
+		if step.Action != nil && step.Action.Tool != "" {
+			if _, ok := trace.UsedTools[step.Action.Tool]; !ok {
+				trace.UsedTools[step.Action.Tool] = map[string]interface{}{
+					"count":    0,
+					"total_ms": int64(0),
+				}
+			}
+			stats := trace.UsedTools[step.Action.Tool].(map[string]interface{})
+			stats["count"] = stats["count"].(int) + 1
+			stats["total_ms"] = stats["total_ms"].(int64) + step.ElapsedMs
+			trace.UsedTools[step.Action.Tool] = stats
+		}
+	}
+
+	// Step 3: 生成最终答案
+	finalAnswer, err := e.generateFinalAnswer(ctx, userMessage, trace)
+	if err != nil {
+		log.Error(ctx, "生成最终答案失败: %v", err)
+		finalAnswer = "任务已执行完成，但生成总结失败。"
+	}
+
+	trace.FinalAnswer = finalAnswer
+	trace.FinishReason = "final"
+	trace.TotalMs = time.Since(startTime).Milliseconds()
+
+	// 发送最终事件
+	if streamCallback != nil {
+		streamCallback(StreamEvent{
+			Type: "final",
+			Data: map[string]interface{}{
+				"answer":        finalAnswer,
+				"finish_reason": "final",
+				"trace":         trace,
+			},
+		})
+	}
+
+	return &ExecutionResult{
+		Trace:   trace,
+		Success: true,
+	}, nil
+}
+
+// generatePlan 生成执行计划
+func (e *PlanExecutor) generatePlan(
+	ctx context.Context,
+	userMessage string,
+	conversationHistory string,
+	allowedTools []string,
+) (*models.AgentPlan, error) {
+	// 获取工具定义
+	toolDefinitions := e.toolRegistry.GetToolDefinitions(allowedTools)
+
+	// 转换为 map 格式
+	toolDefs := make([]map[string]interface{}, len(toolDefinitions))
+	for i, td := range toolDefinitions {
+		toolDefs[i] = map[string]interface{}{
+			"type":     td.Type,
+			"function": td.Function,
+		}
+	}
+
+	// 构建提示词
+	toolDefsStr := prompt.FormatToolDefinitions(toolDefs)
+	promptText := prompt.PlanPrompt.Render(map[string]string{
+		"tool_definitions": toolDefsStr,
+		"user_message":     userMessage,
+	})
+
+	// 调用 LLM
+	messages := []llm.Message{
+		{
+			Role:    "system",
+			Content: "You are a planning AI. Generate execution plans in JSON format.",
+		},
+		{
+			Role:    "user",
+			Content: promptText,
+		},
+	}
+
+	response, err := e.llmClient.Call(ctx, messages, &llm.CallOptions{
+		Temperature:    e.temperature,
+		ResponseFormat: "json_object",
+	})
+
+	if err != nil {
+		return nil, fmt.Errorf("LLM 调用失败: %w", err)
+	}
+
+	// 解析计划
+	var planData struct {
+		Steps []struct {
+			Step        int    `json:"step"`
+			Description string `json:"description"`
+			Tool        string `json:"tool"`
+			Reasoning   string `json:"reasoning"`
+		} `json:"steps"`
+	}
+
+	if err := json.Unmarshal([]byte(response.Content), &planData); err != nil {
+		return nil, fmt.Errorf("解析计划失败: %w", err)
+	}
+
+	// 构建计划
+	plan := &models.AgentPlan{
+		Steps:       make([]models.AgentPlanStep, len(planData.Steps)),
+		TotalSteps:  len(planData.Steps),
+		CreatedAt:   time.Now().Format(time.RFC3339),
+		GeneratedBy: e.llmClient.GetModelInfo().Model,
+	}
+
+	for i, s := range planData.Steps {
+		plan.Steps[i] = models.AgentPlanStep{
+			Step:        s.Step,
+			Description: s.Description,
+			Tool:        s.Tool,
+			Status:      "pending",
+		}
+	}
+
+	return plan, nil
+}
+
+// executeStep 执行单个步骤
+func (e *PlanExecutor) executeStep(
+	ctx context.Context,
+	planStep models.AgentPlanStep,
+	stepIndex int,
+	streamCallback func(event StreamEvent),
+) (*models.AgentStep, error) {
+	stepStartTime := time.Now()
+
+	// 发送步骤开始事件
+	if streamCallback != nil {
+		streamCallback(StreamEvent{
+			Type: "step_start",
+			Data: map[string]interface{}{
+				"step": stepIndex,
+				"tool": planStep.Tool,
+			},
+		})
+	}
+
+	// 如果没有指定工具，跳过执行
+	if planStep.Tool == "" {
+		observation := planStep.Description
+		elapsedMs := time.Since(stepStartTime).Milliseconds()
+
+		step := &models.AgentStep{
+			Step:        stepIndex,
+			Observation: observation,
+			ElapsedMs:   elapsedMs,
+			Timestamp:   time.Now().Format(time.RFC3339),
+		}
+
+		if streamCallback != nil {
+			streamCallback(StreamEvent{
+				Type: "step_end",
+				Data: map[string]interface{}{
+					"step":        stepIndex,
+					"observation": observation,
+					"elapsed_ms":  elapsedMs,
+				},
+			})
+		}
+
+		return step, nil
+	}
+
+	// 使用 LLM 生成工具参数
+	args, err := e.generateToolArgs(ctx, planStep)
+	if err != nil {
+		return nil, fmt.Errorf("生成工具参数失败: %w", err)
+	}
+
+	log.Info(ctx, "执行工具: %s, 参数: %v", planStep.Tool, args)
+
+	// 执行工具
+	toolResult, toolErr := e.toolRegistry.Execute(ctx, planStep.Tool, args)
+
+	// 格式化结果
+	var observation string
+	var toolOutput interface{}
+
+	if toolErr != nil {
+		observation = fmt.Sprintf("Error: %s", toolErr.Error())
+		log.Error(ctx, "工具执行失败: %v", toolErr)
+	} else {
+		toolOutput = toolResult
+		observation = registry.FormatToolResult(toolResult)
+		log.Info(ctx, "工具执行成功，结果长度: %d", len(observation))
+	}
+
+	elapsedMs := time.Since(stepStartTime).Milliseconds()
+
+	// 构建步骤
+	step := &models.AgentStep{
+		Step: stepIndex,
+		Action: &models.AgentAction{
+			Type: "action",
+			Tool: planStep.Tool,
+			Args: args,
+		},
+		Observation: observation,
+		ToolOutput:  toolOutput.(map[string]interface{}),
+		ElapsedMs:   elapsedMs,
+		Timestamp:   time.Now().Format(time.RFC3339),
+	}
+
+	if toolErr != nil {
+		step.Error = toolErr.Error()
+	}
+
+	// 发送步骤结束事件
+	if streamCallback != nil {
+		streamCallback(StreamEvent{
+			Type: "step_end",
+			Data: map[string]interface{}{
+				"step":        stepIndex,
+				"tool":        planStep.Tool,
+				"observation": observation,
+				"elapsed_ms":  elapsedMs,
+			},
+		})
+	}
+
+	if toolErr != nil {
+		return step, toolErr
+	}
+
+	return step, nil
+}
+
+// generateToolArgs 使用 LLM 生成工具参数
+func (e *PlanExecutor) generateToolArgs(
+	ctx context.Context,
+	planStep models.AgentPlanStep,
+) (map[string]interface{}, error) {
+	// 获取工具定义
+	tool, err := e.toolRegistry.GetTool(planStep.Tool)
+	if err != nil {
+		return nil, err
+	}
+
+	schema := tool.GetConfigSchema()
+	schemaJSON, _ := json.Marshal(schema)
+
+	// 构建提示词
+	promptText := fmt.Sprintf(`Generate parameters for the following tool call:
+
+Tool: %s
+Description: %s
+Task: %s
+Parameter Schema: %s
+
+Return ONLY a JSON object with the required parameters. Do not include any explanation.`,
+		planStep.Tool,
+		tool.GetDescription(),
+		planStep.Description,
+		string(schemaJSON),
+	)
+
+	messages := []llm.Message{
+		{
+			Role:    "user",
+			Content: promptText,
+		},
+	}
+
+	response, err := e.llmClient.Call(ctx, messages, &llm.CallOptions{
+		Temperature:    0.3, // 低温度以获得更确定的结果
+		ResponseFormat: "json_object",
+	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	// 解析参数
+	var args map[string]interface{}
+	if err := json.Unmarshal([]byte(response.Content), &args); err != nil {
+		return nil, fmt.Errorf("解析工具参数失败: %w", err)
+	}
+
+	return args, nil
+}
+
+// generateFinalAnswer 生成最终答案
+func (e *PlanExecutor) generateFinalAnswer(
+	ctx context.Context,
+	userMessage string,
+	trace *models.AgentTrace,
+) (string, error) {
+	// 格式化执行轨迹
+	steps := make([]map[string]interface{}, len(trace.Steps))
+	for i, step := range trace.Steps {
+		steps[i] = map[string]interface{}{
+			"step":        step.Step,
+			"action":      step.Action,
+			"observation": step.Observation,
+		}
+	}
+
+	traceStr := prompt.FormatExecutionTrace(steps)
+
+	// 构建提示词
+	promptText := prompt.SummaryPrompt.Render(map[string]string{
+		"user_message":    userMessage,
+		"execution_trace": traceStr,
+	})
+
+	messages := []llm.Message{
+		{
+			Role:    "user",
+			Content: promptText,
+		},
+	}
+
+	response, err := e.llmClient.Call(ctx, messages, &llm.CallOptions{
+		Temperature: 0.7,
+	})
+
+	if err != nil {
+		return "", err
+	}
+
+	return response.Content, nil
+}

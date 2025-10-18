@@ -232,10 +232,7 @@
           v-else-if="node.toolCode === 'gemini_chat'"
           v-model:config="localNode.config"
         />
-        <RSSFeedConfig
-          v-else-if="node.toolCode === 'rss_feed'"
-          v-model:config="localNode.config"
-        />
+        <RSSFeedConfig v-else-if="node.toolCode === 'rss_feed'" v-model:config="localNode.config" />
       </div>
 
       <div v-if="node.type === 'external_trigger'" class="border-t border-border-primary pt-4">

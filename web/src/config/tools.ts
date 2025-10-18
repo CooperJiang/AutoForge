@@ -22,6 +22,7 @@ import {
   TrendingUp,
   Briefcase,
   CircleDot,
+  Brain,
 } from 'lucide-vue-next'
 
 export interface ToolUsageItem {

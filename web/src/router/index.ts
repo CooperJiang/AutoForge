@@ -110,6 +110,16 @@ const router = createRouter({
         },
       ],
     },
+    // Agent 独立页面（不使用 Layout）
+    {
+      path: '/agent',
+      name: 'agent',
+      component: () => import('@/pages/Agent/index.vue'),
+      meta: {
+        title: 'AI Agent',
+        requiresAuth: true,
+      },
+    },
 
     {
       path: '/admin/login',
@@ -158,7 +168,15 @@ router.beforeEach((to, from, next) => {
   const publicPaths = ['/auth', '/admin/login']
   const isPublicPath = publicPaths.includes(to.path)
 
-  if (!isPublicPath && !token) {
+  // 检查是否需要认证
+  const requiresAuth = to.meta.requiresAuth === true
+
+  if (!isPublicPath && !token && requiresAuth) {
+    next({ name: 'auth' })
+    return
+  }
+
+  if (!isPublicPath && !token && !requiresAuth) {
     next({ name: 'auth' })
     return
   }
