@@ -10,6 +10,7 @@ import (
 	"io"
 	"net/http"
 	"strconv"
+	"strings"
 	"time"
 
 	"go.uber.org/zap"
@@ -84,7 +85,7 @@ func NewFeishuTool() *FeishuTool {
 			"post_content": {
 				Type:        "string",
 				Title:       "富文本内容",
-				Description: "富文本消息内容，支持 Markdown 格式（当消息类型为 post 时使用）",
+				Description: "富文本消息的 content 数组（JSON格式），支持 text/a/at/img/md/hr/code_block 等标签。示例：[[{\"tag\":\"text\",\"text\":\"内容\"}],[{\"tag\":\"a\",\"href\":\"http://xxx\",\"text\":\"链接\"}]]",
 			},
 			"image_url": {
 				Type:        "string",
@@ -283,25 +284,145 @@ func (t *FeishuTool) buildTextMessage(config map[string]interface{}) (map[string
 
 func (t *FeishuTool) buildPostMessage(config map[string]interface{}) (map[string]interface{}, error) {
 	title, _ := config["title"].(string)
-	postContent, _ := config["post_content"].(string)
+	postContentRaw := config["post_content"]
 
-	if title == "" {
-		title = "通知"
-	}
-	if postContent == "" {
+	if postContentRaw == nil {
 		return nil, fmt.Errorf("富文本内容不能为空")
 	}
 
+	// 情况1: post_content 已经是数组（workflow 变量解析后的结果）
+	if contentArray, ok := postContentRaw.([]interface{}); ok {
+		// 检查是否是二维数组 [[{...}], [{...}]]
+		contentLines := make([][]interface{}, 0, len(contentArray))
+		for _, line := range contentArray {
+			if lineArray, ok := line.([]interface{}); ok {
+				contentLines = append(contentLines, lineArray)
+			} else {
+				// 如果不是二维数组，包装成一行
+				contentLines = append(contentLines, []interface{}{line})
+			}
+		}
 
-	contentLines := t.parseMarkdownToFeishu(postContent)
+		if len(contentLines) == 0 {
+			return nil, fmt.Errorf("富文本内容不能为空")
+		}
 
+		if title == "" {
+			title = "通知"
+		}
+		return map[string]interface{}{
+			"msg_type": "post",
+			"content": map[string]interface{}{
+				"post": map[string]interface{}{
+					"zh_cn": map[string]interface{}{
+						"title":   title,
+						"content": contentLines,
+					},
+				},
+			},
+		}, nil
+	}
+
+	// 情况2: post_content 是 map（完整格式 {"zh_cn": {...}}）
+	if fullFormat, ok := postContentRaw.(map[string]interface{}); ok {
+		// 检查是否是完整格式（包含 zh_cn 或 en_us）
+		if zhCn, ok := fullFormat["zh_cn"].(map[string]interface{}); ok {
+			if _, hasContent := zhCn["content"]; hasContent {
+				return map[string]interface{}{
+					"msg_type": "post",
+					"content": map[string]interface{}{
+						"post": fullFormat,
+					},
+				}, nil
+			}
+		}
+		if enUs, ok := fullFormat["en_us"].(map[string]interface{}); ok {
+			if _, hasContent := enUs["content"]; hasContent {
+				return map[string]interface{}{
+					"msg_type": "post",
+					"content": map[string]interface{}{
+						"post": fullFormat,
+					},
+				}, nil
+			}
+		}
+	}
+
+	// 情况3: post_content 是字符串（需要 JSON 解析）
+	postContent, ok := postContentRaw.(string)
+	if !ok || postContent == "" {
+		return nil, fmt.Errorf("富文本内容不能为空")
+	}
+
+	// 处理字符串中的实际换行符（JSON 不允许字符串中有实际换行符）
+	postContent = strings.ReplaceAll(postContent, "\n", "")
+	postContent = strings.ReplaceAll(postContent, "\r", "")
+
+	// 先尝试解析为完整的飞书富文本格式 {"zh_cn": {"title": "...", "content": [[...]]}}
+	var fullFormat map[string]interface{}
+	if err := json.Unmarshal([]byte(postContent), &fullFormat); err == nil {
+		// 检查是否是完整格式（包含 zh_cn 或 en_us）
+		if zhCn, ok := fullFormat["zh_cn"].(map[string]interface{}); ok {
+			if _, hasContent := zhCn["content"]; hasContent {
+				// 完整格式，直接使用
+				return map[string]interface{}{
+					"msg_type": "post",
+					"content": map[string]interface{}{
+						"post": fullFormat,
+					},
+				}, nil
+			}
+		}
+		if enUs, ok := fullFormat["en_us"].(map[string]interface{}); ok {
+			if _, hasContent := enUs["content"]; hasContent {
+				// 完整格式，直接使用
+				return map[string]interface{}{
+					"msg_type": "post",
+					"content": map[string]interface{}{
+						"post": fullFormat,
+					},
+				}, nil
+			}
+		}
+	}
+
+	// 再尝试解析为纯 content 数组格式 [[{...}], [{...}]]
+	var contentLines [][]interface{}
+	if err := json.Unmarshal([]byte(postContent), &contentLines); err == nil {
+		if title == "" {
+			title = "通知"
+		}
+		return map[string]interface{}{
+			"msg_type": "post",
+			"content": map[string]interface{}{
+				"post": map[string]interface{}{
+					"zh_cn": map[string]interface{}{
+						"title":   title,
+						"content": contentLines,
+					},
+				},
+			},
+		}, nil
+	}
+
+	// 都失败则当作纯文本处理
+	if title == "" {
+		title = "通知"
+	}
 	return map[string]interface{}{
 		"msg_type": "post",
 		"content": map[string]interface{}{
 			"post": map[string]interface{}{
 				"zh_cn": map[string]interface{}{
-					"title":   title,
-					"content": contentLines,
+					"title": title,
+					"content": [][]interface{}{
+						{
+							map[string]interface{}{
+								"tag":  "text",
+								"text": postContent,
+							},
+						},
+					},
 				},
 			},
 		},
@@ -535,22 +656,6 @@ func (t *FeishuTool) buildCardByTemplate(template string, config map[string]inte
 		"header":   header,
 		"elements": elements,
 	}, nil
-}
-
-
-func (t *FeishuTool) parseMarkdownToFeishu(markdown string) [][]interface{} {
-	lines := [][]interface{}{}
-
-
-	line := []interface{}{
-		map[string]interface{}{
-			"tag":  "text",
-			"text": markdown,
-		},
-	}
-	lines = append(lines, line)
-
-	return lines
 }
 
 
