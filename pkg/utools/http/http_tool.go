@@ -120,20 +120,47 @@ func (t *HTTPTool) Execute(ctx *utools.ExecutionContext, config map[string]inter
 	}
 
 
+	// 处理 headers：支持数组格式 [{key, value}] 和对象格式 {key: value}
 	if headers, ok := config["headers"].(map[string]interface{}); ok {
+		// 对象格式
 		for key, value := range headers {
 			if strValue, ok := value.(string); ok {
 				req.Header.Set(key, strValue)
 			}
 		}
+	} else if headersArray, ok := config["headers"].([]interface{}); ok {
+		// 数组格式 [{key: "xxx", value: "yyy"}, ...]
+		for _, item := range headersArray {
+			if headerMap, ok := item.(map[string]interface{}); ok {
+				key, _ := headerMap["key"].(string)
+				value, _ := headerMap["value"].(string)
+				if key != "" {
+					req.Header.Set(key, value)
+				}
+			}
+		}
 	}
 
-
+	// 处理 params：支持数组格式 [{key, value}] 和对象格式 {key: value}
+	q := req.URL.Query()
 	if params, ok := config["params"].(map[string]interface{}); ok {
-		q := req.URL.Query()
+		// 对象格式
 		for key, value := range params {
 			q.Add(key, fmt.Sprintf("%v", value))
 		}
+	} else if paramsArray, ok := config["params"].([]interface{}); ok {
+		// 数组格式 [{key: "xxx", value: "yyy"}, ...]
+		for _, item := range paramsArray {
+			if paramMap, ok := item.(map[string]interface{}); ok {
+				key, _ := paramMap["key"].(string)
+				value, _ := paramMap["value"].(string)
+				if key != "" {
+					q.Add(key, value)
+				}
+			}
+		}
+	}
+	if len(q) > 0 {
 		req.URL.RawQuery = q.Encode()
 	}
 
